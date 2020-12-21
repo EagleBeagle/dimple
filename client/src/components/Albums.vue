@@ -1,7 +1,9 @@
 <template>
 <v-container class="px-8 album-container" fluid>
     <v-row justify="start">
-      <div class="display-1 my-2">Your Albums</div>
+      <v-col class="pb-0" style="text-align: left">
+        <div class="display-1 my-2">Your Albums</div>
+      </v-col>
     </v-row>
     <v-row justify="start">
       <v-col xs="4" lg="3" v-for="album in albums" :key="album.id">
