@@ -3,18 +3,17 @@ const db = require('../config/db.config.js')
 const Op = db.Sequelize.Op
 const Image = db.image
 const Album = db.album
-const b2 = require('../config/b2.config.js')
+const cloudinary = require('../config/cloudinary.config.js')
 
 module.exports = {
-  async upload (req, res) {
+  async initiateUpload (req, res) {
     try {
       const visibility = req.body.visibility
-      const albums = req.body.albums ? req.body.albums.split(',') : []
-      const id = uuidv4()
+      const albums = req.body.albums
+      const publicId = uuidv4()
       const image = await Image.create({
-        id: `${req.user.username}/${id}.${req.file.mimetype.split('/')[1]}`,
+        id: publicId,
         visibility: visibility,
-        uploaded: false,
         userId: req.user.id
       })
       const storedAlbums = await Album.findAll({
@@ -26,21 +25,60 @@ module.exports = {
       })
       await image.addAlbums(storedAlbums)
 
-      await b2.authorize()
-      const { uploadUrl, authorizationToken } = (await b2.getUploadUrl({
-        bucketId: process.env.B2_BUCKET_ID
-      })).data
-      await b2.uploadFile({
-        uploadUrl: uploadUrl,
-        uploadAuthToken: authorizationToken,
-        fileName: image.id,
-        data: req.file.buffer,
-        mime: req.file.mimetype
+      const timestamp = Math.round((new Date()).getTime() / 1000)
+      const signature = cloudinary.utils.api_sign_request({ timestamp, public_id: publicId, folder: req.user.username }, process.env.CLOUDINARY_API_SECRET)
+      console.log(timestamp)
+      console.log(publicId)
+      console.log(signature)
+      res.status(201).send({
+        timestamp,
+        signature,
+        publicId
       })
-      res.status(201).send(image)
     } catch (err) {
       console.log(err)
       res.status(500).send('An error happened during image upload')
+    }
+  },
+
+  async finalizeUpload (req, res) {
+    try {
+      const publicId = req.body.publicId
+      const url = req.body.url
+      console.log('retekRETEKETEKTEKTKETKTEKETKETKETKETKETKEKTEKTEKTKEK')
+      console.log(publicId)
+      console.log(url)
+      const image = await Image.findByPk(publicId)
+      if (image) {
+        await image.update({
+          url: url
+        })
+      } else {
+        res.status(404).send('Image with given ID not found')
+      }
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('An error happened during upload verification')
+    }
+  },
+
+  async deleteImage (req, res) { // most csak saját user, később admin is
+    try {
+      const imageId = req.params.imageId
+      const userId = req.user.id
+      const image = await Image.findByPk(imageId)
+      if (!image) {
+        return res.status(404).send('Image not found')
+      }
+      if (image.userId === userId) {
+        await image.destroy()
+        return res.status(200).send()
+      } else {
+        return res.status(403).send('Unauthorized')
+      }
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('An error happened while deleting the image')
     }
   },
 
@@ -64,7 +102,7 @@ module.exports = {
     }
   },
 
-  async getSingleFile (req, res) {
+  async getSingleFile (req, res) { // probably nem kell már
     try {
       const image = await Image.findByPk(`${req.params.username}/${req.params.filename}`)
 

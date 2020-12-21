@@ -3,7 +3,7 @@
   width="1200"
   v-model="dialog">
   <v-card>
-    <v-img v-if="image" :src="image.src"></v-img>
+    <v-img v-if="image" :src="image.url"></v-img>
   </v-card>
   </v-dialog>
 </template>

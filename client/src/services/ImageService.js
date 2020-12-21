@@ -1,8 +1,21 @@
-import Api from '@/services/Api'
+import Api from '@/services/DimpleApi'
+import CloudinaryApi from '@/services/CloudinaryApi'
 
 export default {
+  initiateUpload (data) {
+    return Api().put('/image', data)
+  },
+
   upload (data) {
-    return Api().put('image', data)
+    return CloudinaryApi().post('', data)
+  },
+
+  finalizeUpload (data) {
+    return Api().post('image/finalize', data)
+  },
+
+  delete (imageId) {
+    return Api().delete(`image/${imageId}`)
   },
 
   get (data) {

@@ -4,9 +4,15 @@ import vuetify from './plugins/vuetify'
 import router from './router'
 import store from './store/store'
 import VueKinesis from 'vue-kinesis'
+import Cloudinary from 'cloudinary-vue'
 
 Vue.config.productionTip = false
 Vue.use(VueKinesis)
+Vue.use(Cloudinary, {
+  configuration: {
+    cloudName: process.env.CLOUDINARY_NAME
+  }
+})
 
 new Vue({
   vuetify,

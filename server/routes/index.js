@@ -4,12 +4,6 @@ const UserControllerValidator = require('../policies/UserControllerValidator.js'
 const AlbumController = require('../controllers/AlbumController.js')
 const ImageController = require('../controllers/ImageController.js')
 
-const multer = require('multer')
-const storage = multer.memoryStorage()
-const upload = multer({
-  storage: storage
-})
-
 module.exports = app => {
   app.post('/signup',
     UserControllerValidator.signup,
@@ -35,9 +29,16 @@ module.exports = app => {
     AlbumController.get)
 
   app.put('/image',
-    upload.single('image'),
     verifyAuth.isLoggedIn,
-    ImageController.upload)
+    ImageController.initiateUpload)
+
+  app.post('/image/finalize',
+    verifyAuth.isLoggedIn,
+    ImageController.finalizeUpload)
+
+  app.delete('/image/:imageId',
+    verifyAuth.isLoggedIn,
+    ImageController.deleteImage)
 
   app.get('/image',
     verifyAuth.isLoggedIn,

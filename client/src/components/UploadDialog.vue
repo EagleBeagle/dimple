@@ -73,6 +73,7 @@
 
 <script>
 import AlbumService from '@/services/AlbumService'
+import ImageService from '@/services/ImageService'
 import { mapState } from 'vuex'
 export default {
   computed: {
@@ -106,10 +107,20 @@ export default {
   methods: {
     async upload() {
       try {
+        const response = (await ImageService.initiateUpload({
+          visibility: this.visibility === 'Private' ? 0 : 1,
+          albums: this.selectedAlbums
+        })).data
         const formData = new FormData()
-        formData.append('image', this.imageData)
-        formData.append('visibility', this.visibility === 'Private' ? 0 : 1)
-        formData.append('albums', this.selectedAlbums)
+        formData.append('file', this.imageData)
+        formData.append('signature', response.signature)
+        formData.append('timestamp', response.timestamp)
+        formData.append('public_id', response.publicId)
+        formData.append('folder', this.$store.state.user.username)
+        formData.append('api_key', process.env.VUE_APP_CLOUDINARY_API_KEY)
+        console.log(response.timestamp)
+        console.log(response.publicId)
+        console.log(response.signature)
         this.$store.dispatch('initiateUpload', formData)
         this.show = false
       } catch (err) {

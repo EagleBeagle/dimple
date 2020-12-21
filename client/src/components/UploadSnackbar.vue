@@ -45,10 +45,12 @@ export default {
   watch: {
     async imageUploadData (value) {
       if (value) {
+        let response
+        const imageUploadData = value
         try {
-          const imageUploadData = value
           this.show = true
-          const response = await ImageService.upload(imageUploadData)
+          response = await ImageService.upload(imageUploadData)
+          console.log(response)
           this.showLoadingCircle = false
           this.title = 'Upload Complete'
           this.showSuccess = true
@@ -57,7 +59,18 @@ export default {
             this.clear()
           }, 2000)
           this.$store.dispatch('finishUpload')
+          await ImageService.finalizeUpload({
+            publicId: imageUploadData.get('public_id'),
+            url: response.data.secure_url
+          })
         } catch (err) {
+          if (!response || response.status !== 200) {
+            try {
+              await ImageService.delete(imageUploadData.get('public_id'))
+            } catch (err) {
+              console.log(err)
+            }
+          }
           this.showFailre = true
           this.title = 'Upload Failed'
           this.showLoadingCircle = false
