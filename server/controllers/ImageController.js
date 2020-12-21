@@ -10,6 +10,7 @@ module.exports = {
     try {
       const visibility = req.body.visibility
       const albums = req.body.albums
+      console.log(albums)
       const publicId = uuidv4()
       const image = await Image.create({
         id: publicId,
@@ -19,7 +20,7 @@ module.exports = {
       const storedAlbums = await Album.findAll({
         where: {
           name: {
-            [Op.or]: albums
+            [Op.in]: albums
           }
         }
       })
