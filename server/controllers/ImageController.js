@@ -63,6 +63,24 @@ module.exports = {
     }
   },
 
+  async cancelUpload (req, res) {
+    try {
+      const imageId = req.params.imageId
+      const image = await Image.findByPk(imageId)
+      if (!image) {
+        return res.status(404).send('Image not found')
+      }
+      if (image.url) {
+        return res.status(400).send()
+      }
+      await image.destroy()
+      res.status(200).send()
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('Failed to cancel upload')
+    }
+  },
+
   async deleteImage (req, res) { // most csak saját user, később admin is
     try {
       const imageId = req.params.imageId

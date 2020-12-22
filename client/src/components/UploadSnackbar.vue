@@ -15,7 +15,9 @@
         </v-col>
         <v-spacer></v-spacer>
         <v-col xs="4" class="snack-column d-flex justify-end">
-          <v-progress-circular v-if="showLoadingCircle" indeterminate color="blue" />
+          <v-progress-circular v-if="showLoadingCircle" :value="progress" rotate="-90" color="blue">
+            {{ progress }}
+          </v-progress-circular>
           <v-icon v-if="showSuccess" color="green">mdi-emoticon-happy</v-icon>
           <v-icon v-if="showFailure" color="red">mdi-emoticon-sad</v-icon>
         </v-col>
@@ -34,8 +36,30 @@ export default {
       title: 'Uploading Photo',
       showLoadingCircle: true,
       showSuccess: false,
-      showFailure: false
+      showFailure: false,
+      uploading: false,
+      progress: 0
     }
+  },
+  beforeMount () {
+    
+    window.addEventListener('unload', () => {
+      if (!this.uploading) return
+      try {
+        console.log('lelelelel')
+        ImageService.cancelUpload(this.imageUploadData.get('public_id'))
+      } catch (err) {
+        console.log(err)
+      }
+    })
+    window.addEventListener('beforeunload', async event => {
+      if (!this.uploading) return
+      console.log(event)
+      event.preventDefault()
+      event.returnValue = ""
+      console.log(event)
+      return 'sadadasdsadasdsa'
+    })
   },
   computed: {
     ...mapState([
@@ -49,7 +73,9 @@ export default {
         const imageUploadData = value
         try {
           this.show = true
-          response = await ImageService.upload(imageUploadData)
+          this.uploading = true
+          response = await ImageService.upload(imageUploadData, this.uploadProgress)
+          this.uploading = false
           console.log(response)
           this.showLoadingCircle = false
           this.title = 'Upload Complete'
@@ -71,6 +97,7 @@ export default {
               console.log(err)
             }
           }
+          this.uploading = false
           this.showFailre = true
           this.title = 'Upload Failed'
           this.showLoadingCircle = false
@@ -91,6 +118,9 @@ export default {
       this.title = 'Uploading Photo'
       this.showSuccess = false
       this.showFailure = false
+    },
+    uploadProgress(percent) {
+      this.progress = percent
     }
   }
 }

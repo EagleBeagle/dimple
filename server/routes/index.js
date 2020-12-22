@@ -36,6 +36,9 @@ module.exports = app => {
     verifyAuth.isLoggedIn,
     ImageController.finalizeUpload)
 
+  app.post('/image/:imageId/cancelupload',
+    ImageController.cancelUpload)
+
   app.delete('/image/:imageId',
     verifyAuth.isLoggedIn,
     ImageController.deleteImage)
