@@ -5,6 +5,8 @@ import router from './router'
 import store from './store/store'
 import VueKinesis from 'vue-kinesis'
 import Cloudinary from 'cloudinary-vue'
+import { VueMasonryPlugin } from 'vue-masonry'
+import VueSelectImage from 'vue-select-image'
 
 Vue.config.productionTip = false
 Vue.use(VueKinesis)
@@ -13,6 +15,9 @@ Vue.use(Cloudinary, {
     cloudName: process.env.CLOUDINARY_NAME
   }
 })
+
+Vue.use(VueMasonryPlugin)
+Vue.use(VueSelectImage)
 
 new Vue({
   vuetify,

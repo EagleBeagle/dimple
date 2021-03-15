@@ -66,6 +66,7 @@ module.exports = {
   async cancelUpload (req, res) {
     try {
       const imageId = req.params.imageId
+      console.log('cancelUpload called')
       const image = await Image.findByPk(imageId)
       if (!image) {
         return res.status(404).send('Image not found')
@@ -85,6 +86,7 @@ module.exports = {
     try {
       const imageId = req.params.imageId
       const userId = req.user.id
+      console.log('deleteImage called')
       const image = await Image.findByPk(imageId)
       if (!image) {
         return res.status(404).send('Image not found')

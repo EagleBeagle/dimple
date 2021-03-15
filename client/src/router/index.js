@@ -4,7 +4,8 @@ import store from '../store/store'
 import Home from '../components/Home.vue'
 import Auth from '../components/Authentication'
 import Albums from '../components/Albums'
-import PhotoGrid from '../components/PhotoGrid'
+import UserPhotos from '../components/UserPhotos'
+import Dashboard from '../components/Dashboard'
 
 Vue.use(VueRouter)
 
@@ -20,14 +21,21 @@ const routes = [
     component: Auth
   },
   {
-    path: '/albums',
-    name: 'Albums',
-    component: Albums
-  },
-  {
-    path: '/photos/:album',
-    name: 'Photos',
-    component: PhotoGrid
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
+    children: [
+      {
+        path: 'albums',
+        name: 'Albums',
+        component: Albums
+      },
+      {
+        path: 'photos/:album',
+        name: 'Photos',
+        component: UserPhotos
+      }
+    ]
   }
 ]
 

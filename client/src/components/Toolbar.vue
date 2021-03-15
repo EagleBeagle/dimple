@@ -1,12 +1,14 @@
 <template>
-    <v-app-bar dense app fixed flat outlined style="top: 48px" class="toolbar">
-      <v-menu offset-y>
+    <v-app-bar dense app fixed flat clipped-right style="top: 48px" class="toolbar" color="grey lighten-3">
+      <v-toolbar-items>
+        <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               depressed
               rounded
               v-bind="attrs"
-              v-on="on">
+              v-on="on"
+              color="grey lighten-3">
               <v-icon>
                 mdi-plus
               </v-icon>
@@ -25,6 +27,7 @@
                   style="display: none"
                   ref="fileInput"
                   accept="image/jpeg, image/png"
+                  multiple
                   @change="onFileChosen">
               </form>
             <v-list-item @click="dialog = true">
@@ -33,12 +36,20 @@
           </v-list>
         </v-menu>
         <new-album-dialog :show="dialog" v-on:close="dialog = false"/>
-      <div v-if="$route.name === 'Albums'">        
+        <div v-if="$route.name === 'Albums'">        
+            
+        </div>
+        <div v-if="$route.name === 'Photos'">
           
-      </div>
-      <div v-if="$route.name === 'Photos'">
-        
-      </div>
+        </div>
+      </v-toolbar-items>
+      <v-spacer />
+      <v-toolbar-items>
+        <v-btn depressed color="grey lighten-3" class="upload-button" @click="$emit('showUploadbar')">
+          <v-icon class="blue--text">mdi-autorenew</v-icon>
+          <div class="text-body-2">Upload of 1 photo is in progress</div>
+        </v-btn>
+      </v-toolbar-items>
     </v-app-bar> 
 </template>
 
@@ -55,8 +66,8 @@ export default {
   },
   methods: {
     onFileChosen(event) {
-      const image = event.target.files[0]
-      this.$store.dispatch('imageChosen', image)
+      console.log(event.target.files)
+      this.$store.dispatch('imageChosen', event.target.files)
     }
   }
 }
@@ -65,5 +76,8 @@ export default {
 <style>
 .toolbar {
   padding: 0px;
+}
+.upload-button {
+  text-transform: none;
 }
 </style>

@@ -2,8 +2,6 @@
   <v-app>
       <div v-if="user.jwtToken">
         <page-header />
-        <sidebar />
-        <toolbar />
       </div>
       <v-main :style="mainMargin">
         <router-view  />
@@ -23,8 +21,6 @@
 
 <script>
 import PageHeader from '@/components/PageHeader.vue'
-import Sidebar from '@/components/Sidebar'
-import Toolbar from '@/components/Toolbar'
 import UploadSnackbar from '@/components/UploadSnackbar'
 import UploadDialog from '@/components/UploadDialog'
 import { mapState } from 'vuex'
@@ -39,8 +35,6 @@ export default {
   },
   components: {
     PageHeader,
-    Sidebar,
-    Toolbar,
     UploadSnackbar,
     UploadDialog
   },

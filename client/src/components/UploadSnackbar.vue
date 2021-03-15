@@ -6,20 +6,86 @@
     timeout="-1"
     v-model="show"
     bottom right
+    class="pb-2 pr-2"
     style="text-align: center;"
     >
-    <v-container class="snack-container">
-      <v-row align="center" justify="space-between">
-        <v-col xs="11" lg="8" class="snack-column">
-          <div class="h4 font-weight-bold gray--text pl-3">{{ title }}</div>
+    <v-container class="snack-container pa-0">
+      <v-expand-transition>
+        <v-row v-show="expand" class="upload-details">
+          <v-col class="py-0">
+            <v-container class="pa-0">
+              <v-row align="center" justify="space-around" class="pb-3">
+                <v-col cols="1" lg="1" class="snack-column">
+                  <v-img>
+                    <v-icon>
+                      mdi-emoticon-happy
+                    </v-icon>
+                  </v-img>
+                </v-col>
+                <v-col cols="9" lg="9" class="snack-column d-flex justify-end">
+                  <v-progress-linear v-if="showLoadingCircle" :value="progress" color="blue">
+                  </v-progress-linear>
+                  <v-icon v-if="showSuccess" color="green">mdi-emoticon-happy</v-icon>
+                  <v-icon v-if="showFailure" color="red">mdi-emoticon-sad</v-icon>
+                </v-col>
+              </v-row>
+              <v-row align="center" justify="space-around" class="pb-3">
+                <v-col cols="1" lg="1" class="snack-column">
+                  <v-img>
+                    <v-icon>
+                      mdi-emoticon-happy
+                    </v-icon>
+                  </v-img>
+                </v-col>
+                <v-col cols="9" lg="9" class="snack-column d-flex justify-end">
+                  <v-progress-linear v-if="showLoadingCircle" :value="progress" color="blue">
+                  </v-progress-linear>
+                  <v-icon v-if="showSuccess" color="green">mdi-emoticon-happy</v-icon>
+                  <v-icon v-if="showFailure" color="red">mdi-emoticon-sad</v-icon>
+                </v-col>
+              </v-row>
+              <v-row align="center" justify="space-around" class="pb-3">
+                <v-col cols="1" lg="1" class="snack-column">
+                  <v-img>
+                    <v-icon>
+                      mdi-emoticon-happy
+                    </v-icon>
+                  </v-img>
+                </v-col>
+                <v-col cols="9" lg="9" class="snack-column d-flex justify-end">
+                  <v-progress-linear v-if="showLoadingCircle" :value="progress" color="blue">
+                  </v-progress-linear>
+                  <v-icon v-if="showSuccess" color="green">mdi-emoticon-happy</v-icon>
+                  <v-icon v-if="showFailure" color="red">mdi-emoticon-sad</v-icon>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-col>
+        </v-row>
+      </v-expand-transition>
+      <v-row v-show="expand">
+        <v-col class="pt-0 pb-3">
+          <v-divider class="elevation-5"></v-divider>
         </v-col>
-        <v-spacer></v-spacer>
-        <v-col xs="4" class="snack-column d-flex justify-end">
+      </v-row>
+      <v-row align="center" justify="space-around">
+        <v-col cols="1" lg="1" class="snack-column ml-3">
           <v-progress-circular v-if="showLoadingCircle" :value="progress" rotate="-90" color="blue">
             {{ progress }}
           </v-progress-circular>
           <v-icon v-if="showSuccess" color="green">mdi-emoticon-happy</v-icon>
           <v-icon v-if="showFailure" color="red">mdi-emoticon-sad</v-icon>
+        </v-col>
+        <v-col xs="6" sm="8" md="8" lg="8" class="snack-column">
+          <div class="h4 font-weight-bold gray--text pl-3">{{ title }}</div>
+        </v-col>
+        <v-spacer></v-spacer>
+        <v-col cols="1" lg="1" class="snack-column mr-2">
+          <v-btn icon @click="expand = !expand">
+            <v-icon>
+              mdi-chevron-up
+            </v-icon>
+          </v-btn>
         </v-col>
       </v-row>
     </v-container>
@@ -33,12 +99,13 @@ export default {
   data () {
     return {
       show: false,
-      title: 'Uploading Photo',
+      title: 'Uploading 1 photo',
       showLoadingCircle: true,
       showSuccess: false,
       showFailure: false,
       uploading: false,
-      progress: 0
+      progress: 0,
+      expand: false
     }
   },
   beforeMount () {
@@ -76,6 +143,7 @@ export default {
           this.uploading = true
           response = await ImageService.upload(imageUploadData, this.uploadProgress)
           this.uploading = false
+          this.progress = 0
           console.log(response)
           this.showLoadingCircle = false
           this.title = 'Upload Complete'
@@ -98,6 +166,7 @@ export default {
             }
           }
           this.uploading = false
+          this.progress = 0
           this.showFailre = true
           this.title = 'Upload Failed'
           this.showLoadingCircle = false
@@ -129,5 +198,13 @@ export default {
 <style>
 .snack-column {
   padding: 0px;
+}
+.upload-details {
+  max-height: 50vh;
+  overflow: auto;
+}
+
+.upload-details::-webkit-scrollbar {
+  display:none;
 }
 </style>

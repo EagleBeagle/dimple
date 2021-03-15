@@ -6,7 +6,6 @@
       >
         <v-list-item-group
           color="primary"
-          mandatory
         >
           <v-list-item @click="goTo('Albums')">
             <v-list-item-icon>
@@ -24,7 +23,7 @@
               <v-list-item-title>All Photos</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item @click="$emit('selection-changed', 'favourites')">
+          <v-list-item>
             <v-list-item-icon>
               <v-icon>mdi-star</v-icon>
             </v-list-item-icon>
@@ -32,7 +31,7 @@
               <v-list-item-title>Favourites</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item @click="$emit('selection-changed', 'trash')">
+          <v-list-item>
             <v-list-item-icon>
               <v-icon>mdi-trash-can</v-icon>
             </v-list-item-icon>
