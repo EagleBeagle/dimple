@@ -44,17 +44,17 @@
                           v-if="index === 2"
                           class="grey--text caption"
                         >
-                          (+{{ selectedAlbums.length - 2 }} others)
+                          <span class="ml-1">(+{{ selectedAlbums.length - 2 }} others)</span>
                         </span>
                       </template>
                     </v-select>
                   </v-row>
                   <v-row v-if="selectedCount" class="mr-1">
-                    <v-select
-                      :items="visibilityItems"
-                      label="Visibility"
-                      v-model="visibility"
-                    ></v-select>
+                    <v-checkbox
+                      v-model="privateCheckbox"
+                      label="Private"
+                      :indeterminate="privateCheckboxIndeterminate"
+                    ></v-checkbox>
                   </v-row>
                   <v-row v-if="selectedCount" class="mr-1 mt-5">
                     <v-btn
@@ -128,8 +128,8 @@ export default {
       selectedAlbums: [],
       allAlbums: [],
       differentAlbumsSelected: false,
-      visibilityItems: ['Private', 'Public'],
-      visibility: 'Private',
+      privateCheckbox: false,
+      privateCheckboxIndeterminate: true
     }
   },
   computed: {
@@ -156,7 +156,8 @@ export default {
             id: i,
             src: URL.createObjectURL(this.imageData[i]),
             selected: false,
-            selectedAlbums: []
+            selectedAlbums: [],
+            private: false
           })
         }
         const albums = (await AlbumService.get()).data
@@ -173,6 +174,7 @@ export default {
         if (imagePreview.selected) {
             imagePreview.selectedAlbums = [...this.selectedAlbums]
             imagePreview.selected = false
+            imagePreview.private = this.privateCheckbox
         }
         return imagePreview
       })
@@ -180,18 +182,22 @@ export default {
     },
     async upload() {
       try {
-        const response = (await ImageService.initiateUpload({
-          visibility: this.visibility === 'Private' ? 0 : 1,
-          albums: this.selectedAlbums
-        })).data
-        const formData = new FormData()
-        formData.append('file', this.imageData)
-        formData.append('signature', response.signature)
-        formData.append('timestamp', response.timestamp)
-        formData.append('public_id', response.publicId)
-        formData.append('folder', this.$store.state.user.username)
-        formData.append('api_key', process.env.VUE_APP_CLOUDINARY_API_KEY)
-        this.$store.dispatch('initiateUpload', formData)
+        let allFormData = []
+        for (let i = 0; i < this.imageData.length; i++) {
+          const response = (await ImageService.initiateUpload({
+            visibility: this.imagePreviews[i].private  ? 0 : 1,
+            albums: this.imagePreviews[i].selectedAlbums
+          })).data
+          const formData = new FormData()
+          formData.append('file', this.imageData[i])
+          formData.append('signature', response.signature)
+          formData.append('timestamp', response.timestamp)
+          formData.append('public_id', response.publicId)
+          formData.append('folder', this.$store.state.user.username)
+          formData.append('api_key', process.env.VUE_APP_CLOUDINARY_API_KEY)
+          allFormData.push(formData)
+        }
+        this.$store.dispatch('initiateUpload', allFormData)
         this.show = false
       } catch (err) {
         console.log(err)
@@ -199,6 +205,7 @@ export default {
     },
     select(id) {
       this.differentAlbumsSelected = false
+      this.privateCheckboxIndeterminate = false
       //console.log('választás')
       if (this.imagePreviews[id].selected) {
         this.imagePreviews[id].selected = false
@@ -212,6 +219,7 @@ export default {
           if (imagePreview.selected) {
             //console.log(imagePreview.id)
             this.selectedAlbums = [...imagePreview.selectedAlbums]
+            this.privateCheckbox = imagePreview.private
           }
         })
       } else if (this.selectedCount > 1 && this.sameAlbumsSelected()) {
@@ -225,6 +233,16 @@ export default {
         this.differentAlbumsSelected = true
         this.selectedAlbums = []
       }
+
+      if (this.selectedCount > 1 && this.sameVisibilitySelected()) {
+        this.imagePreviews.forEach((imagePreview) => {
+          if (imagePreview.selected) {
+            this.privateCheckbox = imagePreview.private
+          }
+        })
+      } else if (this.selectedCount > 1 && !this.sameVisibilitySelected()) {
+        this.privateCheckboxIndeterminate = true
+      }
     },
     sameAlbumsSelected() {
       let sameAlbums = true
@@ -233,27 +251,6 @@ export default {
           return imagePreview
         }
       })
-      /* let selectedAlbums = []
-      for (let i = 0; i < this.imagePreviews.length; i++) {
-        if (selectedAlbums.length === 0 && this.imagePreviews[i].selected && this.imagePreviews[i].selectedAlbums.length > 0) {
-          selectedAlbums = [...this.imagePreviews[i].selectedAlbums].sort()
-          //console.log('elso,', i, selectedAlbums)
-        } else if (this.imagePreviews[i].selected) {
-          //console.log('masik,', i, this.imagePreviews[i].selectedAlbums)
-          let actualSelectedAlbums = this.imagePreviews[i].selectedAlbums.sort()
-          if (actualSelectedAlbums.length != selectedAlbums.length) {
-            sameAlbums = false
-            break
-          } else {
-            for (let j = 0; j < selectedAlbums.length; j++) {
-              if (selectedAlbums[j] !== actualSelectedAlbums[j]) {
-                sameAlbums = false
-                break
-              } 
-            }
-          }
-        }
-      } */
       for (let i = 0; i < selectedImagePreviews.length; i++) {
         let selectedAlbums = selectedImagePreviews[i].selectedAlbums
         for (let j = i + 1; j < selectedImagePreviews.length; j++) {
@@ -271,8 +268,25 @@ export default {
         }
       
       }
-      console.log(sameAlbums)
       return sameAlbums
+    },
+    sameVisibilitySelected() {
+      let selectedImagePreviews = this.imagePreviews.filter((imagePreview) => {
+        if (imagePreview.selected) {
+          return imagePreview
+        }
+      })
+      if (selectedImagePreviews.length === 0 || selectedImagePreviews.length === 1) {
+        return true
+      }
+      const privacy = selectedImagePreviews[0].private
+      for (let i = 1; i < selectedImagePreviews.length; i++) {
+        if (privacy !== selectedImagePreviews[i].private) {
+          return false
+        }
+      }
+
+      return true
     },
     close() {
       this.clearFields()
@@ -280,7 +294,7 @@ export default {
     },
     async clearFields() {
       this.selectedAlbums = []
-      this.visibility = 'Private'
+      this.privateCheckbox = false
     }
   }
 }

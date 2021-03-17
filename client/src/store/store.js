@@ -11,6 +11,7 @@ export default new Vuex.Store({
     user: {},
     imageData: null,
     imageUploadData: null,
+    uploadInProgress: false,
     newAlbum: null
   },
   actions: {
@@ -52,10 +53,12 @@ export default new Vuex.Store({
     },
     initiateUpload(state, imageUploadData) {
       state.imageUploadData = imageUploadData
+      state.uploadInProgress = true
     },
     finishUpload(state) {
       state.imageData = null
       state.imageUploadData = null
+      state.uploadInProgress = false
     },
     albumAdded(state, newAlbum) {
       state.newAlbum = newAlbum

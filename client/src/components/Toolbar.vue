@@ -19,7 +19,7 @@
             <form
                 name ="form"
                 autocomplete="off">
-                  <v-list-item @click="$refs.fileInput.click()">
+                  <v-list-item :disabled="$store.state.uploadInProgress ? true : false" @click="$refs.fileInput.click()">
                     <v-list-item-title>Photo</v-list-item-title>
                   </v-list-item>
                 <input

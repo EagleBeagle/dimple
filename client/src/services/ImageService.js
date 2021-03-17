@@ -7,15 +7,30 @@ export default {
     return Api().put('/image', data)
   },
 
-  upload (data, onProgress) {
-    let config = { 
+  upload (data, onProgress, onError) {
+    let requests = []
+    for (let i = 0; i < data.length; i++) {
+      requests.push(
+        CloudinaryApi().post('', data[i], {
+          onUploadProgress(progressEvent) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            if (onProgress) onProgress(percentCompleted, i)
+            return percentCompleted
+          }
+        }).catch(() => {
+          onError(i)
+        })
+      )
+    }
+    return Promise.all(requests)
+    /* let config = { 
       onUploadProgress(progressEvent) {
         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-        if (onProgress) onProgress(percentCompleted)
+        if (onProgress) onProgress(percentCompleted, data.index)
         return percentCompleted
       }
     }
-    return CloudinaryApi().post('', data, config)
+    return CloudinaryApi().post('', data, config) */
   },
 
   finalizeUpload (data) {

@@ -54,6 +54,7 @@ module.exports = {
         await image.update({
           url: url
         })
+        res.status(200).send()
       } else {
         res.status(404).send('Image with given ID not found')
       }
@@ -112,7 +113,10 @@ module.exports = {
       } else {
         images = await Image.findAll({
           where: {
-            userId: req.user.id
+            userId: req.user.id,
+            url: {
+              [Op.not]: null
+            }
           }
         })
       }
