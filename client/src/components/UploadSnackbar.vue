@@ -99,7 +99,11 @@ export default {
       if (!this.uploading) return
       try {
         console.log('lelelelel')
-        ImageService.cancelUpload(this.imageUploadData.get('public_id'))
+        for (let i = 0; i < this.imageUploadData.length; i++) {
+          if (!this.fileMetadata[i].finalized) {
+            ImageService.cancelUpload(this.imageUploadData[i].get('public_id'))
+          }
+        }
       } catch (err) {
         console.log(err)
       }
@@ -135,7 +139,8 @@ export default {
             src: URL.createObjectURL(file),
             progress: 0,
             failed: false,
-            finished: false
+            finished: false,
+            finalized: false
           })
           uploadDataArray.push(this.imageUploadData[i])
         } 
@@ -160,6 +165,7 @@ export default {
                   publicId: this.imageUploadData[i].get('public_id'),
                   url: response[i].data.secure_url
                 })
+                this.fileMetadata[i].finalized = true
               } else {
                 await ImageService.delete(this.imageUploadData[i].get('public_id'))                
               }
