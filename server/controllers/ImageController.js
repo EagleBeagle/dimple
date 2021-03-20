@@ -12,10 +12,12 @@ module.exports = {
       const albums = req.body.albums
       console.log(albums)
       const publicId = uuidv4()
+      const cancellationToken = uuidv4()
       const image = await Image.create({
         id: publicId,
         visibility: visibility,
-        userId: req.user.id
+        userId: req.user.id,
+        cancellationToken: cancellationToken
       })
       const storedAlbums = await Album.findAll({
         where: {
@@ -34,7 +36,8 @@ module.exports = {
       res.status(201).send({
         timestamp,
         signature,
-        publicId
+        publicId,
+        cancellationToken
       })
     } catch (err) {
       console.log(err)
@@ -67,16 +70,23 @@ module.exports = {
   async cancelUpload (req, res) {
     try {
       const imageId = req.params.imageId
+      const username = req.params.username
+      const cancellationToken = req.params.cancellationToken
       console.log('cancelUpload called')
       const image = await Image.findByPk(imageId)
       if (!image) {
-        return res.status(404).send('Image not found')
+        return res.status(404).send('image does not exist')
       }
-      if (image.url) {
-        return res.status(400).send()
+      if (image.cancellationToken !== cancellationToken) {
+        return res.status(403).send('Unauthorized')
       }
-      await image.destroy()
-      res.status(200).send()
+      try {
+        await cloudinary.api.resource(`${username}/${imageId}`) // ha nem létezik a kép, akkor error jön
+        return res.status(400).send('invalid cancellation')
+      } catch {
+        await image.destroy()
+        return res.status(200).send()
+      }
     } catch (err) {
       console.log(err)
       res.status(500).send('Failed to cancel upload')
@@ -113,10 +123,7 @@ module.exports = {
       } else {
         images = await Image.findAll({
           where: {
-            userId: req.user.id,
-            url: {
-              [Op.not]: null
-            }
+            userId: req.user.id
           }
         })
       }

@@ -6,6 +6,7 @@ import store from './store/store'
 import VueKinesis from 'vue-kinesis'
 import Cloudinary from 'cloudinary-vue'
 import { VueMasonryPlugin } from 'vue-masonry'
+import VueMasonry from 'vue-masonry-css'
 import VueSelectImage from 'vue-select-image'
 
 Vue.config.productionTip = false
@@ -17,6 +18,7 @@ Vue.use(Cloudinary, {
 })
 
 Vue.use(VueMasonryPlugin)
+Vue.use(VueMasonry)
 Vue.use(VueSelectImage)
 
 new Vue({

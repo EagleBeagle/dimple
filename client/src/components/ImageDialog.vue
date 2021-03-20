@@ -3,12 +3,13 @@
   width="1200"
   v-model="dialog">
   <v-card>
-    <v-img v-if="image" :src="image.url"></v-img>
+    <cld-image v-if="image" :publicId="`${user.username}/${image.id}`" cloudName="dimplecloud"></cld-image>
   </v-card>
   </v-dialog>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   props: [
     'show',
@@ -22,7 +23,10 @@ export default {
       set () {
         this.$emit('close')
       }
-    }
+    },
+    ...mapState([
+      'user'
+    ])
   }
 }
 </script>

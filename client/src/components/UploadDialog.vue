@@ -188,6 +188,7 @@ export default {
             visibility: this.imagePreviews[i].private  ? 0 : 1,
             albums: this.imagePreviews[i].selectedAlbums
           })).data
+          const cancellationToken = response.cancellationToken
           const formData = new FormData()
           formData.append('file', this.imageData[i])
           formData.append('signature', response.signature)
@@ -195,7 +196,10 @@ export default {
           formData.append('public_id', response.publicId)
           formData.append('folder', this.$store.state.user.username)
           formData.append('api_key', process.env.VUE_APP_CLOUDINARY_API_KEY)
-          allFormData.push(formData)
+          allFormData.push({
+            formData,
+            cancellationToken
+          })
         }
         this.$store.dispatch('initiateUpload', allFormData)
         this.show = false

@@ -89,19 +89,20 @@ export default {
       fileMetadata: [],
       overallProgress: 0,
       previousProgresses: [],
+      cancellationTokens: [],
       failure: false,
       expand: false
     }
   },
   beforeMount () {
     
-    window.addEventListener('unload', () => {
+    window.addEventListener('unload', async () => {
       if (!this.uploading) return
       try {
-        console.log('lelelelel')
         for (let i = 0; i < this.imageUploadData.length; i++) {
           if (!this.fileMetadata[i].finalized) {
-            ImageService.cancelUpload(this.imageUploadData[i].get('public_id'))
+            console.log('lelelelel')
+            await ImageService.cancelUpload(this.imageUploadData[i].formData.get('public_id'), this.cancellationTokens[i])
           }
         }
       } catch (err) {
@@ -134,7 +135,7 @@ export default {
         this.uploadCount = this.imageUploadData.length
         this.overallUploadCount = this.imageUploadData.length
         for (let i = 0; i < this.imageUploadData.length; i++) {
-          const file = this.imageUploadData[i].get('file')
+          const file = this.imageUploadData[i].formData.get('file')
           this.fileMetadata.push({
             src: URL.createObjectURL(file),
             progress: 0,
@@ -142,7 +143,8 @@ export default {
             finished: false,
             finalized: false
           })
-          uploadDataArray.push(this.imageUploadData[i])
+          this.cancellationTokens.push(this.imageUploadData[i].cancellationToken)
+          uploadDataArray.push(this.imageUploadData[i].formData)
         } 
         // Failure teszt
         /* this.fileMetadata.push({
@@ -162,12 +164,12 @@ export default {
             try {
               if (response[i] && response[i].status === 200) {
                 await ImageService.finalizeUpload({
-                  publicId: this.imageUploadData[i].get('public_id'),
+                  publicId: this.imageUploadData[i].formData.get('public_id'),
                   url: response[i].data.secure_url
                 })
                 this.fileMetadata[i].finalized = true
               } else {
-                await ImageService.delete(this.imageUploadData[i].get('public_id'))                
+                await ImageService.delete(this.imageUploadData[i].formData.get('public_id'))                
               }
             } catch(err) {
               console.log(err)

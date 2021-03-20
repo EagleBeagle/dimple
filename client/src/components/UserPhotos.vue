@@ -56,7 +56,7 @@ export default {
     async getImages() {
       try {
         if (this.$route.params.album === 'all') {
-          this.images = (await ImageService.get()).data
+          this.images = (await ImageService.get()).data // itt tudjuk megoldani hogy url-t használjunk
         } else {
           this.images = (await ImageService.get({
             album: this.$route.params.album

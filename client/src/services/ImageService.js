@@ -1,6 +1,6 @@
 import Api from '@/services/DimpleApi'
 import CloudinaryApi from '@/services/CloudinaryApi'
-
+import store from '@/store/store'
 
 export default {
   initiateUpload (data) {
@@ -41,8 +41,9 @@ export default {
     return Api().delete(`image/${imageId}`)
   },
 
-  cancelUpload(imageId) {
-    return navigator.sendBeacon(`${process.env.VUE_APP_BASE_URL}/image/${imageId}/cancelupload`)
+  cancelUpload(imageId, cancellationToken) {
+    const username = store.state.user.username
+    return navigator.sendBeacon(`${process.env.VUE_APP_BASE_URL}/image/${username}/${imageId}/cancelupload/${cancellationToken}`)
   },
 
   get (data) {

@@ -46,7 +46,6 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-
   const publicPages = ['/auth'];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = JSON.parse(localStorage.getItem('user'))
