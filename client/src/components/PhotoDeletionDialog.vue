@@ -1,0 +1,68 @@
+<template>
+<v-dialog
+  v-model="dialog"
+  width="500">
+  <v-card>
+    <v-card-title class="headline">
+      Delete Photo
+    </v-card-title>
+    <v-card-text>
+      Are you sure?
+    </v-card-text>
+
+    <v-divider></v-divider>
+
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn
+        depressed
+        class="blue--text"
+        @click="$emit('confirm')">
+        CREATE
+      </v-btn>
+      <v-btn
+        depressed
+        class="red--text"
+        @click="close()"
+      >
+        CANCEL
+      </v-btn>
+    </v-card-actions>
+  </v-card>
+  </v-dialog>
+</template>
+
+<script>
+export default {
+  props: [
+    'show'
+  ],
+  computed: {
+    dialog: {
+      get () {
+        return this.show
+      },
+      set () {
+        this.$emit('close')
+      }
+    }
+  },
+  data () {
+    return {
+     
+    }
+  },
+  methods: {
+    close() {
+      this.dialog = false
+    },
+    delete() {
+
+    }
+  }
+}
+</script>
+
+<style>
+
+</style>

@@ -2,71 +2,79 @@
 <v-dialog
   scrollable
   v-model="show"
-  width="1100px">
+  :width="$vuetify.breakpoint.xs ? '100%' : '50%'">
   <v-card>
-    <v-card-title class="headline">
-      Upload New Photos
+    <v-card-title>
+      <v-container class="ma-0 pa-0">
+        <v-row justify="space-between" class="mb-1">
+          <v-col cols="3" class="ma-0 pa-0">
+            <span class="headline font-weight-medium" style="white-space: nowrap">Upload New Photos</span>
+          </v-col>
+          <v-col cols="5" sm="4" md="3" lg="2" class="ma-0 pa-0" align-self="center">
+            <span
+              style="white-space: nowrap; cursor: pointer"
+              class="pl-0 ma-0 pl-5"
+              :class="allSelected ? 'blue--text' : null"
+              @click="selectAll()"
+            >select all</span>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-card-title>
     <v-divider></v-divider>
     <v-container style="padding-bottom: 0px; padding-top: 0px">
-      <v-row justify="center">
+      <v-row justify="space-around">
         <v-col cols="3" style="padding: 0px">
           <v-card-text>
-          <v-container style="upload-container">
-            <v-row justify="space-around">
-              <v-col cols="12" class="column">
-                <v-container class="upload-container">
-                  <v-row v-if="!selectedCount">
-                    <div class="text-h6 font-weight-regular">
-                      Select photos to edit...
-                    </div>
-                  </v-row>
-                  <v-row v-else>
-                    <div v-if="selectedCount === 1" class="text-h6 font-weight-regular">
-                      Editing 1 photo
-                    </div>
-                    <div v-else class="text-h6 font-weight-regular">
-                      Editing {{ selectedCount }} photos
-                    </div>
-                  </v-row>
-                  <v-row v-if="selectedCount" class="mr-1 mt-5">
-                    <v-select
-                      class="album-select"
-                      v-model="selectedAlbums"
-                      :items="allAlbums"
-                      label="Albums"
-                      :placeholder="differentAlbumsSelected ? 'Different albums selected' : null"
-                      multiple>
-                      <template v-slot:selection="{ item, index }">
-                        <span v-if="index === 0">{{ item + ',' }}&nbsp;</span>
-                        <span v-if="index === 1">{{ item }}&nbsp;</span>
-                        <span
-                          v-if="index === 2"
-                          class="grey--text caption"
-                        >
-                          <span class="ml-1">(+{{ selectedAlbums.length - 2 }} others)</span>
-                        </span>
-                      </template>
-                    </v-select>
-                  </v-row>
-                  <v-row v-if="selectedCount" class="mr-1">
-                    <v-checkbox
-                      v-model="privateCheckbox"
-                      label="Private"
-                      :indeterminate="privateCheckboxIndeterminate"
-                    ></v-checkbox>
-                  </v-row>
-                  <v-row v-if="selectedCount" class="mr-1 mt-5">
-                    <v-btn
-                      color="blue"
-                      block
-                      outlined
-                      @click="edit()">
-                      Done
-                    </v-btn>
-                  </v-row>
-                </v-container>
-              </v-col>
+          <v-container class="ml-4">
+            <v-row v-if="!selectedCount" justify="center">
+              <div class="text-h6 font-weight-regular" style="text-align: center">
+                Select photos to edit...
+              </div>
+            </v-row>
+            <v-row v-else justify="start" class="mt-5">
+              <div v-if="selectedCount === 1" class="text-h6 font-weight-regular">
+                Editing 1 photo
+              </div>
+              <div v-else class="text-h6 font-weight-regular">
+                Editing {{ selectedCount }} photos
+              </div>
+            </v-row>
+            <v-row v-if="selectedCount" class="mr-1 mt-5" justify="center">
+              <v-select
+                class="album-select"
+                v-model="selectedAlbums"
+                :items="allAlbums"
+                label="Albums"
+                :placeholder="differentAlbumsSelected ? 'Different albums selected' : null"
+                multiple>
+                <template v-slot:selection="{ item, index }">
+                  <span v-if="index === 0">{{ item + ',' }}&nbsp;</span>
+                  <span v-if="index === 1">{{ item }}&nbsp;</span>
+                  <span
+                    v-if="index === 2"
+                    class="grey--text caption"
+                  >
+                    <span class="ml-1">(+{{ selectedAlbums.length - 2 }} others)</span>
+                  </span>
+                </template>
+              </v-select>
+            </v-row>
+            <v-row v-if="selectedCount" class="mr-1" justify="start">
+              <v-checkbox
+                v-model="privateCheckbox"
+                label="Private"
+                :indeterminate="privateCheckboxIndeterminate"
+              ></v-checkbox>
+            </v-row>
+            <v-row v-if="selectedCount" class="mr-1 mt-5" justify="center">
+              <v-btn
+                color="blue"
+                block
+                outlined
+                @click="edit()">
+                Done
+              </v-btn>
             </v-row>
           </v-container>
         </v-card-text>
@@ -74,19 +82,23 @@
         <v-divider vertical></v-divider>
         <v-col cols="8" style="padding: 0px">
         <v-card-text class="photo-grid" style="height: 400px;">
-          <v-container style="upload-container">
+          <v-container style="upload-container" fluid>
             <v-row justify="start">
-              <v-col cols="12" sm="6" md="4" lg="3" align-self="center" v-for="imagePreview in imagePreviews" :key="imagePreview.id" v-masonry>
-                <v-img 
-                  :src="imagePreview.src" 
-                  v-bind:class="[imagePreview.selected ? 'selected' : 'not-selected', 'photo']"
-                  min-width="160px" 
-                  max-height="150px" 
-                  max-width="150px"
-                  @click="select(imagePreview.id)"
-                  @load="$redrawVueMasonry()">
-                </v-img>
-              </v-col>
+              <masonry
+                :cols="{default: 3, 1765: 2, 1368: 2, 1198: 1}" 
+                :gutter="15">
+                <div v-for="(imagePreview, index) in imagePreviews" :key="index">
+                  <v-img 
+                    :src="imagePreview.src" 
+                    v-bind:class="[imagePreview.selected ? 'selected' : 'not-selected', 'photo']"
+                    max-height="200px" 
+                    max-width="185px"
+                    min-width="185px"
+                    style="margin-bottom: 15px"
+                    @click="select(imagePreview.id)">
+                  </v-img>
+                </div>
+              </masonry>
             </v-row>
           </v-container>
         </v-card-text>
@@ -129,12 +141,14 @@ export default {
       allAlbums: [],
       differentAlbumsSelected: false,
       privateCheckbox: false,
-      privateCheckboxIndeterminate: true
+      privateCheckboxIndeterminate: true,
+      allSelected: false
     }
   },
   computed: {
     ...mapState([
-      'imageData'
+      'imageData',
+      'user'
     ]),
     selectedCount() {
       let sum = 0;
@@ -152,6 +166,10 @@ export default {
         this.clearFields()
         this.imagePreviews = []
         for (let i = 0; i < this.imageData.length; i++) {
+          if (this.imageData[i].size >= 10 * 1024 * 1024) {
+            this.$store.dispatch('alert', "The maximum file size limit is 10MB.")
+            return
+          }
           this.imagePreviews.push({
             id: i,
             src: URL.createObjectURL(this.imageData[i]),
@@ -166,7 +184,7 @@ export default {
         })
         this.show = true
       }
-    }
+    },
   },
   methods: {
     edit() {
@@ -179,6 +197,16 @@ export default {
         return imagePreview
       })
       this.selectedAlbums = []
+    },
+    selectAll() {
+      console.log('hej')
+      if (!this.allSelected) {
+        this.imagePreviews = this.imagePreviews.map((imagePreview) => {
+          imagePreview.selected = true
+          return imagePreview
+        })
+        this.allSelected = !this.allSelected
+      }
     },
     async upload() {
       try {
@@ -247,6 +275,11 @@ export default {
       } else if (this.selectedCount > 1 && !this.sameVisibilitySelected()) {
         this.privateCheckboxIndeterminate = true
       }
+      if (this.selectedCount !== this.imagePreviews.length) {
+        this.allSelected = false
+      } else {
+        this.allSelected = true
+      }
     },
     sameAlbumsSelected() {
       let sameAlbums = true
@@ -299,6 +332,7 @@ export default {
     async clearFields() {
       this.selectedAlbums = []
       this.privateCheckbox = false
+      this.allSelected = false
     }
   }
 }
@@ -339,4 +373,9 @@ export default {
 }
 
 .photo-grid::-webkit-scrollbar {display:none;}
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+}
 </style>

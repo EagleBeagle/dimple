@@ -33,10 +33,6 @@ export default {
     return CloudinaryApi().post('', data, config) */
   },
 
-  finalizeUpload (data) {
-    return Api().post('image/finalize', data)
-  },
-
   delete (imageId) {
     return Api().delete(`image/${imageId}`)
   },

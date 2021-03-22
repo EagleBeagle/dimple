@@ -103,6 +103,10 @@ module.exports = {
         return res.status(404).send('Image not found')
       }
       if (image.userId === userId) {
+        const response = await cloudinary.uploader.destroy(`${req.user.username}/${image.id}`)
+        if (response.result !== 'ok') {
+          return res.status(400).send('cloudinary error')
+        }
         await image.destroy()
         return res.status(200).send()
       } else {

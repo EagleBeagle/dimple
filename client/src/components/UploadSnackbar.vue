@@ -50,7 +50,7 @@
           <v-icon v-if="showFailure" color="red">mdi-emoticon-sad</v-icon>
         </v-col>
         <v-col xs="6" sm="8" md="8" lg="8" class="snack-column">
-          <div class="h4 font-weight-bold gray--text pl-3">
+          <div class="text-h6 pl-3 ml-3">
             <span v-if="uploadCount === 1">Uploading 1 photo</span>
             <span v-if="uploadCount > 1">Uploading {{ uploadCount }} photos</span>
             <span v-if="showFailure">Some uploads failed</span>
@@ -156,20 +156,15 @@ export default {
         this.uploadCount++ */
         try {
           response = await ImageService.upload(uploadDataArray, this.uploadProgress, this.errorLocator)
-          
-          this.uploading = false
-          this.showLoadingCircle = false
 
           for (let i = 0; i < response.length; i++) {
             try {
+              console.log(response[i].status)
               if (response[i] && response[i].status === 200) {
-                await ImageService.finalizeUpload({
-                  publicId: this.imageUploadData[i].formData.get('public_id'),
-                  url: response[i].data.secure_url
-                })
                 this.fileMetadata[i].finalized = true
+                console.log('itt')
               } else {
-                await ImageService.delete(this.imageUploadData[i].formData.get('public_id'))                
+                await ImageService.cancelUpload(this.imageUploadData[i].formData.get('public_id'), this.cancellationTokens[i])
               }
             } catch(err) {
               console.log(err)
@@ -178,6 +173,9 @@ export default {
               this.fileMetadata[i].failed = true
             }
           }
+
+          this.uploading = false
+          this.showLoadingCircle = false
 
           this.$store.dispatch('finishUpload')
           if (this.failure) {
