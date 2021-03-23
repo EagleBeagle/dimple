@@ -33,6 +33,8 @@ module.exports = {
           res.status(400).send('Email already in use')
         } else if (err.errors[0].path === 'users.username') {
           res.status(400).send('Username already in use')
+        } else {
+          res.status(400).send('Unavailable credentials')
         }
       } else {
         res.status(500).send('an error happened during signup')

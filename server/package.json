@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/mocha --timeout 15000 \"./{,!(node_modules)/**/}*.test.js\" -r dotenv/config"
   },
   "author": "Zoltán Biacsi",
   "license": "ISC",
@@ -28,10 +28,15 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "chai": "^4.3.4",
     "eslint": "^7.15.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-promise": "^4.2.1",
-    "nodemon": "^2.0.6"
+    "mocha": "^8.3.2",
+    "mock-req-res": "^1.2.0",
+    "nodemon": "^2.0.6",
+    "sinon": "^10.0.0",
+    "sinon-chai": "^3.5.0"
   }
 }

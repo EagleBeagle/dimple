@@ -27,7 +27,6 @@ module.exports = {
         }
       })
       await image.addAlbums(storedAlbums)
-
       const timestamp = Math.round((new Date()).getTime() / 1000)
       const signature = cloudinary.utils.api_sign_request({ timestamp, public_id: publicId, folder: req.user.username }, process.env.CLOUDINARY_API_SECRET)
       console.log(timestamp)
@@ -97,7 +96,6 @@ module.exports = {
     try {
       const imageId = req.params.imageId
       const userId = req.user.id
-      console.log('deleteImage called')
       const image = await Image.findByPk(imageId)
       if (!image) {
         return res.status(404).send('Image not found')
@@ -123,7 +121,15 @@ module.exports = {
       let images
       if (req.query.album) {
         const album = await Album.findByPk(req.query.album)
-        images = await album.getImages()
+        if (album) {
+          if (album.userId === req.user.id || album.visibility) {
+            images = await album.getImages()
+          } else {
+            return res.status(403).send('Unauthorized')
+          }
+        } else {
+          return res.status(404).send('the given album does not exist')
+        }
       } else {
         images = await Image.findAll({
           where: {
@@ -135,31 +141,6 @@ module.exports = {
     } catch (err) {
       console.log(err)
       res.status(500).send('An error happened while fetching images')
-    }
-  },
-
-  async getSingleFile (req, res) { // probably nem kell már
-    try {
-      const image = await Image.findByPk(`${req.params.username}/${req.params.filename}`)
-
-      if (!image.visibility) {
-        if (!req.user) {
-          return res.status(403).send('Unauthorized')
-        } else if (image.userId !== req.user.id) {
-          return res.status(403).send('Unauthorized')
-        }
-      }
-      await b2.authorize()
-      const response = await b2.downloadFileByName({
-        bucketName: 'dimple-private-images',
-        fileName: `${req.params.username}/${req.params.filename}`,
-        responseType: 'arraybuffer'
-      })
-      res.write(response.data, 'binary')
-      res.status(200).end(null, 'binary')
-    } catch (err) {
-      console.log(err)
-      res.status(500).send('An error happened while fetching the image')
     }
   }
 }

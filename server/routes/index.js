@@ -3,6 +3,7 @@ const UserController = require('../controllers/UserController.js')
 const UserControllerValidator = require('../policies/UserControllerValidator.js')
 const AlbumController = require('../controllers/AlbumController.js')
 const ImageController = require('../controllers/ImageController.js')
+const ImageControllerValidator = require('../policies/ImageControllerValidator.js')
 
 module.exports = app => {
   app.post('/signup',
@@ -30,6 +31,7 @@ module.exports = app => {
 
   app.put('/image',
     verifyAuth.isLoggedIn,
+    ImageControllerValidator.initiateUpload,
     ImageController.initiateUpload)
 
   app.post('/image/finalize',
@@ -37,10 +39,12 @@ module.exports = app => {
     ImageController.finalizeUpload)
 
   app.post('/image/:username/:imageId/cancelupload/:cancellationToken',
+    ImageControllerValidator.cancelUpload,
     ImageController.cancelUpload)
 
   app.delete('/image/:imageId',
     verifyAuth.isLoggedIn,
+    ImageControllerValidator.deleteImage,
     ImageController.deleteImage)
 
   app.get('/image',
