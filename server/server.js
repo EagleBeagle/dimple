@@ -14,7 +14,10 @@ app.use(cors(corsOptions))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.text())
-app.use(logger('dev'))
+
+if (process.env.NODE_ENV !== 'test') {
+  app.use(logger('dev'))
+}
 
 require('./config/passport.js')
 require('./config/db.config.js')
@@ -25,3 +28,5 @@ app.listen(PORT, () => {
 })
 
 require('./routes')(app)
+
+module.exports = app

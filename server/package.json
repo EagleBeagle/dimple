@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "./node_modules/.bin/mocha --timeout 15000 \"./{,!(node_modules)/**/}*.test.js\" -r dotenv/config"
+    "test:all": "./node_modules/.bin/mocha --timeout 15000 \"./{,!(node_modules)/**/}*.test.js\" -r dotenv/config --exit",
+    "test:unit": "./node_modules/.bin/mocha --timeout 15000 \"./tests/unit.test.js\" -r dotenv/config --exit",
+    "test:integration": "./node_modules/.bin/mocha --timeout 15000 \"./tests/integration.test.js\" -r dotenv/config --exit"
   },
   "author": "Zoltán Biacsi",
   "license": "ISC",
@@ -37,6 +39,7 @@
     "mock-req-res": "^1.2.0",
     "nodemon": "^2.0.6",
     "sinon": "^10.0.0",
-    "sinon-chai": "^3.5.0"
+    "sinon-chai": "^3.5.0",
+    "supertest": "^6.1.3"
   }
 }

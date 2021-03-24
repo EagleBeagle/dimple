@@ -50,8 +50,4 @@ module.exports = app => {
   app.get('/image',
     verifyAuth.isLoggedIn,
     ImageController.getImages)
-
-  app.get('/image/:username/:filename',
-    verifyAuth.attachUserObject,
-    ImageController.getSingleFile)
 }

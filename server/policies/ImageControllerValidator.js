@@ -59,6 +59,7 @@ module.exports = {
     })
     const { error } = schema.validate(req.params)
     if (error) {
+      console.log('FOS', req.params.imageId)
       res.status(400).send({
         error: 'Invalid image id'
       })

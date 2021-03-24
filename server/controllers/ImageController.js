@@ -48,7 +48,6 @@ module.exports = {
     try {
       const publicId = req.body.publicId
       const url = req.body.url
-      console.log('retekRETEKETEKTEKTKETKTEKETKETKETKETKETKEKTEKTEKTKEK')
       console.log(publicId)
       console.log(url)
       const image = await Image.findByPk(publicId)
@@ -102,7 +101,10 @@ module.exports = {
       }
       if (image.userId === userId) {
         const response = await cloudinary.uploader.destroy(`${req.user.username}/${image.id}`)
-        if (response.result !== 'ok') {
+        if (response.result !== 'ok' && response.result !== 'not found') {
+          console.log('MIA A FASSAZDGSADUZASGDUASZDGASDSASDAS')
+          console.log(response.result)
+          console.log(response.result === 'not found')
           return res.status(400).send('cloudinary error')
         }
         await image.destroy()
