@@ -8,6 +8,7 @@ module.exports = {
     })
     const { error } = schema.validate(req.body)
     if (error) {
+      console.log(error)
       switch (error.details[0].context.key) {
         case 'visibility':
           res.status(400).send({

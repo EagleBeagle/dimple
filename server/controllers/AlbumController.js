@@ -1,5 +1,6 @@
 const db = require('../config/db.config.js')
 const Album = db.album
+const Image = db.image
 
 module.exports = {
   async create (req, res) {

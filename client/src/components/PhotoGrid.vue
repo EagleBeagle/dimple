@@ -6,13 +6,13 @@
         :cols="{default: 4, 1264: 3, 960: 2, 600: 1}" 
         :gutter="30">
         <div class="image-div" v-for="(image, index) in images" :key="index" @click="enlarge(image)">
-          <kinesis-container>
+          <kinesis-container v-if="!invalidImageIndices.has(index)">
             <kinesis-element :strength="10" type="depth">
               <v-hover v-slot="{hover}">
                 <v-card class="image-card" elevation="20" @click="enlarge(image)">
                   <v-img 
                     class="image" 
-                    :src="image.url">
+                    :src="image.url" @error="imageError(index)">
                     <v-fade-transition>
                       <v-overlay
                         v-if="hover"
@@ -71,16 +71,19 @@ export default {
   },
   data () {
     return {
+      invalidImageIndices: new Set(),
       showDialog: false,
-      x: 0,
-      y: 0,
-      enlargedImage: null
+      enlargedImage: null,
     }
   },
   methods: {
     enlarge(image) {
       this.enlargedImage = image
       this.showDialog = true
+    },
+    imageError(index) {
+     this.invalidImageIndices.add(index)
+     console.log(this.invalidImageIndices.has(index))
     }
   }
 }

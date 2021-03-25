@@ -1,5 +1,5 @@
 <template>
-  <v-container class="px-8 photo-container" fluid>
+  <v-container class="px-8 photo-container" fluid v-scroll="scroll">
     <v-row v-if="images.length !== 0" justify="start" align="start" class="align-self-start">
       <v-col v-if="album" xs="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
         <div class="display-1 mt-2 mb-0">{{ album.name }}</div>
@@ -92,6 +92,10 @@ export default {
         console.log(err)
         this.$store.dispatch('alert', 'An error occured during deletion.')
       }
+    },
+    scroll() {
+      console.log(document.documentElement.clientHeight)
+      console.log(document.documentElement.scrollHeight)
     }
   }
 }

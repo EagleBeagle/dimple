@@ -121,8 +121,38 @@ module.exports = {
   async getImages (req, res) {
     try {
       let images
-      if (req.query.album) {
-        const album = await Album.findByPk(req.query.album)
+      const fromDate = req.query.from
+      const toDate = req.query.to
+      const albumName = req.query.album
+      const limit = req.query.limit
+      const sort = req.query.sort
+      const queryObject = {
+        where: {
+          userId: req.user.id
+        },
+        order: []
+      }
+      if (sort) {
+        if (sort === 'date:desc') {
+          queryObject.order.push(['createdAt', 'DESC'])
+        } else if (sort === 'date:asc') {
+          queryObject.order.push(['createdAt', 'ASC'])
+        }
+      }
+      if (fromDate || toDate) {
+        queryObject.where.createdAt = {}
+      }
+      if (fromDate) {
+        queryObject.where.createdAt[Op.gte] = fromDate
+      }
+      if (toDate) {
+        queryObject.where.createdAt[Op.lte] = toDate
+      }
+      if (limit) {
+        queryObject.limit = Number(limit)
+      }
+      if (albumName) {
+        const album = await Album.findByPk(albumName)
         if (album) {
           if (album.userId === req.user.id || album.visibility) {
             images = await album.getImages()
@@ -133,11 +163,7 @@ module.exports = {
           return res.status(404).send('the given album does not exist')
         }
       } else {
-        images = await Image.findAll({
-          where: {
-            userId: req.user.id
-          }
-        })
+        images = await Image.findAll(queryObject)
       }
       res.status(200).send(images)
     } catch (err) {

@@ -213,7 +213,7 @@ export default {
         let allFormData = []
         for (let i = 0; i < this.imageData.length; i++) {
           const response = (await ImageService.initiateUpload({
-            visibility: this.imagePreviews[i].private  ? 0 : 1,
+            visibility: this.imagePreviews[i].private  ? false : true,
             albums: this.imagePreviews[i].selectedAlbums
           })).data
           const cancellationToken = response.cancellationToken

@@ -46,15 +46,25 @@
           <v-progress-circular v-if="showLoadingCircle" :value="overallProgress" rotate="-90" color="blue">
             <!-- {{ overallProgress }} -->
           </v-progress-circular>
-          <v-icon v-if="showSuccess" color="green">mdi-emoticon-happy</v-icon>
-          <v-icon v-if="showFailure" color="red">mdi-emoticon-sad</v-icon>
+          <v-fade-transition>
+            <v-icon v-if="showSuccess" color="green">mdi-emoticon-happy</v-icon>
+            <v-icon v-if="showFailure" color="red">mdi-emoticon-sad</v-icon>
+          </v-fade-transition>
         </v-col>
         <v-col xs="6" sm="8" md="8" lg="8" class="snack-column">
           <div class="text-h6 pl-3 ml-3">
-            <span v-if="uploadCount === 1">Uploading 1 photo</span>
-            <span v-if="uploadCount > 1">Uploading {{ uploadCount }} photos</span>
-            <span v-if="showFailure">Some uploads failed</span>
-            <span v-if="showSuccess">Upload successful</span>
+            <v-fade-transition>
+              <span v-if="uploadCount === 1">Uploading 1 photo</span>
+            </v-fade-transition>
+            <v-fade-transition>
+              <span v-if="uploadCount > 1">Uploading {{ uploadCount }} photos</span>
+            </v-fade-transition>
+            <v-fade-transition>
+              <span v-if="showFailure">Some uploads failed</span>
+            </v-fade-transition>
+            <v-fade-transition>
+              <span v-if="showSuccess">Upload successful</span>
+            </v-fade-transition>
           </div>
         </v-col>
         <v-spacer></v-spacer>

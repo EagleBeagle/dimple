@@ -8,6 +8,11 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.BOOLEAN,
       allowNull: false
     },
+    createdAt: {
+      type: Sequelize.DATE(6),
+      allowNull: false,
+      defaultValue: Sequelize.NOW
+    },
     cancellationToken: {
       type: Sequelize.STRING
     }
