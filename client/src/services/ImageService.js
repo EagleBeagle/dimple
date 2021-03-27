@@ -43,14 +43,32 @@ export default {
   },
 
   get (data) {
-    if (data && data.album) {
-      return Api().get(`image?album=${data.album}`)
+    data.limit = 10
+    let queryString = ''
+    if (data.user) {
+      queryString += `&user=${data.user}`
     }
-    return Api().get('image')
+    if (data.from) {
+      queryString += `&from=${data.from}` 
+    }
+    if (data.to) {
+      queryString += `&to=${data.to}` 
+    }
+    if (data.limit) {
+      queryString += `&limit=${data.limit}` 
+    }
+    if (data.sort) {
+      queryString += `&sort=${data.sort}` 
+    }
+    if (data.album) {
+      queryString += `&album=${data.album}` 
+    }
+
+    return Api().get(`image?${queryString}`)
   },
 
   getPrivateImage(id) {
-    return Api().get(`image/${id}`, {
+    return Api().get(`image/?${id}`, {
       responseType: 'arraybuffer'
     })
   }

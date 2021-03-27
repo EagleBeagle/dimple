@@ -8,6 +8,7 @@ import Cloudinary from 'cloudinary-vue'
 import { VueMasonryPlugin } from 'vue-masonry'
 import VueMasonry from 'vue-masonry-css'
 import VueSelectImage from 'vue-select-image'
+import InfiniteLoading from 'vue-infinite-loading';
 
 Vue.config.productionTip = false
 Vue.use(VueKinesis)
@@ -20,6 +21,7 @@ Vue.use(Cloudinary, {
 Vue.use(VueMasonryPlugin)
 Vue.use(VueMasonry)
 Vue.use(VueSelectImage)
+Vue.use(InfiniteLoading)
 
 new Vue({
   vuetify,

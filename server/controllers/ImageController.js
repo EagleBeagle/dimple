@@ -121,16 +121,24 @@ module.exports = {
   async getImages (req, res) {
     try {
       let images
+      const user = req.query.user
       const fromDate = req.query.from
       const toDate = req.query.to
       const albumName = req.query.album
       const limit = req.query.limit
       const sort = req.query.sort
       const queryObject = {
-        where: {
-          userId: req.user.id
-        },
+        where: {},
         order: []
+      }
+      if (user) {
+        if (albumName) {
+          return res.status(400).send('Invalid query')
+        }
+        queryObject.where.userId = req.user.id
+        if (user !== req.user.id) {
+          queryObject.where.visibilty = true
+        }
       }
       if (sort) {
         if (sort === 'date:desc') {
@@ -143,19 +151,21 @@ module.exports = {
         queryObject.where.createdAt = {}
       }
       if (fromDate) {
-        queryObject.where.createdAt[Op.gte] = fromDate
+        queryObject.where.createdAt[Op.gt] = fromDate
       }
       if (toDate) {
-        queryObject.where.createdAt[Op.lte] = toDate
+        queryObject.where.createdAt[Op.lt] = toDate
       }
       if (limit) {
         queryObject.limit = Number(limit)
+      } else {
+        queryObject.limit = 30
       }
       if (albumName) {
         const album = await Album.findByPk(albumName)
         if (album) {
           if (album.userId === req.user.id || album.visibility) {
-            images = await album.getImages()
+            images = await album.getImages(queryObject)
           } else {
             return res.status(403).send('Unauthorized')
           }

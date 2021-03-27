@@ -49,5 +49,6 @@ module.exports = app => {
 
   app.get('/image',
     verifyAuth.isLoggedIn,
+    ImageControllerValidator.getImages,
     ImageController.getImages)
 }

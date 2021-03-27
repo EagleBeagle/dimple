@@ -1,5 +1,5 @@
 <template>
-  <v-container class="px-8 photo-container" fluid v-scroll="scroll">
+  <v-container class="px-8 photo-container" fluid>
     <v-row v-if="images.length !== 0" justify="start" align="start" class="align-self-start">
       <v-col v-if="album" xs="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
         <div class="display-1 mt-2 mb-0">{{ album.name }}</div>
@@ -11,7 +11,7 @@
         <div class="display-1 my-2">All Photos</div>
       </v-col>
     </v-row>
-    <photo-grid :images="images" @delete="deleteImage" />
+    <photo-grid :images="images" @delete="deleteImage" @reachedBottom="infiniteHandler" />
   </v-container>
 </template>
 
@@ -29,13 +29,14 @@ export default {
     return {
       album: null,
       images: [],
-      cloudinaryCore: null
+      cloudinaryCore: null,
+      oldestDate: null,
+      newestDate: null
     }
   },
   async mounted() {
     this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME });
     await this.getAlbum()
-    await this.getImages()
   },
   computed: {
     ...mapState([
@@ -46,7 +47,8 @@ export default {
     '$route.params.album': async function () {
       this.images = []
       await this.getAlbum()
-      await this.getImages()
+      const images = await this.getImages({ sort: 'date:desc' })
+      this.images.push(...images)
     }
   },
   methods: {
@@ -62,22 +64,29 @@ export default {
         this.album = null
       }
     },
-    async getImages() { // itt kell majd lekezelni a hiányzó képeket
+    async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
       try {
         if (this.$route.params.album === 'all') {
-          this.images = (await ImageService.get()).data.map((image) => {
+          const images = (await ImageService.get(filter)).data.map((image) => {
             image.url = this.cloudinaryCore.url(`${this.user.username}/${image.id}`)
-            console.log(image.url)
             return image
           })
-          console.log(this.images)
+          console.log(images.length)
+          if (images.length) {
+            this.oldestDate = images[images.length - 1].createdAt
+          }
+          return images
         } else {
-          this.images = (await ImageService.get({
-            album: this.$route.params.album
-          })).data.map((image) => {
+          filter.album = this.$route.params.album
+          const images = (await ImageService.get(filter)).data.map((image) => {
             image.url = this.cloudinaryCore.url(`${this.user.username}/${image.id}`)
             return image
-          }) 
+          })
+          console.log(images.length)
+          if (images.length) {
+            this.oldestDate = images[images.length - 1].createdAt
+          }
+          return images
         }
       } catch (err) {
         console.log(err)
@@ -93,9 +102,25 @@ export default {
         this.$store.dispatch('alert', 'An error occured during deletion.')
       }
     },
-    scroll() {
-      console.log(document.documentElement.clientHeight)
-      console.log(document.documentElement.scrollHeight)
+    async infiniteHandler($state) {
+      console.log($state)
+      let images
+      console.log(this.oldestDate)
+      if (this.oldestDate) {
+        images = await this.getImages({
+          to: this.oldestDate,
+          sort: 'date:desc'
+        })
+      } else {
+        images = await this.getImages({ sort: 'date:desc' })
+      }
+      console.log(images)
+      if (images.length) {
+        this.images.push(...images)
+        $state.loaded()
+      } else {
+        $state.complete()
+      }
     }
   }
 }

@@ -38,8 +38,8 @@
             </kinesis-element>
           </kinesis-container>
         </div>
+      <infinite-loading @infinite="infiniteHandler"></infinite-loading>
       </masonry>
-
       </v-col>
       <!-- <v-col xs="cols" sm="6" md="4" lg="3" v-for="image in images" :key="image.id">
         <kinesis-container>
@@ -84,6 +84,9 @@ export default {
     imageError(index) {
      this.invalidImageIndices.add(index)
      console.log(this.invalidImageIndices.has(index))
+    },
+    infiniteHandler($state) {
+      this.$emit('reachedBottom', $state)
     }
   }
 }

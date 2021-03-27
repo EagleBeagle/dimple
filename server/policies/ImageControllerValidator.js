@@ -54,13 +54,31 @@ module.exports = {
     }
   },
 
+  getImages (req, res, next) {
+    const schema = Joi.object({
+      from: Joi.date().less('now'),
+      to: Joi.date().less('now'),
+      album: Joi.number(),
+      limit: Joi.number().max(100),
+      sort: Joi.string().valid('date:desc', 'date:asc'),
+      user: Joi.number()
+    })
+    const { error } = schema.validate(req.query)
+    if (error) {
+      res.status(400).send({
+        error: error.details[0].message
+      })
+    } else {
+      next()
+    }
+  },
+
   deleteImage (req, res, next) {
     const schema = Joi.object({
       imageId: Joi.string().uuid().required()
     })
     const { error } = schema.validate(req.params)
     if (error) {
-      console.log('FOS', req.params.imageId)
       res.status(400).send({
         error: 'Invalid image id'
       })

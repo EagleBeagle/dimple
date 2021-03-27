@@ -12,6 +12,7 @@
     "cloudinary-vue": "^1.1.2",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
+    "vue-infinite-loading": "^2.4.5",
     "vue-kinesis": "^1.1.7",
     "vue-masonry": "^0.12.0",
     "vue-masonry-css": "^1.0.3",
