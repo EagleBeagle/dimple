@@ -43,7 +43,6 @@ export default {
   },
 
   get (data) {
-    data.limit = 10
     let queryString = ''
     if (data.user) {
       queryString += `&user=${data.user}`

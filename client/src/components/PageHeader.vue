@@ -1,10 +1,12 @@
 <template>
 <div>
-  <v-app-bar fixed dense clipped-left clipped-right app flat outlined color="blue">
-    <v-toolbar-title class="font-weight-bold display-1 white--text">dimple</v-toolbar-title>
+  <v-app-bar fixed min-height="64px" clipped-left clipped-right app flat outlined color="blue">
+    <v-toolbar-title class="font-weight-bold text-h3 white--text">dimple</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-toolbar-items>
-      <div class="mr-2 white--text text-h5">{{ user.username }}</div>
+      <v-container fill-height>
+        <div class="mr-2 white--text text-h5">{{ user.username }}</div>
+      </v-container>
       <v-btn class="white--text" depressed tile color="blue" light @click="signOut()">
         Sign out
       </v-btn>

@@ -37,6 +37,7 @@ export default {
   async mounted() {
     this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME });
     await this.getAlbum()
+    this.images = await this.getImages({ sort: 'date:desc' })
   },
   computed: {
     ...mapState([
@@ -71,7 +72,6 @@ export default {
             image.url = this.cloudinaryCore.url(`${this.user.username}/${image.id}`)
             return image
           })
-          console.log(images.length)
           if (images.length) {
             this.oldestDate = images[images.length - 1].createdAt
           }
@@ -82,7 +82,6 @@ export default {
             image.url = this.cloudinaryCore.url(`${this.user.username}/${image.id}`)
             return image
           })
-          console.log(images.length)
           if (images.length) {
             this.oldestDate = images[images.length - 1].createdAt
           }
@@ -103,9 +102,8 @@ export default {
       }
     },
     async infiniteHandler($state) {
-      console.log($state)
+      console.log('handled')
       let images
-      console.log(this.oldestDate)
       if (this.oldestDate) {
         images = await this.getImages({
           to: this.oldestDate,
@@ -114,7 +112,6 @@ export default {
       } else {
         images = await this.getImages({ sort: 'date:desc' })
       }
-      console.log(images)
       if (images.length) {
         this.images.push(...images)
         $state.loaded()

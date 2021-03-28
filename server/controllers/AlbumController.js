@@ -31,6 +31,14 @@ module.exports = {
             userId: req.user.id
           }
         })
+        for (let i = 0; i < albums.length; i++) {
+          albums[i].dataValues.images = await albums[i].getImages({
+            order: db.Sequelize.literal('rand()'),
+            limit: 4,
+            attributes: ['id'],
+            joinTableAttributes: []
+          })
+        }
         res.status(200).send(albums)
       }
     } catch (err) {

@@ -159,7 +159,7 @@ module.exports = {
       if (limit) {
         queryObject.limit = Number(limit)
       } else {
-        queryObject.limit = 30
+        queryObject.limit = 20
       }
       if (albumName) {
         const album = await Album.findByPk(albumName)

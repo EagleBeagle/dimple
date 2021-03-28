@@ -1,46 +1,41 @@
 <template>
   <v-container class="pa-0 ma-0 photo-container" fluid>
     <v-row justify="start"> <!-- v-masonry property -->
-      <v-col cols="12">
-      <masonry
-        :cols="{default: 4, 1264: 3, 960: 2, 600: 1}" 
-        :gutter="30">
-        <div class="image-div" v-for="(image, index) in images" :key="index" @click="enlarge(image)">
-          <kinesis-container v-if="!invalidImageIndices.has(index)">
-            <kinesis-element :strength="10" type="depth">
-              <v-hover v-slot="{hover}">
-                <v-card class="image-card" elevation="20" @click="enlarge(image)">
-                  <v-img 
-                    class="image" 
-                    :src="image.url" @error="imageError(index)">
-                    <v-fade-transition>
-                      <v-overlay
-                        v-if="hover"
-                        absolute
-                        color="#000000"
-                        opacity="0.2">
-                        <v-btn
-                          v-on:click.stop
-                          icon
-                          color="white"
-                          class="delete"
-                          @click="$emit('delete', image.id)">
-                          <v-icon>mdi-close</v-icon>
-                        </v-btn>
-                        <div class="overlay-content">
-                          asdadas
-                        </div>
-                      </v-overlay>
-                    </v-fade-transition>
-                  </v-img>
-                </v-card>
-              </v-hover>
-            </kinesis-element>
-          </kinesis-container>
-        </div>
-      <infinite-loading @infinite="infiniteHandler"></infinite-loading>
-      </masonry>
+      <v-col cols="12" sm="4" md="3" lg="2" class="image-div pa-3" v-for="(image, index) in images" :key="index" @click="enlarge(image)">
+        <kinesis-container v-if="!invalidImageIndices.has(index)">
+          <kinesis-element :strength="10" type="depth">
+            <v-hover v-slot="{hover}">
+              <v-card class="image-card" elevation="20" @click="enlarge(image)">
+                <v-img 
+                  class="image"
+                  aspect-ratio="1"
+                  :src="image.url" @error="imageError(index)">
+                  <v-fade-transition>
+                    <v-overlay
+                      v-if="hover"
+                      absolute
+                      color="#000000"
+                      opacity="0.2">
+                      <v-btn
+                        v-on:click.stop
+                        icon
+                        color="white"
+                        class="delete"
+                        @click="$emit('delete', image.id)">
+                        <v-icon>mdi-close</v-icon>
+                      </v-btn>
+                      <div class="overlay-content">
+                        asdadas
+                      </div>
+                    </v-overlay>
+                  </v-fade-transition>
+                </v-img>
+              </v-card>
+            </v-hover>
+          </kinesis-element>
+        </kinesis-container>
       </v-col>
+      <infinite-loading @infinite="infiniteHandler"></infinite-loading>
       <!-- <v-col xs="cols" sm="6" md="4" lg="3" v-for="image in images" :key="image.id">
         <kinesis-container>
           <kinesis-element :strength="10" type="depth">
@@ -99,7 +94,6 @@ export default {
 
 .image-div {
   cursor: pointer;
-  margin-bottom: 30px;
 }
 
 .v-overlay__content {

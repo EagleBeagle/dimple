@@ -84,21 +84,14 @@
         <v-card-text class="photo-grid" style="height: 400px;">
           <v-container style="upload-container" fluid>
             <v-row justify="start">
-              <masonry
-                :cols="{default: 3, 1765: 2, 1368: 2, 1198: 1}" 
-                :gutter="15">
-                <div v-for="(imagePreview, index) in imagePreviews" :key="index">
-                  <v-img 
-                    :src="imagePreview.src" 
-                    v-bind:class="[imagePreview.selected ? 'selected' : 'not-selected', 'photo']"
-                    max-height="200px" 
-                    max-width="185px"
-                    min-width="185px"
-                    style="margin-bottom: 15px"
-                    @click="select(imagePreview.id)">
-                  </v-img>
-                </div>
-              </masonry>
+              <v-col cols="12" sm="6" md="4" lg="3" class="pa-2" v-for="(imagePreview, index) in imagePreviews" :key="index">
+                <v-img 
+                  :src="imagePreview.src" 
+                  v-bind:class="[imagePreview.selected ? 'selected' : 'not-selected', 'photo']"
+                  aspect-ratio="1"
+                  @click="select(imagePreview.id)">
+                </v-img>
+              </v-col>
             </v-row>
           </v-container>
         </v-card-text>

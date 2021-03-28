@@ -1,5 +1,5 @@
 <template>
-    <v-app-bar dense app fixed flat clipped-right style="top: 48px" class="toolbar" color="grey lighten-3">
+    <v-app-bar dense app fixed flat clipped-right style="top: 64px" class="toolbar" color="grey lighten-3">
       <v-toolbar-items>
         <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">

@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer app clipped>
+  <v-navigation-drawer app clipped style="top: 64px">
     <v-list
         nav
         
