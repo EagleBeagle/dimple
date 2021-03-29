@@ -7,23 +7,43 @@
     </v-row>
     <v-row justify="start">
       <v-col cols="12" sm="6" md="4" lg="3" class="pa-4" v-for="album in albums" :key="album.id">
-        <v-card elevation="5" tile @click="open(album.id)" style="height: 100%">
+        <v-card tile @click="open(album.id)" height="100%">
           <div class="overlay-div white--text text-h4 font-weight-medium">
               {{ album.name }}
             </div>
-          <v-container fill-height v-if="album.images.length === 0">
+          <v-container fill-height v-if="album.images.length === 0" class="pa-0">
             <div class="vignette"></div>
-            <v-card-text>
-              <v-icon x-large>
-                mdi-image-multiple
-              </v-icon>
+            <v-card-text class="pa-0">
+              <v-img aspect-ratio="1">
+                <v-icon size="100px" style="top: 33%">
+                  mdi-image-multiple
+                </v-icon>
+              </v-img>
             </v-card-text>
           </v-container>
+          <v-card-text v-else-if="album.images.length === 2 || album.images.length === 3" class="pa-0 thumbnail">
+          <div class="vignette"></div>
+          <v-container class="py-0">
+            <v-row>
+              <v-col cols="6" v-for="(image, index) in album.images" :key="index" class="pa-0">
+                <v-img aspect-ratio="1" :src="image.url">
+                  
+                </v-img>
+              </v-col>
+              <v-col cols="6" class="pa-0">
+                <v-img aspect-ratio="1">
+                  <v-icon size="100px" style="top: 18%">
+                    mdi-image-multiple
+                  </v-icon>
+                </v-img>
+              </v-col>
+            </v-row>
+          </v-container>
+          </v-card-text>
           <v-card-text v-else-if="album.images.length === 4" class="pa-0 thumbnail">
           <div class="vignette"></div>
           <v-container class="py-0">
             <v-row>
-            
               <v-col cols="6" v-for="(image, index) in album.images" :key="index" class="pa-0">
                 <v-img aspect-ratio="1" :src="image.url">
                   
@@ -113,5 +133,10 @@ export default {
   z-index: 2;
   max-width: 94%;
   word-wrap: break-word;
+}
+
+.album {
+  width: 200px;
+  height: 200px;
 }
 </style>

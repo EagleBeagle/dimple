@@ -61,7 +61,8 @@ module.exports = {
       album: Joi.number(),
       limit: Joi.number().max(100),
       sort: Joi.string().valid('date:desc', 'date:asc'),
-      user: Joi.number()
+      user: Joi.string().min(4).max(25),
+      id: Joi.string().uuid()
     })
     const { error } = schema.validate(req.query)
     if (error) {

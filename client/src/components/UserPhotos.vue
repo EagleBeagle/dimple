@@ -68,6 +68,7 @@ export default {
     async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
       try {
         if (this.$route.params.album === 'all') {
+          filter.user = this.user.username
           const images = (await ImageService.get(filter)).data.map((image) => {
             image.url = this.cloudinaryCore.url(`${this.user.username}/${image.id}`)
             return image

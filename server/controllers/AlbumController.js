@@ -6,12 +6,11 @@ module.exports = {
   async create (req, res) {
     try {
       const { name, description, visibility } = req.body
-      const userId = req.user.id
       const album = await Album.create({
         name,
         description,
         visibility,
-        userId
+        fk_username: req.user.username
       })
       res.status(201).send(album)
     } catch (err) {

@@ -44,6 +44,9 @@ export default {
 
   get (data) {
     let queryString = ''
+    if (data.id) {
+      queryString += `&id=${data.id}`
+    }
     if (data.user) {
       queryString += `&user=${data.user}`
     }

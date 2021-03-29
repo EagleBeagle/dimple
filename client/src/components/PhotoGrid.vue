@@ -1,11 +1,11 @@
 <template>
   <v-container class="pa-0 ma-0 photo-container" fluid>
     <v-row justify="start"> <!-- v-masonry property -->
-      <v-col cols="12" sm="4" md="3" lg="2" class="image-div pa-3" v-for="(image, index) in images" :key="index" @click="enlarge(image)">
+      <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3" v-for="(image, index) in images" :key="index" @click="enlarge(image)">
         <kinesis-container v-if="!invalidImageIndices.has(index)">
           <kinesis-element :strength="10" type="depth">
             <v-hover v-slot="{hover}">
-              <v-card class="image-card" elevation="20" @click="enlarge(image)">
+              <v-card class="image-card" elevation="20" @click="$router.push({ name: 'Photo', params: { username: image.fk_username, id: image.id } })">
                 <v-img 
                   class="image"
                   aspect-ratio="1"
@@ -35,7 +35,11 @@
           </kinesis-element>
         </kinesis-container>
       </v-col>
-      <infinite-loading @infinite="infiniteHandler"></infinite-loading>
+      <infinite-loading @infinite="infiniteHandler">
+        <span slot="no-more"></span>
+        <span slot="no-results"></span>
+        <span slot="spinner"></span>
+      </infinite-loading>
       <!-- <v-col xs="cols" sm="6" md="4" lg="3" v-for="image in images" :key="image.id">
         <kinesis-container>
           <kinesis-element :strength="10" type="depth">

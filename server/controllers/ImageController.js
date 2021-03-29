@@ -4,6 +4,7 @@ const Op = db.Sequelize.Op
 const Image = db.image
 const Album = db.album
 const cloudinary = require('../config/cloudinary.config.js')
+const { image } = require('../config/cloudinary.config.js')
 
 module.exports = {
   async initiateUpload (req, res) {
@@ -16,7 +17,7 @@ module.exports = {
       const image = await Image.create({
         id: publicId,
         visibility: visibility,
-        userId: req.user.id,
+        fk_username: req.user.username,
         cancellationToken: cancellationToken
       })
       const storedAlbums = await Album.findAll({
@@ -94,12 +95,12 @@ module.exports = {
   async deleteImage (req, res) { // most csak saját user, később admin is
     try {
       const imageId = req.params.imageId
-      const userId = req.user.id
+      const username = req.user.username
       const image = await Image.findByPk(imageId)
       if (!image) {
         return res.status(404).send('Image not found')
       }
-      if (image.userId === userId) {
+      if (image.fk_username === username) {
         const response = await cloudinary.uploader.destroy(`${req.user.username}/${image.id}`)
         if (response.result !== 'ok' && response.result !== 'not found') {
           console.log('MIA A FASSAZDGSADUZASGDUASZDGASDSASDAS')
@@ -121,6 +122,7 @@ module.exports = {
   async getImages (req, res) {
     try {
       let images
+      const id = req.query.id
       const user = req.query.user
       const fromDate = req.query.from
       const toDate = req.query.to
@@ -131,14 +133,28 @@ module.exports = {
         where: {},
         order: []
       }
+      if (id) {
+        images = await Image.findByPk(id)
+        if (images.visibility || images.fk_username === req.user.username) {
+          return res.status(200).send(images)
+        } else {
+          return res.status(403).send('Unauthorized')
+        }
+      }
+      if ((user && albumName) || (user && id) || (id && albumName)) {
+        return res.status(400).send('Invalid query')
+      }
+      if (!user && !albumName && !id) {
+        return res.status(400).send('Invalid query')
+      }
       if (user) {
-        if (albumName) {
-          return res.status(400).send('Invalid query')
+        queryObject.where.fk_username = user
+        if (user !== req.user.username) {
+          console.log('IUFHAIUFBIUFAWUIDBAWUODUAWHDUOAWDHAIUWDHAUIODHASOUDHASUDOASHDIUASHDI')
+          queryObject.where.visibility = true
         }
-        queryObject.where.userId = req.user.id
-        if (user !== req.user.id) {
-          queryObject.where.visibilty = true
-        }
+      } else { // ide jön majd minden retek
+        queryObject.where.fk_username = req.user.username
       }
       if (sort) {
         if (sort === 'date:desc') {

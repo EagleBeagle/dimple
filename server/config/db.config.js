@@ -28,7 +28,23 @@ db.album = require('../models/album.model.js')(sequelize, Sequelize)
 db.image = require('../models/image.model.js')(sequelize, Sequelize)
 
 db.user.hasMany(db.album)
+db.album.belongsTo(db.user, {
+  foreignKey: {
+    name: 'fk_username',
+    allowNull: false
+  },
+  targetKey: 'username'
+})
+
 db.user.hasMany(db.image)
+db.image.belongsTo(db.user, {
+  foreignKey: {
+    name: 'fk_username',
+    allowNull: false
+  },
+  targetKey: 'username'
+})
+
 db.image.belongsToMany(db.album, { through: 'AlbumImage' })
 db.album.belongsToMany(db.image, { through: 'AlbumImage' })
 
