@@ -7,7 +7,7 @@
         <v-list-item-group
           color="primary"
         >
-          <v-list-item @click="goTo('Albums')">
+          <v-list-item @click="goTo('UserAlbums')">
             <v-list-item-icon>
               <v-icon>mdi-image-album</v-icon>
             </v-list-item-icon>

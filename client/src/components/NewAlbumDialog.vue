@@ -106,7 +106,10 @@ export default {
           userId: localStorage.getItem('user').id
         })
         this.$store.dispatch('alert', `Album ${this.name} succesfully created`)
-        this.$store.dispatch('albumAdded', response.data)
+        const newAlbum = response.data
+        newAlbum.imageCount = 0
+        newAlbum.images = []
+        this.$store.dispatch('albumAdded', newAlbum)
         this.clearFields()
         this.dialog = false
       } catch(err) {

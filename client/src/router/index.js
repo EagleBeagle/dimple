@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import store from '../store/store'
 import Home from '../components/Home.vue'
 import Auth from '../components/Authentication'
-import Albums from '../components/Albums'
+import UserAlbums from '../components/UserAlbums'
 import UserPhotos from '../components/UserPhotos'
 import Dashboard from '../components/Dashboard'
 import PhotoPage from '../components/PhotoPage'
@@ -33,8 +33,8 @@ const routes = [
     children: [
       {
         path: 'albums',
-        name: 'Albums',
-        component: Albums
+        name: 'UserAlbums',
+        component: UserAlbums
       },
       {
         path: 'photos/:album',

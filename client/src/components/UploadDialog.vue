@@ -171,7 +171,7 @@ export default {
             private: false
           })
         }
-        const albums = (await AlbumService.get()).data
+        const albums = (await AlbumService.get({ user: this.user.username })).data
             this.allAlbums = albums.map(album => {
               return album.name
         })

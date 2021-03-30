@@ -5,11 +5,18 @@ export default {
     return Api().put('/album', data)
   },
   
-  get (id) {
-    if (id) {
-      return Api().get(`/album?id=${id}`)
-    } else {
-      return Api().get('/album')
+  get (data) {
+    let queryString = ''
+    if (data.id) {
+      queryString += `&id=${data.id}`
     }
+    if (data.user) {
+      queryString += `&user=${data.user}`
+    }
+    return Api().get(`album?${queryString}`)
+  },
+
+  delete (id) {
+    return Api().delete(`album/${id}`)
   }
 }

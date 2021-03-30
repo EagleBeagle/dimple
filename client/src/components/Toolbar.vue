@@ -36,7 +36,7 @@
           </v-list>
         </v-menu>
         <new-album-dialog :show="dialog" v-on:close="dialog = false"/>
-        <div v-if="$route.name === 'Albums'">        
+        <div v-if="$route.name === 'UserAlbums'">        
             
         </div>
         <div v-if="$route.name === 'Photos'">
@@ -45,10 +45,7 @@
       </v-toolbar-items>
       <v-spacer />
       <v-toolbar-items>
-        <v-btn depressed color="grey lighten-3" class="upload-button" @click="$emit('showUploadbar')">
-          <v-icon class="blue--text">mdi-autorenew</v-icon>
-          <div class="text-body-2">Upload of 1 photo is in progress</div>
-        </v-btn>
+        <div></div>
       </v-toolbar-items>
     </v-app-bar> 
 </template>

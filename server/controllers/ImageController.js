@@ -4,7 +4,6 @@ const Op = db.Sequelize.Op
 const Image = db.image
 const Album = db.album
 const cloudinary = require('../config/cloudinary.config.js')
-const { image } = require('../config/cloudinary.config.js')
 
 module.exports = {
   async initiateUpload (req, res) {
@@ -98,7 +97,7 @@ module.exports = {
       const username = req.user.username
       const image = await Image.findByPk(imageId)
       if (!image) {
-        return res.status(404).send('Image not found')
+        return res.status(404).send('Invalid id')
       }
       if (image.fk_username === username) {
         const response = await cloudinary.uploader.destroy(`${req.user.username}/${image.id}`)
@@ -135,6 +134,9 @@ module.exports = {
       }
       if (id) {
         images = await Image.findByPk(id)
+        if (!images) {
+          return res.status(400).send('Invalid id')
+        }
         if (images.visibility || images.fk_username === req.user.username) {
           return res.status(200).send(images)
         } else {
@@ -150,7 +152,6 @@ module.exports = {
       if (user) {
         queryObject.where.fk_username = user
         if (user !== req.user.username) {
-          console.log('IUFHAIUFBIUFAWUIDBAWUODUAWHDUOAWDHAIUWDHAUIODHASOUDHASUDOASHDIUASHDI')
           queryObject.where.visibility = true
         }
       } else { // ide jön majd minden retek
@@ -180,7 +181,7 @@ module.exports = {
       if (albumName) {
         const album = await Album.findByPk(albumName)
         if (album) {
-          if (album.userId === req.user.id || album.visibility) {
+          if (album.fk_username === req.user.username || album.visibility) {
             images = await album.getImages(queryObject)
           } else {
             return res.status(403).send('Unauthorized')
