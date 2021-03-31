@@ -128,6 +128,7 @@ module.exports = {
       const albumName = req.query.album
       const limit = req.query.limit
       const sort = req.query.sort
+      const visibility = req.query.visibility
       const queryObject = {
         where: {},
         order: []
@@ -148,6 +149,9 @@ module.exports = {
       }
       if (!user && !albumName && !id) {
         return res.status(400).send('Invalid query')
+      }
+      if (visibility) {
+        queryObject.visibility = visibility
       }
       if (user) {
         queryObject.where.fk_username = user

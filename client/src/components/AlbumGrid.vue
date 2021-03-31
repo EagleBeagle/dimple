@@ -17,19 +17,19 @@
                     </v-col>
                   </v-row>
                   <v-expand-transition>
-                    <v-row justify="space-around" v-if="hover" class="pb-1">
+                    <v-row justify="space-around" v-if="hover">
                       <v-col cols="3" class="pa-0">
                         <v-icon v-on:click.stop large color="white" class="album-setting-icon">
                           mdi-plus
                         </v-icon>
                       </v-col>
-                      <v-col cols="3" class="pa-0">
+                      <v-col cols="3" class="pa-0 mb-1">
                         <v-icon v-on:click.stop large color="white" class="album-setting-icon">
                           mdi-share
                         </v-icon>
                       </v-col>
                       <v-col cols="3" class="pa-0">
-                        <v-icon v-on:click.stop large color="white" class="album-setting-icon">
+                        <v-icon v-on:click.stop large color="white" class="album-setting-icon" :disabled="!album.images.length" @click="$emit('download', album.id)">
                           mdi-download
                         </v-icon>
                       </v-col>

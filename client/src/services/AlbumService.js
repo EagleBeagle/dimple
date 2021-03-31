@@ -16,6 +16,10 @@ export default {
     return Api().get(`album?${queryString}`)
   },
 
+  download (id) {
+    return Api().get(`album/${id}/download`)
+  },
+
   delete (id) {
     return Api().delete(`album/${id}`)
   }

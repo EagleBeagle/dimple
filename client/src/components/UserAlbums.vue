@@ -6,7 +6,11 @@
       </v-col>
     </v-row>
     <v-row class="pa-0">
-      <album-grid :albums="albums" @open="open" @delete="deleteAlbum" />
+      <album-grid
+        :albums="albums"
+        @open="openAlbum"
+        @download="downloadAlbum"
+        @delete="deleteAlbum" />
     </v-row>
   </v-container>
   
@@ -42,7 +46,7 @@ export default {
     }
   },
   methods: {
-    open(id) {
+    openAlbum(id) {
       this.$router.push({ name: 'Photos', params: { album: id } })
     },
     async getAlbums() {
@@ -59,14 +63,23 @@ export default {
         this.$store.dispatch('alert', 'An error has happened while fetching your albums')
       }
     },
+    async downloadAlbum(id) {
+      try {
+        const url = (await AlbumService.download(id)).data
+        window.open(url)
+      } catch (err) {
+        console.log(err)
+        this.$store.dispatch('alert', 'An error has occured while preparing your download')
+      }
+    },
     async deleteAlbum(id) {
       try {
         await AlbumService.delete(id)
         this.albums = this.albums.filter(album => album.id !== id)
         this.$store.dispatch('alert', 'Album deleted successfully.')
-      } catch(err) {
+      } catch (err) {
         console.log(err)
-        this.$store.dispatch('alert', 'An error occured during deletion.')
+        this.$store.dispatch('alert', 'An error occured during deletion')
       }
     }
   }

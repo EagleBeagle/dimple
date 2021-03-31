@@ -1,11 +1,11 @@
 <template>
   <v-container class="pa-0 ma-0 photo-container" fluid>
     <v-row justify="start"> <!-- v-masonry property -->
-      <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3" v-for="(image, index) in images" :key="index" @click="enlarge(image)">
+      <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3" v-for="(image, index) in images" :key="index">
         <kinesis-container v-if="!invalidImageIndices.has(index)">
           <kinesis-element :strength="10" type="depth">
             <v-hover v-slot="{hover}">
-              <v-card class="image-card" elevation="20" @click="$router.push({ name: 'Photo', params: { username: image.fk_username, id: image.id } })">
+              <v-card class="image-card" elevation="20" @click="$emit('open', image)">
                 <v-img 
                   class="image"
                   aspect-ratio="1"
@@ -54,20 +54,15 @@
           </kinesis-element>
         </kinesis-container>
       </v-col> -->
-      <image-dialog :show="showDialog" :image="enlargedImage" v-on:close="showDialog = false"/>
     </v-row>
   </v-container>
 </template>
 
 <script>
-import ImageDialog from '@/components/ImageDialog'
 export default {
   props: [
     'images'
   ],
-  components: {
-    ImageDialog
-  },
   data () {
     return {
       invalidImageIndices: new Set(),
@@ -76,10 +71,6 @@ export default {
     }
   },
   methods: {
-    enlarge(image) {
-      this.enlargedImage = image
-      this.showDialog = true
-    },
     imageError(index) {
      this.invalidImageIndices.add(index)
      console.log(this.invalidImageIndices.has(index))

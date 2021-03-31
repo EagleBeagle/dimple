@@ -33,6 +33,11 @@ module.exports = app => {
     verifyAuth.isLoggedIn,
     AlbumController.delete)
 
+  app.get('/album/:id/download',
+    verifyAuth.isLoggedIn,
+    AlbumController.download
+  )
+
   app.put('/image',
     verifyAuth.isLoggedIn,
     ImageControllerValidator.initiateUpload,

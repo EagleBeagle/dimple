@@ -1,7 +1,133 @@
 <template>
-  <v-img v-if="image" :src="image.url">
-
-  </v-img>
+  <div class="photo-page">
+    <v-container
+      fluid 
+      class="photo-background pt-0 pb-0"
+      :class="{
+            'photo-background-lg': $vuetify.breakpoint.lgAndUp,
+            'photo-background-md': $vuetify.breakpoint.mdOnly,
+            'photo-background-sm': $vuetify.breakpoint.smOnly,
+            'photo-background-xs': $vuetify.breakpoint.xsOnly}">
+      <v-row justify="end">
+        <v-col
+          cols="2" sm="2" align-self="center" 
+          style="text-align: start; cursor: pointer"
+          v-if="goBackParams"
+          @click="backToStream()">
+          <span style="color: white">
+          <v-icon color="white">
+            mdi-arrow-left
+          </v-icon>
+          Back to photostream
+          </span>
+        </v-col>
+        <v-spacer></v-spacer>
+        <v-col cols="2" sm="1" style="text-align: end">
+          <v-icon large color="white" @click="expand = !expand">
+            mdi-arrow-expand
+          </v-icon>
+        </v-col>
+      </v-row>
+      <v-row justify="space-between">
+        <v-col cols="2" sm="1" class="pa-0" align-self="center" style="text-align: start">
+          <v-icon
+            size="70px" 
+            color="white" 
+            v-show="leftImages.length !== 0"
+            @click="goLeft()">
+            mdi-chevron-left
+          </v-icon>
+        </v-col>
+        <v-col cols="8" sm="10" class="pa-0">
+          <v-img
+            v-if="image" 
+            contain 
+            :src="image.url" 
+            :height="
+              $vuetify.breakpoint.lgAndUp ? '65vh' : 
+              $vuetify.breakpoint.mdOnly ? '65vh' : 
+              $vuetify.breakpoint.smOnly ? '54vh' : '45vh'" 
+            class="photo"></v-img>
+        </v-col>
+        <v-col cols="2" sm="1" class="pa-0" align-self="center" style="text-align: end">
+          <v-icon 
+            size="70px" 
+            color="white"
+            v-show="rightImages.length !== 0"
+            class="font-weight-thin"
+             @click="goRight()">
+            mdi-chevron-right
+          </v-icon>
+        </v-col>
+      </v-row>
+      <v-row justify="center">
+        <v-container
+          class="pt-6 photo-rail"
+          :class="{
+            'photo-rail-lg': $vuetify.breakpoint.lgAndUp,
+            'photo-rail-md': $vuetify.breakpoint.mdOnly,
+            'photo-rail-sm': $vuetify.breakpoint.smOnly,
+            'photo-rail-xs': $vuetify.breakpoint.xsOnly}">
+          <v-row justify="center">
+            <v-col v-if="leftImages.length === 0" cols="2" sm="1" class="pa-0">
+              <v-img v-if="image" height="40px" width="40px" aspect-ratio="1" class="thumbnail"></v-img>
+            </v-col>
+            <v-col v-if="leftImages.length < 2" cols="2" sm="1" class="pa-0">
+              <v-img v-if="image" height="40px" width="40px" aspect-ratio="1" class="thumbnail"></v-img>
+            </v-col>
+            <v-col cols="2" sm="1" class="pa-0" v-for="(image, index) in leftImages" :key="index">
+              <v-img v-if="image" :src="image.url" height="40px" width="40px" aspect-ratio="1" class="thumbnail thumbnail-loaded" @click="imageFromThumbnail(index, 'left')"></v-img>
+            </v-col>
+            <v-col cols="2" sm="1" class="pa-0">
+              <v-img v-if="image" :src="image.url" height="40px" width="40px" aspect-ratio="1" class="thumbnail thumbnail-current"></v-img>
+            </v-col>
+            <v-col cols="2" sm="1" class="pa-0" v-for="(image, index) in rightImages" :key="index + 2">
+              <v-img v-if="image" :src="image.url" height="40px" width="40px" aspect-ratio="1" class="thumbnail thumbnail-loaded" @click="imageFromThumbnail(index, 'right')"></v-img>
+            </v-col>
+            <v-col v-if="rightImages.length < 2" cols="2" sm="1" class="pa-0">
+              <v-img v-if="image" height="40px" width="40px" aspect-ratio="1" class="thumbnail"></v-img>
+            </v-col>
+            <v-col v-if="rightImages.length === 0" cols="2" sm="1" class="pa-0">
+              <v-img v-if="image" height="40px" width="40px" aspect-ratio="1" class="thumbnail"></v-img>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-container 
+          fluid 
+          class="pa-0 pt-6 settings-container"
+          :class="{
+            'settings-container-lg': $vuetify.breakpoint.lgAndUp,
+            'settings-container-md': $vuetify.breakpoint.mdOnly,
+            'settings-container-sm': $vuetify.breakpoint.smOnly,
+            'settings-container-xs': $vuetify.breakpoint.xsOnly}">
+          <v-row justify="center" align-content="center">
+            <v-col cols="3" sm="4">
+              <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="shareImage">
+                mdi-share
+              </v-icon>
+            </v-col>
+            <v-col cols="3" sm="4">
+              <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="downloadImage">
+                mdi-download
+              </v-icon>
+            </v-col>
+            <v-col cols="3" sm="4">
+              <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="deleteImage">
+                mdi-delete
+              </v-icon>
+            </v-col>
+          </v-row>
+          <v-divider></v-divider>
+        </v-container>
+      </v-row>
+      <div v-if="expand" class="expanded-photo-div" tabindex="0">
+        <v-icon x-large class="close-expand" color="white" @click="expand = !expand">
+          mdi-close
+        </v-icon>
+        <v-img v-if="image" contain height="100%" :src="image.url"></v-img>
+      </div>
+    </v-container>  
+  </div>
 </template>
 
 <script>
@@ -11,7 +137,11 @@ import { Cloudinary } from 'cloudinary-core';
 export default {
   data () {
     return {
-      image: null
+      image: null,
+      expand: false,
+      leftImages: [],
+      rightImages: [],
+      goBackParams: null
     }
   },
   computed: {
@@ -19,15 +149,31 @@ export default {
       'user'
     ])
   },
+  watch: {
+    expand() {
+      if (this.expand) {
+        console.log('adddd')
+        document.addEventListener('keyup', this.escPressed)
+      } else {
+        console.log('remoooove')
+        document.removeEventListener('keyup', this.escPressed)
+      }
+    },
+    '$route.params.id': async function() {
+      await this.getImage()
+      await this.getNeighbouringImages()
+    }
+  },
   async mounted() {
     this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
-    await this.getImage();
+    document.addEventListener('keyup', this.arrowsPressed)
+    await this.getImage()
+    await this.getNeighbouringImages()
   },
   methods: {
     async getImage() { 
       try {
         const image = (await ImageService.get({ id: this.$route.params.id })).data
-        console.log(image)
         image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
         this.image = image
       } catch (err) {
@@ -37,6 +183,232 @@ export default {
         }
       }
     },
+    async getNeighbouringImages() {
+      const query = this.$route.query
+      if (query.page && 
+          query.page === 'user' && 
+          query.in && 
+          query.visibility && 
+          query.order) { // all photos of
+        try {
+          let leftFilter = {
+            limit: 2
+          }
+          let rightFilter = {
+            limit: 2
+          }
+          if (query.visibility !== 'all') {
+            leftFilter.visibility = query.visibility
+            rightFilter.visibility = query.visibility
+          }
+          if (query.in === 'all') {
+            leftFilter.user = this.image.fk_username
+            rightFilter.user = this.image.fk_username
+          }
+          if (query.in !== 'all') {
+            leftFilter.album = query.in
+            rightFilter.album = query.in
+          }
+          if (query.order === 'date:desc') {
+            leftFilter.from = this.image.createdAt
+            leftFilter.sort = 'date:asc'
+            this.leftImages = (await ImageService.get(leftFilter)).data.reverse().map(image => {
+              image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+              return image
+            })
+            rightFilter.to = this.image.createdAt
+            rightFilter.sort = 'date:desc'
+            this.rightImages = (await ImageService.get(rightFilter)).data.map(image => {
+              image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+              return image
+            })
+          } else if (query.order === 'date:asc') { // todo
+            console.log('asc todo')
+          }
+        } catch (err) {
+          console.log(err)
+        }
+      } else { // todo todooo
+
+      }
+    },
+    async imageFromThumbnail(index, side) {
+      try {
+        if (side === 'left') {
+          this.image = this.leftImages[index]
+        } else if (side === 'right') {
+          this.image = this.rightImages[index]
+        }
+        this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query })
+        await this.getNeighbouringImages()
+      } catch (err) {
+        console.log(err)
+        this.$store.dispatch('alert', 'An error happened while trying to go left')
+      }
+    },
+    async goLeft() {
+      if (this.leftImages.length > 0) {
+        try {
+          this.image = this.leftImages[this.leftImages.length - 1]
+          this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query })
+          await this.getNeighbouringImages()
+        } catch (err) {
+          console.log(err)
+          this.$store.dispatch('alert', 'An error happened while trying to go left')
+        }
+      }
+    },
+    async goRight() {
+      if (this.rightImages.length > 0) {
+        try {
+          this.image = this.rightImages[0]
+          this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query })
+          await this.getNeighbouringImages()
+        } catch (err) {
+          console.log(err)
+          this.$store.dispatch('alert', 'An error happened while trying to go left')
+        }
+      }
+    },
+    backToStream() {
+      console.log('todo')
+    },
+    shareImage() {
+      console.log('share')
+    },
+    async downloadImage() {
+      try {
+        const image = (await ImageService.download(this.image.url)).data
+        console.log(image)
+        const url = window.URL.createObjectURL(new Blob([image]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `${this.image.id}.png`)
+        document.body.appendChild(link)
+        link.click()
+      } catch (err) {
+        console.log(err)
+        this.$store.dispatch('alert', 'An error has occured while preparing your download')
+      }
+    },
+    deleteImage() {
+      console.log('delete')
+    },
+    escPressed(event) {
+      if (event.key === 'Escape') {
+        this.expand = !this.expand
+      }
+    },
+    async arrowsPressed(event) {
+      if (event.key === 'ArrowLeft') {
+        await this.goLeft()
+      } else if (event.key === 'ArrowRight') {
+        await this.goRight()
+      }
+    }
+  },
+  destroyed() {
+    document.removeEventListener('keyup', this.escPressed)
+    document.removeEventListener('keyup', this.arrowsPressed)
   }
 }
 </script>
+
+<style scoped>
+.photo-page {
+  height: 100%;
+}
+
+.photo-background {
+  background-color: rgb(71, 71, 71);
+}
+
+.photo-background-lg {
+  height: 80vh;
+}
+
+.photo-background-md {
+  height: 80vh;
+}
+
+.photo-background-sm {
+  height: 70vh;
+}
+
+.photo-background-xs {
+  height: 70vh;
+}
+
+.expanded-photo-div {
+  position: fixed;
+  background-color: black;
+  top: 0px;
+  left: 0px;
+  height: 100vh;
+  width: 100%;
+  z-index: 200;
+}
+
+.close-expand {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  z-index: 200;
+}
+
+.photo-rail {
+  position: absolute;
+}
+.photo-rail-lg {
+  width: 38vw;
+}
+.photo-rail-md {
+  width: 60vw;
+}
+.photo-rail-sm {
+  width: 100vw;
+}
+.photo-rail-xs {
+  width: 80vw;
+}
+
+.thumbnail {
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+}
+
+.thumbnail-loaded {
+  border: 1px solid #ffffff9c;
+  cursor: pointer;
+}
+
+.thumbnail-current {
+  border: 1px solid #ffffff9c;
+}
+
+.settings-container {
+  position: absolute;
+  right: 10px;
+  width: 10vw;
+}
+
+.settings-container-lg {
+  width: 10vw;
+}
+
+.settings-container-md {
+  width: 15vw;
+}
+
+.settings-container-sm {
+  width: 20vw;
+}
+
+.settings-container-xs {
+  right: 0px;
+  width: 100vw;
+  margin-top: 83px;
+}
+
+</style>

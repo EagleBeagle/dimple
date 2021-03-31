@@ -1,3 +1,4 @@
+import axios from 'axios'
 import Api from '@/services/DimpleApi'
 import CloudinaryApi from '@/services/CloudinaryApi'
 import store from '@/store/store'
@@ -69,9 +70,7 @@ export default {
     return Api().get(`image?${queryString}`)
   },
 
-  getPrivateImage(id) {
-    return Api().get(`image/?${id}`, {
-      responseType: 'arraybuffer'
-    })
+  download(url) {
+    return axios({ method: 'get', url, responseType: 'arraybuffer' })
   }
 }

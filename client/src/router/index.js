@@ -64,11 +64,11 @@ router.beforeEach((to, from, next) => {
   }
 
   if (to.path === '/auth' && loggedIn) {
-    return next('/dashboard/photos');
+    return next('/dashboard/photos/all');
   }
 
   if (to.path === '/') {
-    return next('/dashboard/photos')
+    return next('/dashboard/photos/all')
   }
   
 

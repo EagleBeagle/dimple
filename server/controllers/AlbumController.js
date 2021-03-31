@@ -1,3 +1,4 @@
+const cloudinary = require('../config/cloudinary.config.js')
 const db = require('../config/db.config.js')
 const Album = db.album
 const Image = db.image
@@ -89,6 +90,35 @@ module.exports = {
     } catch (err) {
       console.log(err)
       res.status(500).send('An error happened while deleting the image')
+    }
+  },
+
+  async download (req, res) {
+    try {
+      const albumId = req.params.id
+      const username = req.user.username
+      const album = await Album.findByPk(albumId)
+      if (!album) {
+        return res.status(400).send('Invalid request')
+      }
+      if (album.fk_username === username || album.visibility) {
+        const imageIds = (await album.getImages({
+          attributes: ['id'],
+          joinTableAttributes: []
+        })).map(result => `${album.fk_username}/${result.id}`)
+        const date = new Date(Date.now()).toLocaleString().split(',')[0].replace(/\//g, '-')
+        const url = cloudinary.utils.download_zip_url({
+          public_ids: imageIds,
+          target_public_id: `${album.name}-${date}`,
+          flatten_folders: true
+        })
+        return res.status(200).send(url)
+      } else {
+        return res.status(403).send('Unauthorized')
+      }
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('An error happened while preparing the download')
     }
   }
 }

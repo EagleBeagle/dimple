@@ -1,7 +1,21 @@
 <template>
-<div>
-  <v-app-bar fixed min-height="64px" clipped-left clipped-right app flat outlined color="blue">
-    <v-toolbar-title class="font-weight-bold text-h3 white--text">dimple</v-toolbar-title>
+  <v-app-bar fixed min-height="64px" clipped-left flat color="blue">
+    <v-toolbar-title 
+      class="font-weight-bold text-h3 white--text mr-5" 
+      style="cursor: pointer" 
+      @click="$router.push({ name: 'Photos', params: { album: 'all' } }).catch(err => {})">dimple
+    </v-toolbar-title>
+    <v-toolbar-items>
+      <v-btn class="white--text" 
+        depressed tile color="blue" 
+        light 
+        @click="$router.push({ name: 'Photos', params: { album: 'all' } }).catch(err => {})">
+        You
+      </v-btn>
+      <v-btn class="white--text" depressed tile color="blue" light>
+        Explore
+      </v-btn>
+    </v-toolbar-items>
     <v-spacer></v-spacer>
     <v-toolbar-items>
       <v-container fill-height>
@@ -12,7 +26,6 @@
       </v-btn>
     </v-toolbar-items>
   </v-app-bar> 
-  </div>
 </template>
 
 <script>

@@ -1,9 +1,9 @@
 <template>
   <v-app>
-      <div v-if="user.jwtToken">
+      <div v-if="user.jwtToken" style="margin-bottom: 64px">
         <page-header />
       </div>
-      <v-main :style="mainMargin">
+      <v-main>
         <router-view  />
       </v-main>
       <v-snackbar
@@ -40,7 +40,7 @@ export default {
   },
   mounted() {
     if (this.user.jwtToken) {
-      this.mainMargin = 'margin-top: 60px'
+      this.mainMargin = 'margin-top: 64px'
     } else {
       this.mainMargin = 'margin-top: 0px'
     }

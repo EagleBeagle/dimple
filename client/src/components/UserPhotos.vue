@@ -11,7 +11,11 @@
         <div class="display-1 my-2">All Photos</div>
       </v-col>
     </v-row>
-    <photo-grid :images="images" @delete="deleteImage" @reachedBottom="infiniteHandler" />
+    <photo-grid
+      :images="images" 
+      @delete="deleteImage" 
+      @reachedBottom="infiniteHandler"
+      @open="openImage" />
   </v-container>
 </template>
 
@@ -91,6 +95,21 @@ export default {
       } catch (err) {
         console.log(err)
       }
+    },
+    async openImage(image) { // ezt kell még todozni
+      this.$router.push({
+        name: 'Photo',
+        params: {
+          username: image.fk_username,
+          id: image.id
+        },
+        query: {
+          in: this.$route.params.album,
+          visibility: 'all',
+          page: 'user',
+          order: 'date:desc'
+        }
+      })
     },
     async deleteImage(id) {
       try {
