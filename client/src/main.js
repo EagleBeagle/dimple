@@ -5,7 +5,8 @@ import router from './router'
 import store from './store/store'
 import VueKinesis from 'vue-kinesis'
 import Cloudinary from 'cloudinary-vue'
-import InfiniteLoading from 'vue-infinite-loading';
+import InfiniteLoading from 'vue-infinite-loading'
+import VueSocialSharing from 'vue-social-sharing'
 
 Vue.config.productionTip = false
 Vue.use(VueKinesis)
@@ -17,6 +18,7 @@ Vue.use(Cloudinary, {
 
 
 Vue.use(InfiniteLoading)
+Vue.use(VueSocialSharing)
 
 new Vue({
   vuetify,

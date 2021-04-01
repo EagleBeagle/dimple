@@ -29,14 +29,22 @@ module.exports = {
         where: {},
         order: [
           ['name', 'ASC']
-        ]
+        ],
+        attributes: {}
       }
 
       if ((id && user) || (!id && !user)) {
         return res.status(400).send('Invalid query')
       }
+      queryObject.attributes.include = [[
+        db.Sequelize.literal(`(
+          SELECT COUNT(*) FROM albumimage
+          WHERE albumimage.albumId = album.id
+        )`), 'imageCount'
+      ]]
       if (id) {
-        const album = await Album.findByPk(req.query.id)
+        queryObject.where.id = req.query.id
+        const album = await Album.findOne(queryObject)
         if (!album) {
           return res.status(403).send('Invalid id')
         }
@@ -59,12 +67,6 @@ module.exports = {
           attributes: ['id'],
           joinTableAttributes: []
         })
-        albums[i].dataValues.imageCount = (await albums[i].getImages({
-          attributes: [
-            [db.Sequelize.fn('COUNT', db.Sequelize.col('id')), 'imageCount']
-          ],
-          joinTableAttributes: []
-        }))[0].dataValues.imageCount
       }
       res.status(200).send(albums)
     } catch (err) {

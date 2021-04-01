@@ -40,14 +40,16 @@
         </v-col>
         <v-col cols="8" sm="10" class="pa-0">
           <v-img
-            v-if="image" 
-            contain 
+            v-if="image"
+            :key="image.id"
+            contain
             :src="image.url" 
             :height="
               $vuetify.breakpoint.lgAndUp ? '65vh' : 
               $vuetify.breakpoint.mdOnly ? '65vh' : 
               $vuetify.breakpoint.smOnly ? '54vh' : '45vh'" 
-            class="photo"></v-img>
+            class="photo">
+          </v-img>
         </v-col>
         <v-col cols="2" sm="1" class="pa-0" align-self="center" style="text-align: end">
           <v-icon 
@@ -79,7 +81,7 @@
               <v-img v-if="image" :src="image.url" height="40px" width="40px" aspect-ratio="1" class="thumbnail thumbnail-loaded" @click="imageFromThumbnail(index, 'left')"></v-img>
             </v-col>
             <v-col cols="2" sm="1" class="pa-0">
-              <v-img v-if="image" :src="image.url" height="40px" width="40px" aspect-ratio="1" class="thumbnail thumbnail-current"></v-img>
+            <v-img v-if="image" :src="image.url" height="40px" width="40px" aspect-ratio="1" class="thumbnail thumbnail-current"></v-img>
             </v-col>
             <v-col cols="2" sm="1" class="pa-0" v-for="(image, index) in rightImages" :key="index + 2">
               <v-img v-if="image" :src="image.url" height="40px" width="40px" aspect-ratio="1" class="thumbnail thumbnail-loaded" @click="imageFromThumbnail(index, 'right')"></v-img>
@@ -102,9 +104,10 @@
             'settings-container-xs': $vuetify.breakpoint.xsOnly}">
           <v-row justify="center" align-content="center">
             <v-col cols="3" sm="4">
-              <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="shareImage">
+              <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showShareDialog = true">
                 mdi-share
               </v-icon>
+              <share-dialog v-if="showShareDialog" :show="showShareDialog" :image="this.image" @close="showShareDialog = false"></share-dialog>
             </v-col>
             <v-col cols="3" sm="4">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="downloadImage">
@@ -126,7 +129,88 @@
         </v-icon>
         <v-img v-if="image" contain height="100%" :src="image.url"></v-img>
       </div>
-    </v-container>  
+    </v-container>
+    <v-container class="mt-12 mt-sm-1" v-if="image">
+      <v-row justify="center">
+        <v-col cols="12" sm="6" xl="7" class="pa-0">
+          <v-container class="pa-0 pr-xl-6">
+            <v-row justify="center" justify-sm="end">
+              <v-col cols="4" sm="3" md="3" lg="2" xl="2" class="pl-xl-16 pr-xl-0">
+                <v-img v-if="image" :src="image.url" height="80px" width="80px" aspect-ratio="1" class="avatar"></v-img>
+              </v-col>
+              <v-col cols="8" sm="6" md="7" lg="5" xl="4" align-self="center">
+                <v-container class="pa-0">
+                  <v-row justify="start">
+                    <v-col cols="7" class="text-h6 pa-0" style="text-align: start">
+                      Biacsi Zoltán
+                    </v-col>
+                  </v-row>
+                  <v-row justify="start">
+                    <v-col cols="9" class="text-body-2 pa-0 blue--text" style="text-align: start">
+                      Uploaded on
+                      <span>{{ new Date(image.createdAt).toUTCString().split(', ')[1].split(' ').slice(0, 3).join().replace(',', ' ').replace(',', ' ') }}</span>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-col>
+            </v-row>
+            <v-divider v-if="$vuetify.breakpoint.xsOnly"></v-divider>
+          </v-container>
+        </v-col>
+        <v-col cols="12" sm="6" xl="5" align-self="center" class="pa-0">
+          <v-container class="pa-0 pr-xl-16">
+            <v-row justify="center" justify-sm="start">
+              <v-col cols="12" align-self="center">
+                <v-container class="pa-0" style="text-align: start">
+                  <v-row justify="center">
+                    <v-col cols="5" sm="4" xl="2" align-self="center" class="pa-0 text-subtitle-1 blue--text">
+                      10
+                    </v-col>
+                    <v-col cols="5" sm="4" xl="9" align-self="center" class="pa-0 text-subtitle-1 blue--text">
+                      5
+                    </v-col>
+                  </v-row>
+                  <v-row justify="center">
+                    <v-col cols="5" sm="4" xl="2" align-self="center" class="pa-0 text-body-2">
+                      Faves
+                    </v-col>
+                    <v-col cols="5" sm="4" xl="9" align-self="center" class="pa-0 text-body-2">
+                      Comments
+                    </v-col>
+                  </v-row>
+                  <v-row justify="start">
+                  </v-row>
+                </v-container>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-col>
+      </v-row>
+    </v-container>
+    <v-divider v-if="$vuetify.breakpoint.xsOnly"></v-divider>
+    <v-divider v-if="$vuetify.breakpoint.smAndUp" style="margin-left: 25%; margin-right: 25%;"></v-divider>
+    <v-container class="privacy-container" v-if="image">
+      <v-row justify="center">
+        <v-col cols="12" sm="4" xl="2" align-self="start" class="pa-0 text-body-1">
+          <v-icon class="mr-1" v-if="image.visibility">
+            mdi-lock-open-variant-outline
+          </v-icon>
+          <v-icon class="mr-1" v-else>
+            mdi-lock-outline
+          </v-icon>
+          <span class="pt-2">Viewing privacy:</span>
+          <span class="blue--text ml-3">{{ image.visibility ? 'Public' : 'Private' }}</span>
+          <v-icon color="blue">
+            mdi-chevron-up
+          </v-icon>
+        </v-col>
+      </v-row>
+    </v-container>
+    <v-divider v-if="$vuetify.breakpoint.xsOnly"></v-divider>
+    <v-divider v-if="$vuetify.breakpoint.smAndUp" style="margin-left: 25%; margin-right: 25%;"></v-divider>
+    <v-container class="pa-0 mt-5">
+      <comment-container :image="image" @writting="switchWrittingComment" />
+    </v-container>
   </div>
 </template>
 
@@ -134,13 +218,21 @@
 import { mapState } from 'vuex'
 import ImageService from '@/services/ImageService'
 import { Cloudinary } from 'cloudinary-core';
+import ShareDialog from '@/components/ShareDialog'
+import CommentContainer from '@/components/CommentContainer'
 export default {
+  components: {
+    ShareDialog,
+    CommentContainer
+  },
   data () {
     return {
       image: null,
       expand: false,
       leftImages: [],
       rightImages: [],
+      showShareDialog: false,
+      writtingComment: false,
       goBackParams: null
     }
   },
@@ -271,10 +363,7 @@ export default {
       }
     },
     backToStream() {
-      console.log('todo')
-    },
-    shareImage() {
-      console.log('share')
+      console.log('todon')
     },
     async downloadImage() {
       try {
@@ -291,8 +380,15 @@ export default {
         this.$store.dispatch('alert', 'An error has occured while preparing your download')
       }
     },
-    deleteImage() {
-      console.log('delete')
+    async deleteImage() {
+      try {
+        await ImageService.delete(this.image.id)
+        this.$router.push({ name: 'Photos', params: { album: 'all' } })
+        this.$store.dispatch('alert', 'Photo deleted successfully.')
+      } catch(err) {
+        console.log(err)
+        this.$store.dispatch('alert', 'An error occured during deletion.')
+      }
     },
     escPressed(event) {
       if (event.key === 'Escape') {
@@ -300,11 +396,16 @@ export default {
       }
     },
     async arrowsPressed(event) {
-      if (event.key === 'ArrowLeft') {
-        await this.goLeft()
-      } else if (event.key === 'ArrowRight') {
-        await this.goRight()
+      if (!this.writtingComment) {
+        if (event.key === 'ArrowLeft' || event.keyCode === 65) {
+          await this.goLeft()
+        } else if (event.key === 'ArrowRight' || event.keyCode === 68) {
+          await this.goRight()
+        }
       }
+    },
+    switchWrittingComment(value) {
+      this.writtingComment = value
     }
   },
   destroyed() {
@@ -411,4 +512,10 @@ export default {
   margin-top: 83px;
 }
 
+.avatar {
+  border-radius: 50%;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+}
 </style>
