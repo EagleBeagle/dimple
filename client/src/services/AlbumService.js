@@ -2,7 +2,7 @@ import Api from '@/services/DimpleApi'
 
 export default {
   create (data) {
-    return Api().put('/album', data)
+    return Api().post('/album', data)
   },
   
   get (data) {
@@ -12,6 +12,9 @@ export default {
     }
     if (data.user) {
       queryString += `&user=${data.user}`
+    }
+    if (data.imageId) {
+      queryString += `&image=${data.imageId}`
     }
     return Api().get(`album?${queryString}`)
   },

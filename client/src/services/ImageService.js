@@ -5,7 +5,7 @@ import store from '@/store/store'
 
 export default {
   initiateUpload (data) {
-    return Api().put('/image', data)
+    return Api().post('/image', data)
   },
 
   upload (data, onProgress, onError) {
@@ -33,6 +33,11 @@ export default {
     }
     return CloudinaryApi().post('', data, config) */
   },
+
+  update(id, data) {
+    console.log(id)
+    return Api().put(`image/${id}`, data)
+  } ,
 
   delete (imageId) {
     return Api().delete(`image/${imageId}`)

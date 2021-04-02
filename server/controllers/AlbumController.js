@@ -24,24 +24,26 @@ module.exports = {
     try {
       const id = req.query.id
       const user = req.query.user
-
+      const imageId = req.query.image
       const queryObject = {
         where: {},
         order: [
           ['name', 'ASC']
         ],
-        attributes: {}
+        attributes: {
+          include: []
+        }
       }
-
-      if ((id && user) || (!id && !user)) {
+      let albums
+      if ((id && user) || (id && imageId) || (user && imageId) || (!id && !user && !imageId)) {
         return res.status(400).send('Invalid query')
       }
-      queryObject.attributes.include = [[
+      queryObject.attributes.include.push([
         db.Sequelize.literal(`(
           SELECT COUNT(*) FROM albumimage
           WHERE albumimage.albumId = album.id
         )`), 'imageCount'
-      ]]
+      ])
       if (id) {
         queryObject.where.id = req.query.id
         const album = await Album.findOne(queryObject)
@@ -53,18 +55,28 @@ module.exports = {
         } else {
           return res.status(403).send('Unauthorized')
         }
+      } else if (imageId) {
+        const image = await Image.findByPk(imageId)
+        if (!image) {
+          return res.status(400).send('Invalid image id')
+        }
+        queryObject.joinTableAttributes = []
+        if (image.fk_username !== req.user.username) {
+          queryObject.where.visibility = true
+        }
+        albums = await image.getAlbums(queryObject)
       } else if (user) {
         queryObject.where.fk_username = user
         if (user !== req.user.username) {
           queryObject.where.visibility = true
         }
+        albums = await Album.findAll(queryObject)
       }
-      const albums = await Album.findAll(queryObject)
       for (let i = 0; i < albums.length; i++) {
         albums[i].dataValues.images = await albums[i].getImages({
           order: db.Sequelize.literal('rand()'),
           limit: 4,
-          attributes: ['id'],
+          attributes: ['id', 'fk_username'],
           joinTableAttributes: []
         })
       }

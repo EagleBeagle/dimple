@@ -3,11 +3,11 @@
     <v-row justify="start">
       <v-col cols="12" sm="6" md="4" lg="3" class="pa-4" v-for="album in albums" :key="album.id">
         <v-hover v-slot="{hover}">
-          <v-card  tile @click="$emit('open', album.id)" height="100%">
+          <v-card  tile @click="$emit('open', album.id)" :hover="inDialog" height="100%">
             <div class="overlay-div">
                 <v-container class="overlay-container pa-0">
                   <v-row justify="start">
-                    <v-col cols="12" class="album-name pa-0 pl-8 pr-4 text-h4 white--text font-weight-medium">
+                    <v-col cols="12" :class="inDialog ? 'text-h6' : 'text-h4'" class="album-name pa-0 pl-8 pr-4 white--text font-weight-medium">
                       {{ album.name }}
                     </v-col>
                   </v-row>
@@ -16,7 +16,7 @@
                       {{ album.imageCount }} photos
                     </v-col>
                   </v-row>
-                  <v-expand-transition>
+                  <v-expand-transition v-if="!inDialog">
                     <v-row justify="space-around" v-if="hover">
                       <v-col cols="3" class="pa-0">
                         <v-icon v-on:click.stop large color="white" class="album-setting-icon">
@@ -108,7 +108,8 @@
 <script>
 export default {
   props: [
-    'albums'
+    'albums',
+    'inDialog'
   ],
   mounted() {
   }

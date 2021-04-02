@@ -21,7 +21,8 @@
       </v-btn>
       <v-btn
         depressed
-        class="red--text">
+        class="red--text"
+        @click="close()">
         CANCEL
       </v-btn>
     </v-card-actions>
@@ -51,14 +52,12 @@ export default {
     }
   },
   methods: {
-    
-  },
-  close() {
-    this.clearFields()
+    close() {
     this.dialog = false
-  },
-  async clearFields() {
-    
+    },
+    async clearFields() {
+      
+    }
   }
 }
 </script>

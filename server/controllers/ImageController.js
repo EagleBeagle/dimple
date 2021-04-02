@@ -91,6 +91,43 @@ module.exports = {
     }
   },
 
+  async updateImage (req, res) {
+    try {
+      const username = req.user.username
+      const imageId = req.params.id
+      const albums = req.body.albums
+      console.log(imageId)
+      const image = await Image.findByPk(imageId)
+      if (!image) {
+        return res.status(400).send('Invalid request')
+      }
+      if (image.fk_username !== username) {
+        return res.status(403).send('Unauthorized')
+      }
+      if (albums) {
+        const existingAlbums = await Album.findAll({
+          where: {
+            id: {
+              [Op.in]: albums
+            }
+          }
+        })
+        existingAlbums.forEach(album => {
+          if (album.fk_username !== username) {
+            return res.status(403).send('Unauthorized')
+          }
+        })
+        await image.setAlbums(existingAlbums)
+        return res.status(200).send(image)
+      } else {
+        return res.status(400).send('Invalid request')
+      }
+    } catch (err) {
+      console.log(err)
+      res.status(500).send()
+    }
+  },
+
   async deleteImage (req, res) { // most csak saját user, később admin is
     try {
       const imageId = req.params.imageId

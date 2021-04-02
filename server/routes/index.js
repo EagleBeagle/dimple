@@ -21,7 +21,7 @@ module.exports = app => {
       res.json({ message: 'Welcome to the admin page.' })
     })
 
-  app.put('/album',
+  app.post('/album',
     verifyAuth.isLoggedIn,
     AlbumController.create)
 
@@ -38,7 +38,7 @@ module.exports = app => {
     AlbumController.download
   )
 
-  app.put('/image',
+  app.post('/image',
     verifyAuth.isLoggedIn,
     ImageControllerValidator.initiateUpload,
     ImageController.initiateUpload)
@@ -50,6 +50,11 @@ module.exports = app => {
   app.post('/image/:username/:imageId/cancelupload/:cancellationToken',
     ImageControllerValidator.cancelUpload,
     ImageController.cancelUpload)
+
+  app.put('/image/:id',
+    verifyAuth.isLoggedIn,
+    ImageController.updateImage
+  )
 
   app.delete('/image/:imageId',
     verifyAuth.isLoggedIn,

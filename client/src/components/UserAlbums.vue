@@ -53,7 +53,7 @@ export default {
       try {
         this.albums = (await AlbumService.get({ user: this.user.username })).data.map(album => {
           album.images = album.images.map(image => {
-            image.url = this.cloudinaryCore.url(`${this.user.username}/${image.id}`)
+            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
             return image
           })
           return album

@@ -1,14 +1,15 @@
 <template>
 <v-container class="pa-0">
    <v-row justify="center">
-      <v-col cols="12" sm="7" md="4" class="pa-0">
+      <v-col cols="12" sm="9" md="7" lg="6" xl="4" class="pa-0">
+        <div class="pa-0 mb-1 text-body-2 blue--text" style="cursor: pointer;">View 19 previous comments</div>
         <v-hover v-slot="{ hover }">
           <v-container class="pa-0 mb-1">
             <v-row justify="start">
-                <v-col cols="3" sm="3" md="4" lg="4" xl="3" class="pa-0 px-0 pl-sm-5 pl-xl-10">
+                <v-col cols="3" sm="3" md="3" lg="4" xl="3" class="pa-0 px-0 pl-sm-5 pl-xl-10">
                   <v-img v-if="image" :src="image.url" height="60px" width="60px" aspect-ratio="1" class="avatar"></v-img>
                 </v-col>
-                <v-col cols="8" sm="9" md="8" lg="8" xl="9" align-self="center" class="px-0 pr-sm-5 pr-xl-10">
+                <v-col cols="8" sm="9" md="9" lg="8" xl="9" align-self="center" class="px-0 pr-sm-5 pr-xl-10">
                   <v-container class="pa-0">
                     <v-row justify="start">
                       <v-col cols="7" sm="7" md="7" class="pa-0" align-self="center" style="text-align: start">

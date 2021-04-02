@@ -103,18 +103,24 @@
             'settings-container-sm': $vuetify.breakpoint.smOnly,
             'settings-container-xs': $vuetify.breakpoint.xsOnly}">
           <v-row justify="center" align-content="center">
-            <v-col cols="3" sm="4">
+            <v-col cols="3" sm="3">
+              <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showAlbumDialog = true">
+                mdi-image-album
+              </v-icon>
+              <album-dialog v-if="showAlbumDialog" :show="showAlbumDialog" :image="image" @close="showAlbumDialog = false"></album-dialog>
+            </v-col>
+            <v-col cols="3" sm="3">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showShareDialog = true">
                 mdi-share
               </v-icon>
-              <share-dialog v-if="showShareDialog" :show="showShareDialog" :image="this.image" @close="showShareDialog = false"></share-dialog>
+              <share-dialog v-if="showShareDialog" :show="showShareDialog" :image="image" @close="showShareDialog = false"></share-dialog>
             </v-col>
-            <v-col cols="3" sm="4">
+            <v-col cols="3" sm="3">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="downloadImage">
                 mdi-download
               </v-icon>
             </v-col>
-            <v-col cols="3" sm="4">
+            <v-col cols="3" sm="3">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="deleteImage">
                 mdi-delete
               </v-icon>
@@ -148,7 +154,7 @@
                   <v-row justify="start">
                     <v-col cols="9" class="text-body-2 pa-0 blue--text" style="text-align: start">
                       Uploaded on
-                      <span>{{ new Date(image.createdAt).toUTCString().split(', ')[1].split(' ').slice(0, 3).join().replace(',', ' ').replace(',', ' ') }}</span>
+                      <span>{{ new Date(image.createdAt).toUTCString().split(', ')[1].split(' ').slice(0, 3).join(' ')}}</span>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -219,10 +225,12 @@ import { mapState } from 'vuex'
 import ImageService from '@/services/ImageService'
 import { Cloudinary } from 'cloudinary-core';
 import ShareDialog from '@/components/ShareDialog'
+import AlbumDialog from '@/components/AlbumDialog'
 import CommentContainer from '@/components/CommentContainer'
 export default {
   components: {
     ShareDialog,
+    AlbumDialog,
     CommentContainer
   },
   data () {
@@ -232,6 +240,7 @@ export default {
       leftImages: [],
       rightImages: [],
       showShareDialog: false,
+      showAlbumDialog: false,
       writtingComment: false,
       goBackParams: null
     }
@@ -259,6 +268,7 @@ export default {
   async mounted() {
     this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
     document.addEventListener('keyup', this.arrowsPressed)
+    window.scrollTo(0, 0)
     await this.getImage()
     await this.getNeighbouringImages()
   },
@@ -495,15 +505,17 @@ export default {
 }
 
 .settings-container-lg {
-  width: 10vw;
+  width: 12vw;
+  margin-right: 5px;
 }
 
 .settings-container-md {
-  width: 15vw;
+  width: 17vw;
+  margin-right: 5px;
 }
 
 .settings-container-sm {
-  width: 20vw;
+  width: 25vw;
 }
 
 .settings-container-xs {
