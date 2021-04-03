@@ -4,6 +4,7 @@ const UserControllerValidator = require('../policies/UserControllerValidator.js'
 const AlbumController = require('../controllers/AlbumController.js')
 const ImageController = require('../controllers/ImageController.js')
 const ImageControllerValidator = require('../policies/ImageControllerValidator.js')
+const CommentController = require('../controllers/CommentController.js')
 
 module.exports = app => {
   app.post('/signup',
@@ -65,4 +66,19 @@ module.exports = app => {
     verifyAuth.isLoggedIn,
     ImageControllerValidator.getImages,
     ImageController.getImages)
+
+  app.get('/comment',
+    verifyAuth.isLoggedIn,
+    CommentController.get
+  )
+
+  app.post('/comment',
+    verifyAuth.isLoggedIn,
+    CommentController.create
+  )
+
+  app.delete('/comment/:commentId',
+    verifyAuth.isLoggedIn,
+    CommentController.delete
+  )
 }

@@ -96,8 +96,11 @@ module.exports = {
       const username = req.user.username
       const imageId = req.params.id
       const albums = req.body.albums
-      console.log(imageId)
+      const visibility = req.body.visibility
       const image = await Image.findByPk(imageId)
+      if (!albums && typeof visibility === 'undefined') {
+        return res.status(400).send('Invalid request')
+      }
       if (!image) {
         return res.status(400).send('Invalid request')
       }
@@ -118,10 +121,14 @@ module.exports = {
           }
         })
         await image.setAlbums(existingAlbums)
-        return res.status(200).send(image)
-      } else {
-        return res.status(400).send('Invalid request')
       }
+
+      if (typeof visibility !== 'undefined') {
+        image.visibility = visibility
+        await image.save()
+      }
+
+      return res.status(200).send(image)
     } catch (err) {
       console.log(err)
       res.status(500).send()

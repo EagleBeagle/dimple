@@ -7,6 +7,7 @@ import VueKinesis from 'vue-kinesis'
 import Cloudinary from 'cloudinary-vue'
 import InfiniteLoading from 'vue-infinite-loading'
 import VueSocialSharing from 'vue-social-sharing'
+import VueTimeago from 'vue-timeago'
 
 Vue.config.productionTip = false
 Vue.use(VueKinesis)
@@ -16,6 +17,10 @@ Vue.use(Cloudinary, {
   }
 })
 
+Vue.use(VueTimeago, {
+  name: 'Timeago',
+  locale: 'en'
+})
 
 Vue.use(InfiniteLoading)
 Vue.use(VueSocialSharing)

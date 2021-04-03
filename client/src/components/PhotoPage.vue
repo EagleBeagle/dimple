@@ -173,7 +173,7 @@
                       10
                     </v-col>
                     <v-col cols="5" sm="4" xl="9" align-self="center" class="pa-0 text-subtitle-1 blue--text">
-                      5
+                      {{ commentCount }}
                     </v-col>
                   </v-row>
                   <v-row justify="center">
@@ -205,17 +205,31 @@
             mdi-lock-outline
           </v-icon>
           <span class="pt-2">Viewing privacy:</span>
-          <span class="blue--text ml-3">{{ image.visibility ? 'Public' : 'Private' }}</span>
-          <v-icon color="blue">
-            mdi-chevron-up
-          </v-icon>
+          <v-menu top offset-y nudge-top="10">
+            <template v-slot:activator="{ on, attrs }">
+              <span style="cursor: pointer" v-bind="attrs" v-on="on">
+                <span class="blue--text ml-3">{{ image.visibility ? 'Public' : 'Private' }}</span>
+                <v-icon color="blue">
+                  mdi-chevron-up
+                </v-icon>
+              </span>
+            </template>
+            <v-list>
+              <v-list-item @click="updateVisibility(true)">
+                <v-list-item-title :class="image.visibility ? 'font-weight-bold' : null">Public</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="updateVisibility(false)">
+                <v-list-item-title :class="!image.visibility ? 'font-weight-bold' : null">Private</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </v-col>
       </v-row>
     </v-container>
     <v-divider v-if="$vuetify.breakpoint.xsOnly"></v-divider>
     <v-divider v-if="$vuetify.breakpoint.smAndUp" style="margin-left: 25%; margin-right: 25%;"></v-divider>
     <v-container class="pa-0 mt-5">
-      <comment-container :image="image" @writting="switchWrittingComment" />
+      <comment-container v-if="image" :image="image" @writting="switchWrittingComment" @count="updateCommentCount" />
     </v-container>
   </div>
 </template>
@@ -242,7 +256,8 @@ export default {
       showShareDialog: false,
       showAlbumDialog: false,
       writtingComment: false,
-      goBackParams: null
+      goBackParams: null,
+      commentCount: 0
     }
   },
   computed: {
@@ -416,6 +431,18 @@ export default {
     },
     switchWrittingComment(value) {
       this.writtingComment = value
+    },
+    async updateVisibility(visibility) {
+      try {
+        await ImageService.update(this.image.id, { visibility })
+        this.image.visibility = visibility
+      } catch (err) {
+        console.log(err)
+        this.$store.dispatch('alert', 'An error occured while changing viewing privacy')
+      }
+    },
+    updateCommentCount(count) {
+      this.commentCount = count
     }
   },
   destroyed() {
