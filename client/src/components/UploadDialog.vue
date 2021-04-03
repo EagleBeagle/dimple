@@ -25,7 +25,7 @@
     <v-container style="padding-bottom: 0px; padding-top: 0px">
       <v-row justify="space-around">
         <v-col cols="3" style="padding: 0px">
-          <v-card-text>
+          <v-card-text class="pa-0">
           <v-container class="ml-4">
             <v-row v-if="!selectedCount" justify="center">
               <div class="text-h6 font-weight-regular" style="text-align: center">
@@ -41,24 +41,76 @@
               </div>
             </v-row>
             <v-row v-if="selectedCount" class="mr-1 mt-5" justify="center">
-              <v-select
-                class="album-select"
-                v-model="selectedAlbums"
-                :items="allAlbums"
-                label="Albums"
-                :placeholder="differentAlbumsSelected ? 'Different albums selected' : null"
-                multiple>
-                <template v-slot:selection="{ item, index }">
-                  <span v-if="index === 0">{{ item + ',' }}&nbsp;</span>
-                  <span v-if="index === 1">{{ item }}&nbsp;</span>
-                  <span
-                    v-if="index === 2"
-                    class="grey--text caption"
-                  >
-                    <span class="ml-1">(+{{ selectedAlbums.length - 2 }} others)</span>
-                  </span>
-                </template>
-              </v-select>
+              <v-col cols="12" v-if="albums" class="pa-0">
+                <v-hover v-slot="{ hover }">
+                  <v-card flat outlined tile :color="hover ? 'rgb(235, 235, 235)' : null">
+                    <v-card-text class="pa-0 px-4">
+                      <v-container class="pa-0">
+                        <v-row justify="start" class="mb-2">
+                          <v-col cols="9" class="pa-0 text-h6" style="text-align: start" v-if="selectedAlbums.length > 0">
+                            Albums
+                          </v-col>
+                          <v-col cols="8" class="pa-0 text-h6" style="text-align: start; cursor: pointer" v-else @click="addToAlbums()">
+                            Add to Albums
+                          </v-col>
+                          <v-spacer></v-spacer>
+                          <v-fade-transition>
+                            <v-col cols="2" v-if="hover" class="pa-0 pr-0" align-self="center">
+                              <v-icon color="blue" @click="addToAlbums()">
+                                mdi-plus
+                              </v-icon>
+                            </v-col>
+                          </v-fade-transition>
+                        </v-row>
+                        <v-row justify="start" v-if="!differentAlbumsSelected && selectedAlbums.length > 0">
+                          <v-col cols="3" class="pa-1" v-for="album in selectedAlbums" :key="album.id">
+                            <v-tooltip bottom>
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-img
+                                  v-if="album.images.length > 0" 
+                                  aspect-ratio="1" 
+                                  :src="album.images[0].url"
+                                  v-bind="attrs"
+                                  v-on="on">
+                                </v-img>
+                                <v-img 
+                                  v-else 
+                                  aspect-ratio="1"
+                                  style="border: 1px solid grey"
+                                  v-bind="attrs"
+                                  v-on="on">
+                                  <v-container class="pa-0" fill-height>
+                                    <v-row justify="center">
+                                      <v-col cols="12" align-self="center" class="pa-0">
+                                        <v-icon large>
+                                          mdi-image-multiple
+                                        </v-icon>
+                                      </v-col>
+                                    </v-row>
+                                  </v-container>
+                                </v-img>
+                              </template>
+                              <span>{{ album.name }}</span>
+                            </v-tooltip>
+                          </v-col>
+                        </v-row>
+                        <v-row v-else-if="differentAlbumsSelected && selectedAlbums.length > 0">
+                          <v-col cols="12" style="text-align: center" class="text-body1">
+                            Different albums selected
+                          </v-col>
+                        </v-row>
+                        <add-to-albums-dialog
+                          v-if="addToAlbumsDialog" 
+                          :show="addToAlbumsDialog"
+                          :selectedAlbums="selectedAlbums"
+                          :inUploadDialog="true" 
+                          @updateAlbums="updateAlbums" 
+                          @close="addToAlbumsDialog = false" />
+                      </v-container>
+                    </v-card-text>
+                  </v-card>
+                </v-hover>
+              </v-col>
             </v-row>
             <v-row v-if="selectedCount" class="mr-1" justify="start">
               <v-checkbox
@@ -122,20 +174,25 @@
 </template>
 
 <script>
+import { Cloudinary } from 'cloudinary-core';
+import { mapState } from 'vuex'
 import AlbumService from '@/services/AlbumService'
 import ImageService from '@/services/ImageService'
-import { mapState } from 'vuex'
+import AddToAlbumsDialog from '@/components/AddToAlbumsDialog'
 export default {
+  components: { AddToAlbumsDialog },
   data () {
     return {
       show: false,
+      albums: [],
       imagePreviews: [],
       selectedAlbums: [],
       allAlbums: [],
       differentAlbumsSelected: false,
       privateCheckbox: false,
       privateCheckboxIndeterminate: true,
-      allSelected: false
+      allSelected: false,
+      addToAlbumsDialog: false
     }
   },
   computed: {
@@ -171,20 +228,24 @@ export default {
             private: false
           })
         }
-        const albums = (await AlbumService.get({ user: this.user.username })).data
-            this.allAlbums = albums.map(album => {
-              return album.name
+        this.albums = (await AlbumService.get({ user: this.user.username })).data.map(album => {
+          album.images = album.images.map(image => {
+            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+            return image
+          })
+          return album
         })
         this.show = true
       }
     },
   },
+  mounted() {
+    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME });
+  },
   methods: {
     edit() {
       this.imagePreviews = this.imagePreviews.map((imagePreview) => {
         if (imagePreview.selected) {
-            imagePreview.selectedAlbums = [...this.selectedAlbums]
-            imagePreview.selected = false
             imagePreview.private = this.privateCheckbox
         }
         return imagePreview
@@ -227,6 +288,20 @@ export default {
       } catch (err) {
         console.log(err)
       }
+    },
+    addToAlbums() {
+      this.addToAlbumsDialog = true
+    },
+    updateAlbums(selectedAlbums) {
+      this.albums = selectedAlbums
+      this.addToAlbumsDialog = false
+      this.imagePreviews = this.imagePreviews.map(imagePreview => {
+        if (imagePreview.selected) {
+          imagePreview.selectedAlbums = [...selectedAlbums]
+        }
+        return imagePreview
+      })
+      this.selectedAlbums = [...selectedAlbums]
     },
     select(id) {
       this.differentAlbumsSelected = false

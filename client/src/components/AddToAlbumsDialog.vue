@@ -67,7 +67,8 @@ export default {
   props: [
     'show',
     'image',
-    'selectedAlbums'
+    'selectedAlbums',
+    'inUploadDialog'
   ],
   computed: {
     dialog: {
@@ -131,10 +132,12 @@ export default {
             selectedAlbums.push(album.id)
           }
         })
-        await ImageService.update(this.image.id, {
-          albums: selectedAlbums
-        })
-        this.$store.dispatch('alert', 'Albums updated successfully')
+        if (!this.inUploadDialog) {
+          await ImageService.update(this.image.id, {
+            albums: selectedAlbums
+          })
+          this.$store.dispatch('alert', 'Albums updated successfully')
+        }
         this.$emit('updateAlbums', this.albums.filter(album => selectedAlbums.includes(album.id)))
         this.close()
       } catch (err) {
