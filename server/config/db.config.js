@@ -61,6 +61,9 @@ db.comment.belongsTo(db.user, {
 db.image.hasMany(db.comment)
 db.comment.belongsTo(db.image)
 
+db.image.belongsToMany(db.user, { as: 'favourite', through: 'favourites' })
+db.user.belongsToMany(db.image, { as: 'favourite', through: 'favourites' })
+
 db.sequelize.sync({
   alter: true
 })

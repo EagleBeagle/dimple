@@ -3,6 +3,7 @@ const db = require('../config/db.config.js')
 const Op = db.Sequelize.Op
 const Image = db.image
 const Album = db.album
+const User = db.user
 const cloudinary = require('../config/cloudinary.config.js')
 
 module.exports = {
@@ -166,16 +167,35 @@ module.exports = {
     try {
       let images
       const id = req.query.id
-      const user = req.query.user
+      const username = req.query.user
       const fromDate = req.query.from
       const toDate = req.query.to
       const albumName = req.query.album
       const limit = req.query.limit
       const sort = req.query.sort
       const visibility = req.query.visibility
+      const favourites = req.query.favourites
+      const trash = req.query.trash
       const queryObject = {
-        where: {},
+        where: {
+          trashed: false
+        },
         order: []
+      }
+      if ((username && albumName) ||
+         (username && id) ||
+         (id && albumName) ||
+         (!username && favourites) ||
+         (albumName && favourites) ||
+         (id && favourites) ||
+         (trash && albumName) ||
+         (trash && favourites) ||
+         (trash && id) ||
+         (trash && username)) {
+        return res.status(400).send('Invalid query')
+      }
+      if (!username && !albumName && !id && !favourites && !trash) {
+        return res.status(400).send('Invalid query')
       }
       if (id) {
         images = await Image.findByPk(id)
@@ -183,26 +203,22 @@ module.exports = {
           return res.status(400).send('Invalid id')
         }
         if (images.visibility || images.fk_username === req.user.username) {
+          images.dataValues.favouriteCount = await images.countFavourite()
+          images.dataValues.favouritedByUser = await images.hasFavourite(req.user.id)
           return res.status(200).send(images)
         } else {
           return res.status(403).send('Unauthorized')
         }
       }
-      if ((user && albumName) || (user && id) || (id && albumName)) {
-        return res.status(400).send('Invalid query')
-      }
-      if (!user && !albumName && !id) {
-        return res.status(400).send('Invalid query')
-      }
       if (visibility) {
         queryObject.visibility = visibility
       }
-      if (user) {
-        queryObject.where.fk_username = user
-        if (user !== req.user.username) {
+      if (username && !favourites && !trash) {
+        queryObject.where.fk_username = username
+        if (username !== req.user.username) {
           queryObject.where.visibility = true
         }
-      } else { // ide jön majd minden retek
+      } else if (!username && !favourites) { // ide jön majd minden retek
         queryObject.where.fk_username = req.user.username
       }
       if (sort) {
@@ -237,6 +253,21 @@ module.exports = {
         } else {
           return res.status(404).send('the given album does not exist')
         }
+      } else if (favourites && username) {
+        const user = await User.findOne({
+          where: {
+            username: username
+          }
+        })
+        if (!user) {
+          return res.status(404).send('User not found')
+        }
+        queryObject.joinTableAttributes = []
+        images = await user.getFavourite(queryObject)
+      } else if (trash) {
+        queryObject.where.trashed = true
+        images = await Image.findAll(queryObject)
+        console.log(images)
       } else {
         images = await Image.findAll(queryObject)
       }
@@ -244,6 +275,68 @@ module.exports = {
     } catch (err) {
       console.log(err)
       res.status(500).send('An error happened while fetching images')
+    }
+  },
+
+  async favourite (req, res) {
+    try {
+      const imageId = req.params.id
+      const image = await Image.findByPk(imageId)
+      if (!image || image.fk_username === req.user.username) {
+        return res.status(400).send('Invalid request')
+      }
+      await image.addFavourite(req.user.id)
+      return res.status(200).send()
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('An error happened while favouriting the image')
+    }
+  },
+
+  async unfavourite (req, res) {
+    try {
+      const imageId = req.params.id
+      const image = await Image.findByPk(imageId)
+      if (!image || image.fk_username === req.user.username) {
+        return res.status(400).send('Invalid request')
+      }
+      await image.removeFavourite(req.user.id)
+      return res.status(200).send()
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('An error happened while unfavouriting the image')
+    }
+  },
+
+  async putToTrash (req, res) {
+    try {
+      const imageId = req.params.id
+      const image = await Image.findByPk(imageId)
+      if (!image || image.fk_username !== req.user.username) {
+        return res.status(400).send('Invalid request')
+      }
+      image.trashed = true
+      await image.save()
+      res.status(200).send()
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('An error happened while unfavouriting the image')
+    }
+  },
+
+  async removeFromTrash (req, res) {
+    try {
+      const imageId = req.params.id
+      const image = await Image.findByPk(imageId)
+      if (!image || image.fk_username !== req.user.username) {
+        return res.status(400).send('Invalid request')
+      }
+      image.trashed = false
+      await image.save()
+      res.status(200).send()
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('An error happened while unfavouriting the image')
     }
   }
 }

@@ -62,7 +62,9 @@ module.exports = {
       limit: Joi.number().max(100),
       sort: Joi.string().valid('date:desc', 'date:asc'),
       user: Joi.string().min(4).max(25),
-      id: Joi.string().uuid()
+      id: Joi.string().uuid(),
+      favourites: Joi.boolean(),
+      trash: Joi.boolean()
     })
     const { error } = schema.validate(req.query)
     if (error) {

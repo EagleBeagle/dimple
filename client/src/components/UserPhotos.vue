@@ -7,8 +7,14 @@
       <v-col v-if="album" xs="12" sm="12" md="12" lg="12" class="py-0 my-0" style="text-align: left">
         <div class="text-subtitle-1 my-0">{{ album.description }}</div>
       </v-col>
-      <v-col v-if="!album" xs="12" sm="12" md="12" lg="12" style="text-align: left">
+      <v-col v-if="!album && $route.params.album === 'all'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
         <div class="display-1 my-2">All Photos</div>
+      </v-col>
+      <v-col v-if="!album && $route.params.album === 'favourites'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
+        <div class="display-1 my-2">Favourites</div>
+      </v-col>
+      <v-col v-if="!album && $route.params.album === 'trash'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
+        <div class="display-1 my-2">Trash</div>
       </v-col>
     </v-row>
     <photo-grid
@@ -53,20 +59,22 @@ export default {
       this.images = []
       await this.getAlbum()
       const images = await this.getImages({ sort: 'date:desc' })
-      this.images.push(...images)
+      if (images) {
+        this.images.push(...images)
+      }
     }
   },
   methods: {
     async getAlbum() {
-      if (this.$route.params.album && this.$route.params.album !== 'all') {
-        try {
+      try {
+        if (!['all', 'favourites', 'trash'].includes(this.$route.params.album)) {
           const response = await AlbumService.get({ id: this.$route.params.album })
           this.album = response.data
-        } catch (err) {
-          console.log(err)
+        } else {
+          this.album = null
         }
-      } else {
-        this.album = null
+      } catch (err) {
+        console.log(err)
       }
     },
     async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
@@ -74,7 +82,28 @@ export default {
         if (this.$route.params.album === 'all') {
           filter.user = this.user.username
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = this.cloudinaryCore.url(`${this.user.username}/${image.id}`)
+            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+            return image
+          })
+          if (images.length) {
+            this.oldestDate = images[images.length - 1].createdAt
+          }
+          return images
+        } else if (this.$route.params.album === 'favourites') {
+          filter.user = this.user.username
+          filter.favourites = true
+          const images = (await ImageService.get(filter)).data.map((image) => {
+            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+            return image
+          })
+          if (images.length) {
+            this.oldestDate = images[images.length - 1].createdAt
+          }
+          return images
+        } else if (this.$route.params.album === 'trash') {
+          filter.trash = true
+          const images = (await ImageService.get(filter)).data.map((image) => {
+            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
             return image
           })
           if (images.length) {
@@ -84,7 +113,7 @@ export default {
         } else {
           filter.album = this.$route.params.album
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = this.cloudinaryCore.url(`${this.user.username}/${image.id}`)
+            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
             return image
           })
           if (images.length) {
@@ -111,11 +140,16 @@ export default {
         }
       })
     },
-    async deleteImage(id) {
+    async deleteImage(imageToDelete) {
       try {
-        await ImageService.delete(id)
-        this.images = this.images.filter(image => image.id !== id)
-        this.$store.dispatch('alert', 'Photo deleted successfully.')
+        if (!imageToDelete.trashed) {
+          await ImageService.putToTrash(imageToDelete.id)
+          this.$store.dispatch('alert', 'Photo has been moved to trash.')
+        } else {
+          await ImageService.delete(imageToDelete.id)
+          this.$store.dispatch('alert', 'Photo deleted successfully.')
+        }
+        this.images = this.images.filter(image => image.id !== imageToDelete.id)
       } catch(err) {
         console.log(err)
         this.$store.dispatch('alert', 'An error occured during deletion.')

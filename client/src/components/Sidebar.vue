@@ -23,7 +23,7 @@
               <v-list-item-title>All Photos</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item>
+          <v-list-item @click="goTo('Photos', { album: 'favourites' })">
             <v-list-item-icon>
               <v-icon>mdi-star</v-icon>
             </v-list-item-icon>
@@ -31,7 +31,7 @@
               <v-list-item-title>Favourites</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item>
+          <v-list-item @click="goTo('Photos', { album: 'trash' })">
             <v-list-item-icon>
               <v-icon>mdi-trash-can</v-icon>
             </v-list-item-icon>

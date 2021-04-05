@@ -21,8 +21,20 @@
                         icon
                         color="white"
                         class="delete"
-                        @click="$emit('delete', image.id)">
+                        @click="$emit('delete', image)">
                         <v-icon>mdi-close</v-icon>
+                      </v-btn>
+                      <v-btn
+                        v-if="image.trashed"
+                        v-on:click.stop
+                        icon
+                        width="150px"
+                        height="150px"
+                        color="white"
+                        class="restore"
+                        disabled
+                        @click="$emit('restore', image)">
+                        <v-icon size="150px">mdi-restore</v-icon>
                       </v-btn>
                       <div class="overlay-content">
                         asdadas
@@ -99,7 +111,6 @@ export default {
 .overlay-content {
   position: absolute;
   bottom: 0;
-  left: 80%;
 }
 
 .delete {
@@ -112,4 +123,10 @@ export default {
   color: black;
 }
 
+.restore {
+  position: absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+}
 </style>

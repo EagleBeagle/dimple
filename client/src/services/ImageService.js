@@ -71,11 +71,32 @@ export default {
     if (data.album) {
       queryString += `&album=${data.album}` 
     }
-
+    if (data.favourites) {
+      queryString += `&favourites=${data.favourites}` 
+    }
+    if (data.trash) {
+      queryString += `&trash=${data.trash}` 
+    }
     return Api().get(`image?${queryString}`)
   },
 
   download(url) {
     return axios({ method: 'get', url, responseType: 'arraybuffer' })
+  },
+
+  favourite(id) {
+    return Api().post(`image/${id}/favourite`)
+  },
+
+  unfavourite(id) {
+    return Api().delete(`image/${id}/favourite`)
+  },
+
+  putToTrash(id) {
+    return Api().put(`image/${id}/trash`)
+  },
+
+  removeFromTrash(id) {
+    return Api().delete(`image/${id}/trash`)
   }
 }

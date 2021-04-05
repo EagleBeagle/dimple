@@ -102,14 +102,23 @@
             'settings-container-md': $vuetify.breakpoint.mdOnly,
             'settings-container-sm': $vuetify.breakpoint.smOnly,
             'settings-container-xs': $vuetify.breakpoint.xsOnly}">
-          <v-row justify="center" align-content="center">
+          <v-row justify="center" align-content="center" v-if="image">
+            <v-col cols="3" sm="3" v-if="image.fk_username !== user.username">
+              <v-icon v-if="!image.favouritedByUser" large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="favourite()">
+                mdi-star-outline
+              </v-icon>
+              <v-icon v-else large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="unfavourite()">
+                mdi-star
+              </v-icon>
+              <album-dialog v-if="showAlbumDialog" :show="showAlbumDialog" :image="image" @close="showAlbumDialog = false"></album-dialog>
+            </v-col>
             <v-col cols="3" sm="3">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showAlbumDialog = true">
                 mdi-image-album
               </v-icon>
               <album-dialog v-if="showAlbumDialog" :show="showAlbumDialog" :image="image" @close="showAlbumDialog = false"></album-dialog>
             </v-col>
-            <v-col cols="3" sm="3">
+            <v-col cols="3" sm="3" v-if="image && image.visibility">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showShareDialog = true">
                 mdi-share
               </v-icon>
@@ -120,7 +129,7 @@
                 mdi-download
               </v-icon>
             </v-col>
-            <v-col cols="3" sm="3">
+            <v-col cols="3" sm="3" v-if="image.fk_username === user.username">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="deleteImage">
                 mdi-delete
               </v-icon>
@@ -148,7 +157,7 @@
                 <v-container class="pa-0">
                   <v-row justify="start">
                     <v-col cols="7" class="text-h6 pa-0" style="text-align: start">
-                      Biacsi Zoltán
+                      {{ image.fk_username }}
                     </v-col>
                   </v-row>
                   <v-row justify="start">
@@ -170,7 +179,7 @@
                 <v-container class="pa-0" style="text-align: start">
                   <v-row justify="center">
                     <v-col cols="5" sm="4" xl="2" align-self="center" class="pa-0 text-subtitle-1 blue--text">
-                      10
+                      {{ image.favouriteCount }}
                     </v-col>
                     <v-col cols="5" sm="4" xl="9" align-self="center" class="pa-0 text-subtitle-1 blue--text">
                       {{ commentCount }}
@@ -257,7 +266,8 @@ export default {
       showAlbumDialog: false,
       writtingComment: false,
       goBackParams: null,
-      commentCount: 0
+      commentCount: 0,
+      lastSwitchedPhotoTime: null
     }
   },
   computed: {
@@ -291,6 +301,14 @@ export default {
     async getImage() { 
       try {
         const image = (await ImageService.get({ id: this.$route.params.id })).data
+        if (image.trashed) {
+          this.$router.push({
+            name: 'Photos',
+            params: {
+              album: 'trash'
+          }})
+          return
+        }
         image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
         this.image = image
       } catch (err) {
@@ -321,8 +339,15 @@ export default {
           if (query.in === 'all') {
             leftFilter.user = this.image.fk_username
             rightFilter.user = this.image.fk_username
-          }
-          if (query.in !== 'all') {
+          } else if (query.in === 'favourites') {
+            leftFilter.favourites = true
+            rightFilter.favourites = true
+            leftFilter.user = this.user.username
+            rightFilter.user = this.user.username
+          } else if (query.in === 'trash') {
+            leftFilter.trash = true
+            rightFilter.trash = true
+          } else {
             leftFilter.album = query.in
             rightFilter.album = query.in
           }
@@ -365,9 +390,16 @@ export default {
     },
     async goLeft() {
       if (this.leftImages.length > 0) {
+        if (this.lastSwitchedPhotoTime) {
+          const timePassed = Date.now() - this.lastSwitchedPhotoTime
+          if (timePassed < 250) {
+            return
+          }
+        }
         try {
           this.image = this.leftImages[this.leftImages.length - 1]
           this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query })
+          this.lastSwitchedPhotoTime = Date.now()
           await this.getNeighbouringImages()
         } catch (err) {
           console.log(err)
@@ -377,9 +409,16 @@ export default {
     },
     async goRight() {
       if (this.rightImages.length > 0) {
+        if (this.lastSwitchedPhotoTime) {
+          const timePassed = Date.now() - this.lastSwitchedPhotoTime
+          if (timePassed < 250) {
+            return
+          }
+        }
         try {
           this.image = this.rightImages[0]
           this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query })
+          this.lastSwitchedPhotoTime = Date.now()
           await this.getNeighbouringImages()
         } catch (err) {
           console.log(err)
@@ -407,9 +446,15 @@ export default {
     },
     async deleteImage() {
       try {
-        await ImageService.delete(this.image.id)
-        this.$router.push({ name: 'Photos', params: { album: 'all' } })
-        this.$store.dispatch('alert', 'Photo deleted successfully.')
+        if (!this.image.trashed) {
+          await ImageService.putToTrash(this.image.id)
+          this.$router.push({ name: 'Photos', params: { album: 'all' } })
+          this.$store.dispatch('alert', 'Photo has been moved to trash.')
+        } else {
+          await ImageService.delete(this.image.id)
+          this.$router.push({ name: 'Photos', params: { album: 'all' } })
+          this.$store.dispatch('alert', 'Photo deleted successfully.')
+        }
       } catch(err) {
         console.log(err)
         this.$store.dispatch('alert', 'An error occured during deletion.')
@@ -443,6 +488,26 @@ export default {
     },
     updateCommentCount(count) {
       this.commentCount = count
+    },
+    async favourite() {
+      try {
+        await ImageService.favourite(this.image.id)
+        this.image.favouriteCount++
+        this.image.favouritedByUser = true
+      } catch (err) {
+        console.log(err)
+        this.$store.dispatch('alert', 'An error occured while favouriting the phozo')
+      }
+    },
+    async unfavourite() {
+      try {
+        await ImageService.unfavourite(this.image.id)
+        this.image.favouriteCount--
+        this.image.favouritedByUser = false
+      } catch (err) {
+        console.log(err)
+        this.$store.dispatch('alert', 'An error occured while unfavouriting the phozo')
+      }
     }
   },
   destroyed() {

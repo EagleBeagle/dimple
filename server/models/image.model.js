@@ -15,6 +15,11 @@ module.exports = (sequelize, Sequelize) => {
     },
     cancellationToken: {
       type: Sequelize.STRING
+    },
+    trashed: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   })
 

@@ -81,4 +81,24 @@ module.exports = app => {
     verifyAuth.isLoggedIn,
     CommentController.delete
   )
+
+  app.post('/image/:id/favourite',
+    verifyAuth.isLoggedIn,
+    ImageController.favourite
+  )
+
+  app.delete('/image/:id/favourite',
+    verifyAuth.isLoggedIn,
+    ImageController.unfavourite
+  )
+
+  app.put('/image/:id/trash',
+    verifyAuth.isLoggedIn,
+    ImageController.putToTrash
+  )
+
+  app.delete('/image/:id/trash',
+    verifyAuth.isLoggedIn,
+    ImageController.removeFromTrash
+  )
 }
