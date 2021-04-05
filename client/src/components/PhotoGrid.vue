@@ -5,7 +5,7 @@
         <kinesis-container v-if="!invalidImageIndices.has(index)">
           <kinesis-element :strength="10" type="depth">
             <v-hover v-slot="{hover}">
-              <v-card class="image-card" elevation="20" @click="$emit('open', image)">
+              <v-card class="image-card" elevation="20" @click="$emit('imageClicked', image)">
                 <v-img 
                   class="image"
                   aspect-ratio="1"
@@ -19,25 +19,15 @@
                       <v-btn
                         v-on:click.stop
                         icon
+                        large
                         color="white"
                         class="delete"
                         @click="$emit('delete', image)">
                         <v-icon>mdi-close</v-icon>
                       </v-btn>
-                      <v-btn
-                        v-if="image.trashed"
-                        v-on:click.stop
-                        icon
-                        width="150px"
-                        height="150px"
-                        color="white"
-                        class="restore"
-                        disabled
-                        @click="$emit('restore', image)">
-                        <v-icon size="150px">mdi-restore</v-icon>
-                      </v-btn>
-                      <div class="overlay-content">
-                        asdadas
+                      <v-icon v-if="image.trashed" size="200px" class="restore" color="rgb(255, 255, 255, 0.5)" >mdi-restore</v-icon>
+                      <div v-if="image.trashed" class="overlay-content text-h6">
+                        Click to restore
                       </div>
                     </v-overlay>
                   </v-fade-transition>
@@ -110,13 +100,17 @@ export default {
 
 .overlay-content {
   position: absolute;
-  bottom: 0;
+  top: 80%;
+  left: 50%;
+  transform:translate(-50%,-50%);
+  color: rgb(255, 255, 255, 0.7);
 }
 
 .delete {
   position: absolute;
   top: 5px;
   right: 5px;
+  z-index: 1;
 }
 
 .delete:hover {
@@ -124,9 +118,7 @@ export default {
 }
 
 .restore {
-  position: absolute;
-  left:50%;
   top:50%;
-  transform:translate(-50%,-50%);
+  transform:translate(0,-50%);
 }
 </style>

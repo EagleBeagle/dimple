@@ -4,10 +4,10 @@
   width="500">
   <v-card>
     <v-card-title class="headline">
-      Delete Photo
-    </v-card-title>
-    <v-card-text>
       Are you sure?
+    </v-card-title>
+    <v-card-text class="text-body-1">
+      If you permanently delete this photo, you won't be able to restore it later.
     </v-card-text>
 
     <v-divider></v-divider>
@@ -17,8 +17,8 @@
       <v-btn
         depressed
         class="blue--text"
-        @click="$emit('confirm')">
-        CREATE
+        @click="confirm()">
+        CONFIRM
       </v-btn>
       <v-btn
         depressed
@@ -56,8 +56,9 @@ export default {
     close() {
       this.dialog = false
     },
-    delete() {
-
+    confirm() {
+      this.$emit('confirm')
+      this.dialog = false
     }
   }
 }

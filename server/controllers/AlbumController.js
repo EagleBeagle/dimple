@@ -41,7 +41,7 @@ module.exports = {
       queryObject.attributes.include.push([
         db.Sequelize.literal(`(
           SELECT COUNT(*) FROM albumimage
-          WHERE albumimage.albumId = album.id
+          WHERE albumimage.albumId = album.id AND (SELECT trashed FROM images WHERE id = albumimage.imageId ) = 0
         )`), 'imageCount'
       ])
       if (id) {
@@ -75,6 +75,9 @@ module.exports = {
       for (let i = 0; i < albums.length; i++) {
         albums[i].dataValues.images = await albums[i].getImages({
           order: db.Sequelize.literal('rand()'),
+          where: {
+            trashed: false
+          },
           limit: 4,
           attributes: ['id', 'fk_username'],
           joinTableAttributes: []

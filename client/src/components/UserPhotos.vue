@@ -21,19 +21,22 @@
       :images="images" 
       @delete="deleteImage" 
       @reachedBottom="infiniteHandler"
-      @open="openImage" />
+      @imageClicked="imageClicked" />
+    <photo-deletion-dialog :show="showDeletionDialog" @close="showDeletionDialog = false" @confirm="deletionConfirmed"/>
   </v-container>
 </template>
 
 <script>
 import PhotoGrid from '@/components/PhotoGrid'
+import PhotoDeletionDialog from '@/components/PhotoDeletionDialog'
 import ImageService from '@/services/ImageService'
 import AlbumService from '@/services/AlbumService'
-import { Cloudinary } from 'cloudinary-core';
+import { Cloudinary } from 'cloudinary-core'
 import { mapState } from 'vuex'
 export default {
   components: {
-    PhotoGrid
+    PhotoGrid,
+    PhotoDeletionDialog
   },
   data () {
     return {
@@ -41,7 +44,9 @@ export default {
       images: [],
       cloudinaryCore: null,
       oldestDate: null,
-      newestDate: null
+      newestDate: null,
+      showDeletionDialog: false,
+      photoToDelete: null
     }
   },
   async mounted() {
@@ -125,36 +130,63 @@ export default {
         console.log(err)
       }
     },
-    async openImage(image) { // ezt kell még todozni
-      this.$router.push({
-        name: 'Photo',
-        params: {
-          username: image.fk_username,
-          id: image.id
-        },
-        query: {
-          in: this.$route.params.album,
-          visibility: 'all',
-          page: 'user',
-          order: 'date:desc'
+    async imageClicked(image) { // ezt kell még todozni
+      if (!image.trashed) {
+        this.$router.push({
+          name: 'Photo',
+          params: {
+            username: image.fk_username,
+            id: image.id
+          },
+          query: {
+            in: this.$route.params.album,
+            visibility: 'all',
+            page: 'user',
+            order: 'date:desc'
+          }
+        })
+      } else {
+        try {
+          await ImageService.removeFromTrash(image.id)
+          if (this.$route.params.album === 'trash') {
+            this.images = this.images.filter(imageToFilter => imageToFilter.id !== image.id )
+          }
+          this.$store.dispatch('alert', 'Photo restored')
+        } catch (err) {
+          console.log(err)
+          this.$store.dispatch('alert', 'An error happened while restoring the photo')
         }
-      })
+      }
     },
-    async deleteImage(imageToDelete) {
+    async deleteImage(photoToDelete) {
       try {
-        if (!imageToDelete.trashed) {
-          await ImageService.putToTrash(imageToDelete.id)
+        if (!photoToDelete.trashed) {
+          await ImageService.putToTrash(photoToDelete.id)
           this.$store.dispatch('alert', 'Photo has been moved to trash.')
+          this.images = this.images.filter(image => image.id !== photoToDelete.id)
         } else {
-          await ImageService.delete(imageToDelete.id)
-          this.$store.dispatch('alert', 'Photo deleted successfully.')
+          this.showDeletionDialog = true
+          this.photoToDelete = photoToDelete
         }
-        this.images = this.images.filter(image => image.id !== imageToDelete.id)
       } catch(err) {
         console.log(err)
         this.$store.dispatch('alert', 'An error occured during deletion.')
       }
     },
+
+    async deletionConfirmed() {
+      try {
+        await ImageService.delete(this.photoToDelete.id)
+        this.$store.dispatch('alert', 'Photo deleted successfully.')
+        this.images = this.images.filter(image => image.id !== this.photoToDelete.id)
+        this.photoToDelete = null
+      } catch(err) {
+        console.log(err)
+        this.photoToDelete = null
+        this.$store.dispatch('alert', 'An error occured during deletion.')
+      }
+    },
+    
     async infiniteHandler($state) {
       console.log('handled')
       let images
