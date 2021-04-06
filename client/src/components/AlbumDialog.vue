@@ -41,7 +41,7 @@
         color="blue"
         class="white--text"
         @click="addToAlbumsDialog = true">
-        Add to albums
+        Edit albums
       </v-btn>
     </v-card-actions>
     <add-to-albums-dialog

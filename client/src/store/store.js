@@ -12,7 +12,12 @@ export default new Vuex.Store({
     imageData: null,
     imageUploadData: null,
     uploadInProgress: false,
-    newAlbum: null
+    newAlbum: null,
+    sort: {
+      category: 'date',
+      order: 'desc'
+    },
+    visibility: 'all'
   },
   actions: {
     alert({ commit }, text) {
@@ -35,6 +40,12 @@ export default new Vuex.Store({
     },
     albumAdded({ commit }, newAlbum) {
       commit('albumAdded', newAlbum)
+    },
+    changeSort({ commit }, sort) {
+      commit('changeSort', sort)
+    },
+    changeVisibility({ commit }, visibility) {
+      commit('changeVisibility', visibility)
     }
   },
   mutations: {
@@ -62,6 +73,12 @@ export default new Vuex.Store({
     },
     albumAdded(state, newAlbum) {
       state.newAlbum = newAlbum
+    },
+    changeSort(state, sort) {
+      state.sort = sort
+    },
+    changeVisibility(state, visibility) {
+      state.visibility = visibility
     }
   }
 })

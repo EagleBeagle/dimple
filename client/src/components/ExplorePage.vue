@@ -1,0 +1,97 @@
+<template>
+  <v-container class="px-xs-0 px-sm-4 px-md-16 photo-container" fluid>
+    <v-row v-if="images" justify="start" align="start" class="align-self-start px-xs-0 px-sm-4 px-md-16">
+      <v-col xs="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
+        <div class="text-h2 font-weight-regular mt-2 mb-0">Explore</div>
+      </v-col>
+    </v-row>
+    <photo-grid
+      :images="images" 
+      @reachedBottom="infiniteHandler"
+      @imageClicked="imageClicked" 
+      class="px-xs-0 px-sm-4 px-md-16"/>
+  </v-container>
+</template>
+
+<script>
+import PhotoGrid from '@/components/PhotoGrid'
+import ImageService from '@/services/ImageService'
+import { Cloudinary } from 'cloudinary-core'
+import { mapState } from 'vuex'
+export default {
+  components: {
+    PhotoGrid
+  },
+  data () {
+    return {
+      images: [],
+      lastDate: null,
+      cloudinaryCore: null
+    }
+  },
+  async mounted() {
+    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
+    this.images = await this.getImages({})
+  },
+  computed: {
+    ...mapState([
+      'user',
+      'sort',
+      'visibility'
+    ])
+  },
+  methods: {
+    async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
+      try {
+        filter.sort = `date:desc`
+        filter.explore = true
+        const images = (await ImageService.get(filter)).data.map((image) => {
+          image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+          return image
+        })
+        if (images.length) {
+          this.lastDate = images[images.length - 1].createdAt
+        }
+        return images
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async imageClicked(image) { // ezt kell még todozni
+      this.$router.push({
+        name: 'Photo',
+        params: {
+          username: image.fk_username,
+          id: image.id
+        },
+        query: {
+          in: this.$route.params.album,
+          visibility: this.visibility,
+          page: 'explore',
+          order: `date:desc`
+        }
+      })
+    },
+    async infiniteHandler($state) {
+      let images
+      if (this.lastDate) {
+        images = await this.getImages({
+          to: this.lastDate
+        })
+      } else {
+        images = await this.getImages({})
+      }
+      if (images.length) {
+        this.images.push(...images)
+        $state.loaded()
+      } else {
+        $state.complete()
+      }
+    },
+  }
+}
+</script>
+
+<style>
+
+</style>

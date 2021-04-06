@@ -7,6 +7,8 @@ import UserAlbums from '../components/UserAlbums'
 import UserPhotos from '../components/UserPhotos'
 import Dashboard from '../components/Dashboard'
 import PhotoPage from '../components/PhotoPage'
+import ExplorePage from '../components/ExplorePage'
+import UserPage from '../components/UserPage'
 
 Vue.use(VueRouter)
 
@@ -42,6 +44,16 @@ const routes = [
         component: UserPhotos
       }
     ]
+  },
+  {
+    path: '/explore',
+    name: 'Explore',
+    component: ExplorePage
+  },
+  {
+    path: '/user/:username',
+    name: 'User',
+    component: UserPage
   }
 ]
 

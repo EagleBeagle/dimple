@@ -12,7 +12,10 @@
         @click="$router.push({ name: 'Photos', params: { album: 'all' } }).catch(err => {})">
         You
       </v-btn>
-      <v-btn class="white--text" depressed tile color="blue" light>
+      <v-btn class="white--text" 
+        depressed tile color="blue" 
+        light
+        @click="$router.push({ name: 'Explore' }).catch(err => {})">
         Explore
       </v-btn>
     </v-toolbar-items>
@@ -41,6 +44,8 @@ export default {
     signOut() {
       localStorage.removeItem('user')
       this.$store.dispatch('unsetUser')
+      this.$store.dispatch('changeSort', { category: 'date', order: 'desc' })
+      this.$store.dispatch('changeVisibility', 'all')
       this.$router.push({ name: 'Authentication' })
     }
   }

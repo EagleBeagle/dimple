@@ -16,6 +16,9 @@ export default {
     if (data.imageId) {
       queryString += `&image=${data.imageId}`
     }
+    if (typeof data.visibility !== 'undefined') {
+      queryString += `&visibility=${data.visibility}`
+    }
     return Api().get(`album?${queryString}`)
   },
 

@@ -25,6 +25,7 @@ module.exports = {
       const id = req.query.id
       const user = req.query.user
       const imageId = req.query.image
+      const visibility = req.query.visibility
       const queryObject = {
         where: {},
         order: [
@@ -69,6 +70,11 @@ module.exports = {
         queryObject.where.fk_username = user
         if (user !== req.user.username) {
           queryObject.where.visibility = true
+        }
+        if (visibility === 'true') {
+          queryObject.where.visibility = 1
+        } else if (visibility === 'false') {
+          queryObject.where.visibility = 0
         }
         albums = await Album.findAll(queryObject)
       }

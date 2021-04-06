@@ -2,11 +2,12 @@
 <v-container class="px-8 album-container" fluid>
     <v-row justify="start">
       <v-col class="pb-0" style="text-align: left">
-        <div class="display-1 my-2">Your Albums</div>
+        <div class="text-h3 font-weight-regular my-2">Your Albums</div>
       </v-col>
     </v-row>
     <v-row class="pa-0">
       <album-grid
+        v-if="renderAlbumGrid"
         :albums="albums"
         @open="openAlbum"
         @download="downloadAlbum"
@@ -27,7 +28,8 @@ export default {
   },
   data () {
     return {
-      albums: []
+      albums: [],
+      renderAlbumGrid: true
     }
   },
   mounted() {
@@ -37,12 +39,18 @@ export default {
   computed: {
     ...mapState([
       'newAlbum',
-      'user'
+      'user',
+      'visibility'
     ])
   },
   watch: {
     newAlbum() {
       this.albums.push(this.newAlbum)
+    },
+    async visibility() {
+      await this.getAlbums()
+      this.rerenderAlbumGrid()
+      window.scrollTo(0, 0)
     }
   },
   methods: {
@@ -51,7 +59,15 @@ export default {
     },
     async getAlbums() {
       try {
-        this.albums = (await AlbumService.get({ user: this.user.username })).data.map(album => {
+        let filter = {
+          user: this.user.username
+        }
+        if (this.visibility === 'public') {
+          filter.visibility = true
+        } else if (this.visibility === 'private') {
+          filter.visibility = false
+        }
+        this.albums = (await AlbumService.get(filter)).data.map(album => {
           album.images = album.images.map(image => {
             image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
             return image
@@ -81,6 +97,12 @@ export default {
         console.log(err)
         this.$store.dispatch('alert', 'An error occured during deletion')
       }
+    },
+    rerenderAlbumGrid() {
+      this.renderAlbumGrid = false;
+      this.$nextTick(() => {
+        this.renderAlbumGrid = true;
+      });
     }
   }
 }

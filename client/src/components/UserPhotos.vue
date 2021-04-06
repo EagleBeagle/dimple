@@ -1,23 +1,24 @@
 <template>
   <v-container class="px-8 photo-container" fluid>
-    <v-row v-if="images && images.length !== 0" justify="start" align="start" class="align-self-start">
+    <v-row v-if="images" justify="start" align="start" class="align-self-start">
       <v-col v-if="album" xs="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
-        <div class="display-1 mt-2 mb-0">{{ album.name }}</div>
+        <div class="text-h3 font-weight-regular mt-2 mb-0">{{ album.name }}</div>
       </v-col>
       <v-col v-if="album" xs="12" sm="12" md="12" lg="12" class="py-0 my-0" style="text-align: left">
         <div class="text-subtitle-1 my-0">{{ album.description }}</div>
       </v-col>
       <v-col v-if="!album && $route.params.album === 'all'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
-        <div class="display-1 my-2">All Photos</div>
+        <div class="text-h3 font-weight-regular my-2">All Photos</div>
       </v-col>
       <v-col v-if="!album && $route.params.album === 'favourites'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
-        <div class="display-1 my-2">Favourites</div>
+        <div class="text-h3 font-weight-regular my-2">Favourites</div>
       </v-col>
       <v-col v-if="!album && $route.params.album === 'trash'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
-        <div class="display-1 my-2">Trash</div>
+        <div class="text-h3 font-weight-regular my-2">Trash</div>
       </v-col>
     </v-row>
     <photo-grid
+      v-if="renderPhotoGrid"
       :images="images" 
       @delete="deleteImage" 
       @reachedBottom="infiniteHandler"
@@ -41,9 +42,10 @@ export default {
   data () {
     return {
       album: null,
+      renderPhotoGrid: true,
       images: [],
       cloudinaryCore: null,
-      oldestDate: null,
+      lastDate: null,
       newestDate: null,
       showDeletionDialog: false,
       photoToDelete: null
@@ -52,21 +54,33 @@ export default {
   async mounted() {
     this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
     await this.getAlbum()
-    this.images = await this.getImages({ sort: 'date:desc' })
+    this.images = await this.getImages({})
   },
   computed: {
     ...mapState([
-      'user'
+      'user',
+      'sort',
+      'visibility'
     ])
   },
   watch: {
     '$route.params.album': async function () {
       this.images = []
       await this.getAlbum()
-      const images = await this.getImages({ sort: 'date:desc' })
+      const images = await this.getImages({})
       if (images) {
         this.images.push(...images)
       }
+    },
+    async sort() {
+      this.images = await this.getImages({})
+      this.rerenderPhotoGrid()
+      window.scrollTo(0, 0)
+    },
+    async visibility() {
+      this.images = await this.getImages({})
+      this.rerenderPhotoGrid()
+      window.scrollTo(0, 0)
     }
   },
   methods: {
@@ -84,6 +98,12 @@ export default {
     },
     async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
       try {
+        filter.sort = `${this.sort.category}:${this.sort.order}`
+        if (this.visibility === 'public') {
+          filter.visibility = true
+        } else if (this.visibility === 'private') {
+          filter.visibility = false
+        }
         if (this.$route.params.album === 'all') {
           filter.user = this.user.username
           const images = (await ImageService.get(filter)).data.map((image) => {
@@ -91,7 +111,7 @@ export default {
             return image
           })
           if (images.length) {
-            this.oldestDate = images[images.length - 1].createdAt
+            this.lastDate = images[images.length - 1].createdAt
           }
           return images
         } else if (this.$route.params.album === 'favourites') {
@@ -102,7 +122,7 @@ export default {
             return image
           })
           if (images.length) {
-            this.oldestDate = images[images.length - 1].createdAt
+            this.lastDate = images[images.length - 1].createdAt
           }
           return images
         } else if (this.$route.params.album === 'trash') {
@@ -112,7 +132,7 @@ export default {
             return image
           })
           if (images.length) {
-            this.oldestDate = images[images.length - 1].createdAt
+            this.lastDate = images[images.length - 1].createdAt
           }
           return images
         } else {
@@ -122,7 +142,7 @@ export default {
             return image
           })
           if (images.length) {
-            this.oldestDate = images[images.length - 1].createdAt
+            this.lastDate = images[images.length - 1].createdAt
           }
           return images
         }
@@ -140,9 +160,9 @@ export default {
           },
           query: {
             in: this.$route.params.album,
-            visibility: 'all',
+            visibility: this.visibility,
             page: 'user',
-            order: 'date:desc'
+            order: `${this.sort.category}:${this.sort.order}`
           }
         })
       } else {
@@ -188,15 +208,19 @@ export default {
     },
     
     async infiniteHandler($state) {
-      console.log('handled')
       let images
-      if (this.oldestDate) {
-        images = await this.getImages({
-          to: this.oldestDate,
-          sort: 'date:desc'
-        })
+      if (this.lastDate) {
+        if (this.sort.order === 'desc') {
+          images = await this.getImages({
+            to: this.lastDate
+          })
+        } else {
+          images = await this.getImages({
+            from: this.lastDate
+          })
+        }
       } else {
-        images = await this.getImages({ sort: 'date:desc' })
+        images = await this.getImages({})
       }
       if (images.length) {
         this.images.push(...images)
@@ -204,6 +228,12 @@ export default {
       } else {
         $state.complete()
       }
+    },
+    rerenderPhotoGrid() {
+      this.renderPhotoGrid = false;
+      this.$nextTick(() => {
+        this.renderPhotoGrid = true;
+      });
     }
   }
 }

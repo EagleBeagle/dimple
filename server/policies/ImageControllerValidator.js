@@ -60,11 +60,13 @@ module.exports = {
       to: Joi.date().less('now'),
       album: Joi.number(),
       limit: Joi.number().max(100),
-      sort: Joi.string().valid('date:desc', 'date:asc'),
+      sort: Joi.string().valid('date:desc', 'date:asc', 'popularity:asc', 'popularity:desc'),
       user: Joi.string().min(4).max(25),
       id: Joi.string().uuid(),
       favourites: Joi.boolean(),
-      trash: Joi.boolean()
+      trash: Joi.boolean(),
+      visibility: Joi.boolean(),
+      explore: Joi.boolean()
     })
     const { error } = schema.validate(req.query)
     if (error) {

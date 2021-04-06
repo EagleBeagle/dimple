@@ -77,6 +77,12 @@ export default {
     if (data.trash) {
       queryString += `&trash=${data.trash}` 
     }
+    if (typeof data.visibility !== 'undefined') {
+      queryString += `&visibility=${data.visibility}` 
+    }
+    if (data.explore) {
+      queryString += `&explore=${data.explore}` 
+    }
     return Api().get(`image?${queryString}`)
   },
 

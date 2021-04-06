@@ -17,6 +17,7 @@
                       color="#000000"
                       opacity="0.2">
                       <v-btn
+                        v-if="$route.name !== 'Explore'"
                         v-on:click.stop
                         icon
                         large

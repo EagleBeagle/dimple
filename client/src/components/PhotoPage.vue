@@ -278,10 +278,8 @@ export default {
   watch: {
     expand() {
       if (this.expand) {
-        console.log('adddd')
         document.addEventListener('keyup', this.escPressed)
       } else {
-        console.log('remoooove')
         document.removeEventListener('keyup', this.escPressed)
       }
     },
@@ -321,8 +319,6 @@ export default {
     async getNeighbouringImages() {
       const query = this.$route.query
       if (query.page && 
-          query.page === 'user' && 
-          query.in && 
           query.visibility && 
           query.order) { // all photos of
         try {
@@ -332,24 +328,32 @@ export default {
           let rightFilter = {
             limit: 2
           }
-          if (query.visibility !== 'all') {
-            leftFilter.visibility = query.visibility
-            rightFilter.visibility = query.visibility
+          if (query.visibility === 'public') {
+            leftFilter.visibility = true
+            rightFilter.visibility = true
+          } else if (query.visibility === 'private') {
+            leftFilter.visibility = false
+            rightFilter.visibility = false
           }
-          if (query.in === 'all') {
-            leftFilter.user = this.image.fk_username
-            rightFilter.user = this.image.fk_username
-          } else if (query.in === 'favourites') {
-            leftFilter.favourites = true
-            rightFilter.favourites = true
-            leftFilter.user = this.user.username
-            rightFilter.user = this.user.username
-          } else if (query.in === 'trash') {
-            leftFilter.trash = true
-            rightFilter.trash = true
-          } else {
-            leftFilter.album = query.in
-            rightFilter.album = query.in
+          if (query.page === 'user') {
+             if (query.in === 'all') {
+              leftFilter.user = this.image.fk_username
+              rightFilter.user = this.image.fk_username
+            } else if (query.in === 'favourites') {
+              leftFilter.favourites = true
+              rightFilter.favourites = true
+              leftFilter.user = this.user.username
+              rightFilter.user = this.user.username
+            } else if (query.in === 'trash') {
+              leftFilter.trash = true
+              rightFilter.trash = true
+            } else {
+              leftFilter.album = query.in
+              rightFilter.album = query.in
+            }
+          } else if (query.page === 'explore') {
+            leftFilter.explore = true
+            rightFilter.explore = true
           }
           if (query.order === 'date:desc') {
             leftFilter.from = this.image.createdAt
@@ -364,8 +368,23 @@ export default {
               image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
               return image
             })
-          } else if (query.order === 'date:asc') { // todo
-            console.log('asc todo')
+          } else if (query.order === 'date:asc') {
+            leftFilter.to = this.image.createdAt
+            leftFilter.sort = 'date:desc'
+            this.leftImages = (await ImageService.get(leftFilter)).data.reverse().map(image => {
+              image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+              return image
+            })
+            rightFilter.from = this.image.createdAt
+            rightFilter.sort = 'date:asc'
+            this.rightImages = (await ImageService.get(rightFilter)).data.map(image => {
+              image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+              return image
+            })
+          } else if (query.order === 'popularity:desc') {
+            console.log('popularity:desc')
+          } else if (query.order === 'popularity:asc') {
+            console.log('popularity:asc')
           }
         } catch (err) {
           console.log(err)
@@ -478,12 +497,14 @@ export default {
       this.writtingComment = value
     },
     async updateVisibility(visibility) {
-      try {
-        await ImageService.update(this.image.id, { visibility })
-        this.image.visibility = visibility
-      } catch (err) {
-        console.log(err)
-        this.$store.dispatch('alert', 'An error occured while changing viewing privacy')
+      if (visibility !== this.image.visibility) {
+        try {
+          await ImageService.update(this.image.id, { visibility })
+          this.image.visibility = visibility
+        } catch (err) {
+          console.log(err)
+          this.$store.dispatch('alert', 'An error occured while changing viewing privacy')
+        }
       }
     },
     updateCommentCount(count) {

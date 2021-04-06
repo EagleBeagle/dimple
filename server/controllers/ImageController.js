@@ -176,11 +176,19 @@ module.exports = {
       const visibility = req.query.visibility
       const favourites = req.query.favourites
       const trash = req.query.trash
+      const explore = req.query.explore
       const queryObject = {
         where: {
           trashed: false
         },
-        order: []
+        order: [],
+        attributes: {
+          include: [[
+            db.Sequelize.literal(`(
+              SELECT COUNT(*) FROM favourites WHERE imageId = id
+            )`), 'favouriteCount'
+          ]]
+        }
       }
       if ((username && albumName) ||
          (username && id) ||
@@ -191,10 +199,15 @@ module.exports = {
          (trash && albumName) ||
          (trash && favourites) ||
          (trash && id) ||
-         (trash && username)) {
+         (trash && username) ||
+         (trash && explore) ||
+         (username && explore) || // perszonalizációnál ezt kivenni I guess
+         (id && explore) ||
+         (albumName && explore) ||
+         (favourites && explore)) {
         return res.status(400).send('Invalid query')
       }
-      if (!username && !albumName && !id && !favourites && !trash) {
+      if (!username && !albumName && !id && !favourites && !trash && !explore) {
         return res.status(400).send('Invalid query')
       }
       if (id) {
@@ -210,15 +223,17 @@ module.exports = {
           return res.status(403).send('Unauthorized')
         }
       }
-      if (visibility) {
-        queryObject.visibility = visibility
+      if (visibility === 'true' || explore) {
+        queryObject.where.visibility = 1
+      } else if (visibility === 'false') {
+        queryObject.where.visibility = 0
       }
       if (username && !favourites && !trash) {
         queryObject.where.fk_username = username
         if (username !== req.user.username) {
           queryObject.where.visibility = true
         }
-      } else if (!username && !favourites) { // ide jön majd minden retek
+      } else if (!username && !favourites && !explore) { // ide jön majd minden retek
         queryObject.where.fk_username = req.user.username
       }
       if (sort) {
@@ -226,6 +241,8 @@ module.exports = {
           queryObject.order.push(['createdAt', 'DESC'])
         } else if (sort === 'date:asc') {
           queryObject.order.push(['createdAt', 'ASC'])
+        } else {
+          return res.status(400).send('Invalid sort criteria')
         }
       }
       if (fromDate || toDate) {
@@ -269,6 +286,7 @@ module.exports = {
         images = await Image.findAll(queryObject)
         console.log(images)
       } else {
+        console.log(queryObject)
         images = await Image.findAll(queryObject)
       }
       res.status(200).send(images)
