@@ -81,7 +81,7 @@
             </v-list-item>
           </v-list>
         </v-menu>
-        <v-menu offset-y :close-on-content-click="false" tile>
+        <v-menu offset-y :close-on-content-click="false" tile v-if="$route.params.username === user.username">
         <template v-slot:activator="{ on, attrs }">
             <v-btn
               depressed
@@ -144,6 +144,7 @@ export default {
   },
   computed: {
     ...mapState([
+      'user',
       'sort',
       'visibility'
     ])

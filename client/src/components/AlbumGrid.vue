@@ -3,7 +3,7 @@
     <v-row justify="start">
       <v-col cols="12" sm="6" md="4" lg="3" class="pa-4" v-for="album in albums" :key="album.id">
         <v-hover v-slot="{hover}">
-          <v-card  tile @click="$emit('open', album.id)" :hover="inDialog" height="100%">
+          <v-card  tile @click="$emit('open', album)" :hover="inDialog" height="100%">
             <div class="overlay-div">
                 <v-container class="overlay-container pa-0">
                   <v-row justify="start">

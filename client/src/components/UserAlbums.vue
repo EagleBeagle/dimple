@@ -54,13 +54,13 @@ export default {
     }
   },
   methods: {
-    openAlbum(id) {
-      this.$router.push({ name: 'Photos', params: { album: id } })
+    openAlbum(album) {
+      this.$router.push({ name: 'Photos', params: { username: album.fk_username,  album: album.id } })
     },
     async getAlbums() {
       try {
         let filter = {
-          user: this.user.username
+          user: this.$route.params.username
         }
         if (this.visibility === 'public') {
           filter.visibility = true

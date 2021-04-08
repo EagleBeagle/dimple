@@ -5,6 +5,7 @@ const AlbumController = require('../controllers/AlbumController.js')
 const ImageController = require('../controllers/ImageController.js')
 const ImageControllerValidator = require('../policies/ImageControllerValidator.js')
 const CommentController = require('../controllers/CommentController.js')
+const multerUploads = require('../config/multer.config')
 
 module.exports = app => {
   app.post('/signup',
@@ -15,6 +16,15 @@ module.exports = app => {
   app.post('/signin',
     UserControllerValidator.signin,
     UserController.signin)
+
+  app.get('/user/:username',
+    verifyAuth.isLoggedIn,
+    UserController.get)
+
+  app.put('/user/:username/avatar',
+    verifyAuth.isLoggedIn,
+    multerUploads,
+    UserController.changeAvatar)
 
   app.get('/admin',
     verifyAuth.isLoggedIn,

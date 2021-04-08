@@ -312,7 +312,7 @@ export default {
       } catch (err) {
         console.log(err)
         if (err.response.status === 403) {
-          this.$router.push({ name: 'Photos', params: { album: 'all'}})
+          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all'}})
         }
       }
     },
@@ -467,11 +467,11 @@ export default {
       try {
         if (!this.image.trashed) {
           await ImageService.putToTrash(this.image.id)
-          this.$router.push({ name: 'Photos', params: { album: 'all' } })
+          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all' } })
           this.$store.dispatch('alert', 'Photo has been moved to trash.')
         } else {
           await ImageService.delete(this.image.id)
-          this.$router.push({ name: 'Photos', params: { album: 'all' } })
+          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all' } })
           this.$store.dispatch('alert', 'Photo deleted successfully.')
         }
       } catch(err) {

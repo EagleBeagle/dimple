@@ -104,11 +104,14 @@ export default {
         this.close()
       }
     },
-    openAlbum(id) {
-      this.$router.push({ name: 'Photos', params: { album: id } })
+    openAlbum(album) {
+      this.$router.push({ name: 'Photos', params: { username: album.fk_username,  album: album.id } })
     },
     updateAlbums(selectedAlbums) {
-      this.albums = selectedAlbums
+      this.albums = selectedAlbums.map(selectedAlbum => {
+        selectedAlbum.images.push(this.image)
+        return selectedAlbum
+      })
     },
     close() {
       this.dialog = false

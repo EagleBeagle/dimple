@@ -147,9 +147,6 @@ module.exports = {
       if (image.fk_username === username) {
         const response = await cloudinary.uploader.destroy(`${req.user.username}/${image.id}`)
         if (response.result !== 'ok' && response.result !== 'not found') {
-          console.log('MIA A FASSAZDGSADUZASGDUASZDGASDSASDAS')
-          console.log(response.result)
-          console.log(response.result === 'not found')
           return res.status(400).send('cloudinary error')
         }
         await image.destroy()
@@ -233,7 +230,7 @@ module.exports = {
         if (username !== req.user.username) {
           queryObject.where.visibility = true
         }
-      } else if (!username && !favourites && !explore) { // ide jön majd minden retek
+      } else if (!username && !favourites && !explore && !albumName) { // ide jön majd minden retek
         queryObject.where.fk_username = req.user.username
       }
       if (sort) {
@@ -262,7 +259,11 @@ module.exports = {
       if (albumName) {
         const album = await Album.findByPk(albumName)
         if (album) {
+          console.log('itt')
           if (album.fk_username === req.user.username || album.visibility) {
+            if (album.fk_username !== req.user.username) {
+              queryObject.where.visibility = true
+            }
             images = await album.getImages(queryObject)
           } else {
             return res.status(403).send('Unauthorized')
@@ -284,9 +285,7 @@ module.exports = {
       } else if (trash) {
         queryObject.where.trashed = true
         images = await Image.findAll(queryObject)
-        console.log(images)
       } else {
-        console.log(queryObject)
         images = await Image.findAll(queryObject)
       }
       res.status(200).send(images)

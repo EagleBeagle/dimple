@@ -7,5 +7,13 @@ export default {
 
   signIn(credentials) {
     return Api().post('/signin', credentials)
+  },
+
+  changeAvatar(username, formData) {
+    return Api().put(`/user/${username}/avatar`, formData)
+  },
+
+  get(username) {
+    return Api().get(`/user/${username}`)
   }
 }

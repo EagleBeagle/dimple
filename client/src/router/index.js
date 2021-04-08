@@ -5,10 +5,9 @@ import Home from '../components/Home.vue'
 import Auth from '../components/Authentication'
 import UserAlbums from '../components/UserAlbums'
 import UserPhotos from '../components/UserPhotos'
-import Dashboard from '../components/Dashboard'
+import UserPage from '../components/UserPage'
 import PhotoPage from '../components/PhotoPage'
 import ExplorePage from '../components/ExplorePage'
-import UserPage from '../components/UserPage'
 
 Vue.use(VueRouter)
 
@@ -29,9 +28,9 @@ const routes = [
     component: PhotoPage
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: Dashboard,
+    path: '/user/:username',
+    name: 'UserPage',
+    component: UserPage,
     children: [
       {
         path: 'albums',
@@ -49,11 +48,6 @@ const routes = [
     path: '/explore',
     name: 'Explore',
     component: ExplorePage
-  },
-  {
-    path: '/user/:username',
-    name: 'User',
-    component: UserPage
   }
 ]
 
@@ -76,11 +70,11 @@ router.beforeEach((to, from, next) => {
   }
 
   if (to.path === '/auth' && loggedIn) {
-    return next('/dashboard/photos/all');
+    return next(`/user/${store.state.user.username}/photos/all`);
   }
 
-  if (to.path === '/') {
-    return next('/dashboard/photos/all')
+  if (to.path === '/' && loggedIn) {
+    return next(`/user/${store.state.user.username}/photos/all`)
   }
   
 

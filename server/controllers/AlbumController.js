@@ -52,6 +52,13 @@ module.exports = {
           return res.status(403).send('Invalid id')
         }
         if (album.fk_username === req.user.username || album.visibility) {
+          if (album.fk_username !== req.user.username) {
+            album.dataValues.imageCount = await album.countImages({
+              where: {
+                visibility: true
+              }
+            })
+          }
           return res.status(200).send(album)
         } else {
           return res.status(403).send('Unauthorized')
@@ -79,15 +86,35 @@ module.exports = {
         albums = await Album.findAll(queryObject)
       }
       for (let i = 0; i < albums.length; i++) {
-        albums[i].dataValues.images = await albums[i].getImages({
-          order: db.Sequelize.literal('rand()'),
-          where: {
-            trashed: false
-          },
-          limit: 4,
-          attributes: ['id', 'fk_username'],
-          joinTableAttributes: []
-        })
+        if (albums[i].fk_username === req.user.username) {
+          albums[i].dataValues.images = await albums[i].getImages({
+            order: db.Sequelize.literal('rand()'),
+            where: {
+              trashed: false
+            },
+            limit: 4,
+            attributes: ['id', 'fk_username'],
+            joinTableAttributes: []
+          })
+        } else {
+          albums[i].dataValues.images = await albums[i].getImages({
+            order: db.Sequelize.literal('rand()'),
+            where: {
+              trashed: false,
+              visibility: true
+            },
+            limit: 4,
+            attributes: ['id', 'fk_username'],
+            joinTableAttributes: []
+          })
+        }
+        if (albums[i].fk_username !== req.user.username) {
+          albums[i].dataValues.imageCount = await albums[i].countImages({
+            where: {
+              visibility: true
+            }
+          })
+        }
       }
       res.status(200).send(albums)
     } catch (err) {

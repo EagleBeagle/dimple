@@ -105,7 +105,7 @@ export default {
           filter.visibility = false
         }
         if (this.$route.params.album === 'all') {
-          filter.user = this.user.username
+          filter.user = this.$route.params.username
           const images = (await ImageService.get(filter)).data.map((image) => {
             image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
             return image
@@ -115,7 +115,7 @@ export default {
           }
           return images
         } else if (this.$route.params.album === 'favourites') {
-          filter.user = this.user.username
+          filter.user = this.$route.params.username
           filter.favourites = true
           const images = (await ImageService.get(filter)).data.map((image) => {
             image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
@@ -137,10 +137,12 @@ export default {
           return images
         } else {
           filter.album = this.$route.params.album
+          console.log('itt')
           const images = (await ImageService.get(filter)).data.map((image) => {
             image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
             return image
           })
+          console.log(images)
           if (images.length) {
             this.lastDate = images[images.length - 1].createdAt
           }

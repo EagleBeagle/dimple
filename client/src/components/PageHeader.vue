@@ -3,13 +3,13 @@
     <v-toolbar-title 
       class="font-weight-bold text-h3 white--text mr-5" 
       style="cursor: pointer" 
-      @click="$router.push({ name: 'Photos', params: { album: 'all' } }).catch(err => {})">dimple
+      @click="$router.push({ name: 'Photos', params: { username: user.username, album: 'all' } }).catch(err => {})">dimple
     </v-toolbar-title>
     <v-toolbar-items>
       <v-btn class="white--text" 
         depressed tile color="blue" 
         light 
-        @click="$router.push({ name: 'Photos', params: { album: 'all' } }).catch(err => {})">
+        @click="$router.push({ name: 'Photos', params: { username: user.username, album: 'all' } }).catch(err => {})">
         You
       </v-btn>
       <v-btn class="white--text" 

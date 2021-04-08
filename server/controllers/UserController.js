@@ -1,8 +1,13 @@
 const db = require('../config/db.config.js')
 const User = db.user
+const Image = db.image
 const jwt = require('jsonwebtoken')
 const passport = require('passport')
 const bcrypt = require('bcryptjs')
+const cloudinary = require('../config/cloudinary.config.js')
+const DatauriParser = require('datauri/parser')
+const path = require('path')
+const { v4: uuidv4 } = require('uuid')
 
 module.exports = {
   async signup (req, res) {
@@ -24,6 +29,7 @@ module.exports = {
       res.status(201).send({
         id: user.id,
         username,
+        avatar: user.avatar,
         jwtToken
       })
     } catch (err) {
@@ -65,10 +71,74 @@ module.exports = {
           res.status(200).send({
             id: user.id,
             username: user.username,
+            avatar: user.avatar,
             jwtToken
           })
         })
       }
     )(req, res)
+  },
+
+  async changeAvatar (req, res) {
+    try {
+      const parser = new DatauriParser()
+      const username = req.params.username
+      if (username !== req.user.username) {
+        return res.status(403).send('Unauthorized')
+      }
+      parser.format(path.extname(req.file.originalname).toString(), req.file.buffer)
+      const publicId = uuidv4()
+      await cloudinary.uploader.upload(parser.content, {
+        folder: `${req.user.username}/avatar`,
+        public_id: publicId
+      })
+      const user = await User.findByPk(req.user.id)
+      if (user.avatar) {
+        const response = await cloudinary.uploader.destroy(`${user.username}/avatar/${user.avatar}`)
+        if (response.result !== 'ok' && response.result !== 'not found') {
+          return res.status(400).send('cloudinary error')
+        }
+      }
+      user.avatar = publicId
+      await user.save()
+      res.status(200).send(user.avatar)
+    } catch (err) {
+      console.log(err)
+      res.status(500).send()
+    }
+  },
+
+  async get (req, res) {
+    try {
+      const username = req.params.username
+      const user = await User.findOne({ where: { username } })
+      if (!user) {
+        return res.status(404).send('User not found')
+      }
+      let imageCount
+      if (req.user.username === user.username) {
+        imageCount = await Image.count({
+          where: {
+            fk_username: user.username
+          }
+        })
+        console.log(imageCount)
+      } else {
+        imageCount = await Image.count({
+          where: {
+            fk_username: user.username,
+            visibility: true
+          }
+        })
+      }
+      return res.status(200).send({
+        username: user.username,
+        avatar: user.avatar,
+        imageCount
+      })
+    } catch (err) {
+      console.log(err)
+      res.status(500).send()
+    }
   }
 }

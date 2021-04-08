@@ -199,7 +199,7 @@ export default {
           })
           localStorage.setItem('user', JSON.stringify(response.data))
           this.$store.dispatch('setUser', response.data)
-          this.$router.push({ name: 'Photos', params: { album: 'all' } })
+          this.$router.push({ name: 'Photos', params: { username: response.data.username, album: 'all' } })
         } catch (err) {
           let errorMessage
           if (err.response.data.error === 'account doesnt exist') {
@@ -220,7 +220,7 @@ export default {
           })
           localStorage.setItem('user', JSON.stringify(response.data))
           this.$store.dispatch('setUser', response.data)
-          this.$router.push({ name: 'Photos', params: { album: 'all' } })
+          this.$router.push({ name: 'Photos', params: { username: response.data.username, album: 'all' } })
         } catch (err) {
           console.log(err)
           this.$store.dispatch('alert', 'An error has happened during sign up')
