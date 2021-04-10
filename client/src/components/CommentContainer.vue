@@ -13,13 +13,30 @@
             <v-container class="pa-0 mb-1">
               <v-row justify="start">
                   <v-col cols="3" sm="3" md="3" lg="4" xl="3" class="pa-0 px-0 pl-sm-5 pl-xl-10">
-                    <v-img v-if="image" :src="image.url" height="60px" width="60px" aspect-ratio="1" class="avatar"></v-img>
+                    <v-img 
+                      :src="comment.user.avatar" 
+                      class="avatar" 
+                      :class="comment.user.avatar ? 
+                      null: 'no-avatar'" 
+                      aspect-ratio="1" 
+                      width="60px"
+                      style="cursor: pointer"
+                      @click="$router.push({ name: 'Photos', params: { username: comment.fk_username, album: 'all' } }).catch(() => {})">
+                      <v-icon v-if="!comment.user.avatar" size="60px" class="no-avatar-icon">
+                        mdi-account
+                      </v-icon>
+                    </v-img>
                   </v-col>
                   <v-col cols="8" sm="9" md="9" lg="8" xl="9" align-self="center" class="px-0 pr-sm-5 pr-xl-10">
                     <v-container class="pa-0">
                       <v-row justify="start">
                         <v-col cols="7" sm="7" md="7" class="pa-0" align-self="center" style="text-align: start">
-                          <span class="text-body-1 font-weight-bold blue--text pa-0">{{ comment.fk_username }}</span> 
+                          <span 
+                            class="text-body-1 font-weight-bold blue--text pa-0"
+                            style="cursor: pointer"
+                            @click="$router.push({ name: 'Photos', params: { username: comment.fk_username, album: 'all' } }).catch(() => {})">
+                            {{ comment.fk_username }}
+                          </span> 
                           <span class="text-body-2 grey--text text--darken-2 pa-0 ml-2"><timeago :datetime="comment.createdAt"></timeago></span>
                         </v-col>
                         <v-spacer></v-spacer>
@@ -55,7 +72,11 @@
         <v-container class="pa-0 pb-3">
             <v-row justify="start">
               <v-col cols="3" sm="3" md="4" lg="4" xl="3" class="pa-0 px-0 pl-sm-5 pl-xl-10">
-                <v-img v-if="image" :src="image.url" height="60px" width="60px" aspect-ratio="1" class="avatar"></v-img>
+                <v-img :src="user.avatar" class="avatar" :class="user.avatar ? null: 'no-avatar'" aspect-ratio="1" width="60px">
+                  <v-icon v-if="!user.avatar" size="60px" class="no-avatar-icon">
+                    mdi-account
+                  </v-icon>
+                </v-img>
               </v-col>
               <v-col cols="8" sm="9" md="8" lg="8" xl="9" align-self="center" class="px-0 pr-sm-5 pr-xl-10 pb-1">
                 <v-container class="pa-0">
@@ -93,6 +114,7 @@
 <script>
 import { mapState } from 'vuex'
 import CommentService from '@/services/CommentService'
+import { Cloudinary } from 'cloudinary-core'
 export default {
   props: [
     'image'
@@ -125,6 +147,7 @@ export default {
     }
   },
   async mounted() {
+    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
     await this.getComments()
     document.addEventListener('keyup', this.backspacePressed)
   },
@@ -138,7 +161,12 @@ export default {
         this.count = count
         this.$emit('count', count)
 
-        this.comments = comments
+        this.comments = comments.map(comment => {
+          if (comment.user.avatar) {
+            comment.user.avatar = this.cloudinaryCore.url(`${comment.fk_username}/avatar/${comment.user.avatar}`)
+          }
+          return comment
+        })
       } catch (err) {
         console.log(err)
         this.$store.dispatch('alert', 'Failed to load comments.')
@@ -184,6 +212,9 @@ export default {
             newCommentData.replyTo = this.replyTo
           }
           const newComment = (await CommentService.create(newCommentData)).data
+          newComment.user = {
+            avatar: this.user.avatar
+          }
           this.comments.push(newComment)
           this.newComment = ''
           this.replyTo = null
@@ -225,8 +256,21 @@ export default {
 <style>
 .avatar {
   border-radius: 50%;
+  border: 2px #2196F3 solid;
   left:50%;
   top:50%;
+  transform:translate(-50%,-50%);
+}
+
+.no-avatar {
+  border: 2px #2196F3 solid;
+}
+
+.no-avatar-icon {
+  position: absolute;
+  background-color: white;
+  top: 50%;
+  left: 50%;
   transform:translate(-50%,-50%);
 }
 

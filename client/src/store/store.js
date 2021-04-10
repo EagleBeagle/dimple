@@ -17,7 +17,8 @@ export default new Vuex.Store({
       category: 'date',
       order: 'desc'
     },
-    visibility: 'all'
+    visibility: 'all',
+    searching: false
   },
   actions: {
     alert({ commit }, text) {
@@ -46,6 +47,9 @@ export default new Vuex.Store({
     },
     changeVisibility({ commit }, visibility) {
       commit('changeVisibility', visibility)
+    },
+    setSearching({ commit }, searching) {
+      commit ('setSearching', searching)
     }
   },
   mutations: {
@@ -79,6 +83,10 @@ export default new Vuex.Store({
     },
     changeVisibility(state, visibility) {
       state.visibility = visibility
+    },
+    setSearching(state, searching) {
+      state.searching = searching
+      console.log(searching)
     }
   }
 })

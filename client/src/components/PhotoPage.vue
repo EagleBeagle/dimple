@@ -151,12 +151,17 @@
           <v-container class="pa-0 pr-xl-6">
             <v-row justify="center" justify-sm="end">
               <v-col cols="4" sm="3" md="3" lg="2" xl="2" class="pl-xl-16 pr-xl-0">
-                <v-img v-if="image" :src="image.url" height="80px" width="80px" aspect-ratio="1" class="avatar"></v-img>
+                <v-img v-if="image && photoOwner" :src="photoOwner.avatar" class="avatar" :class="photoOwner.avatar ? null: 'no-avatar'" aspect-ratio="1" width="80px"
+                  style="cursor: pointer" @click="$router.push({ name: 'Photos', params: { username: photoOwner.username, album: 'all' } }).catch(() => {})">
+                  <v-icon v-if="!photoOwner.avatar" size="80px" class="no-avatar-icon">
+                    mdi-account
+                  </v-icon>
+                </v-img>
               </v-col>
               <v-col cols="8" sm="6" md="7" lg="5" xl="4" align-self="center">
                 <v-container class="pa-0">
                   <v-row justify="start">
-                    <v-col cols="7" class="text-h6 pa-0" style="text-align: start">
+                    <v-col cols="7" class="text-h6 pa-0" style="text-align: start; cursor: pointer" @click="$router.push({ name: 'Photos', params: { username: photoOwner.username, album: 'all' } }).catch(() => {})">
                       {{ image.fk_username }}
                     </v-col>
                   </v-row>
@@ -246,6 +251,7 @@
 <script>
 import { mapState } from 'vuex'
 import ImageService from '@/services/ImageService'
+import UserService from '@/services/UserService'
 import { Cloudinary } from 'cloudinary-core';
 import ShareDialog from '@/components/ShareDialog'
 import AlbumDialog from '@/components/AlbumDialog'
@@ -267,12 +273,14 @@ export default {
       writtingComment: false,
       goBackParams: null,
       commentCount: 0,
-      lastSwitchedPhotoTime: null
+      lastSwitchedPhotoTime: null,
+      photoOwner: null
     }
   },
   computed: {
     ...mapState([
-      'user'
+      'user',
+      'searching'
     ])
   },
   watch: {
@@ -286,6 +294,7 @@ export default {
     '$route.params.id': async function() {
       await this.getImage()
       await this.getNeighbouringImages()
+      await this.getOwner()
     }
   },
   async mounted() {
@@ -294,6 +303,7 @@ export default {
     window.scrollTo(0, 0)
     await this.getImage()
     await this.getNeighbouringImages()
+    await this.getOwner()
   },
   methods: {
     async getImage() { 
@@ -309,6 +319,21 @@ export default {
         }
         image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
         this.image = image
+      } catch (err) {
+        console.log(err)
+        if (err.response.status === 403) {
+          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all'}})
+        }
+      }
+    },
+    async getOwner() {
+      try {
+        const user = (await UserService.get(this.image.fk_username)).data
+        if (user.avatar) {
+          user.avatar = this.cloudinaryCore.url(`${user.username}/avatar/${user.avatar}`)
+        }
+        this.photoOwner = user
+        console.log(this.photoOwner)
       } catch (err) {
         console.log(err)
         if (err.response.status === 403) {
@@ -486,9 +511,9 @@ export default {
     },
     async arrowsPressed(event) {
       if (!this.writtingComment) {
-        if (event.key === 'ArrowLeft' || event.keyCode === 65) {
+        if (!this.searching && (event.key === 'ArrowLeft' || event.keyCode === 65)) {
           await this.goLeft()
-        } else if (event.key === 'ArrowRight' || event.keyCode === 68) {
+        } else if (!this.searching && (event.key === 'ArrowRight' || event.keyCode === 68)) {
           await this.goRight()
         }
       }
@@ -641,6 +666,18 @@ export default {
   border-radius: 50%;
   left:50%;
   top:50%;
+  transform:translate(-50%,-50%);
+}
+
+.no-avatar {
+  border: 2px #2196F3 solid;
+}
+
+.no-avatar-icon {
+  position: absolute;
+  background-color: white;
+  top: 50%;
+  left: 50%;
   transform:translate(-50%,-50%);
 }
 </style>

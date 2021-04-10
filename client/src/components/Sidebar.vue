@@ -58,7 +58,7 @@
       <v-list-item-group
         color="primary"
         class="pa-2">
-        <v-list-item @click="goTo('UserAlbums')">
+        <v-list-item ref="albumsButton" @click="goTo('UserAlbums')">
           <v-list-item-icon>
             <v-icon>mdi-image-album</v-icon>
           </v-list-item-icon>
@@ -66,7 +66,9 @@
             <v-list-item-title>Albums</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item @click="goTo('Photos', { username: $route.params.username, album: 'all' })">
+        <v-list-item
+          ref="photosButton" 
+          @click="goTo('Photos', { username: $route.params.username, album: 'all' })">
           <v-list-item-icon>
             <v-icon>mdi-image-multiple</v-icon>
           </v-list-item-icon>
@@ -74,7 +76,7 @@
             <v-list-item-title>All Photos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item @click="goTo('Photos', { username: $route.params.username, album: 'favourites' })">
+        <v-list-item ref="favesButton" @click="goTo('Photos', { username: $route.params.username, album: 'favourites' })">
           <v-list-item-icon>
             <v-icon>mdi-star</v-icon>
           </v-list-item-icon>
@@ -82,7 +84,7 @@
             <v-list-item-title>Favourites</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item @click="goTo('Photos', { username: $route.params.username, album: 'trash' })">
+        <v-list-item ref="trashButton" v-if="user.username === $route.params.username" @click="goTo('Photos', { username: $route.params.username, album: 'trash' })">
           <v-list-item-icon>
             <v-icon>mdi-trash-can</v-icon>
           </v-list-item-icon>
@@ -129,7 +131,16 @@ export default {
   watch: {
     '$route.params': async function () {
       await this.getUser()
-    }
+      if (this.$route.name === 'Photos' && this.$route.params.album === 'all') {
+        this.$refs.photosButton.$el.click()
+      } else if (this.$route.name === 'Photos' && this.$route.params.album === 'favourites') {
+        this.$refs.favesButton.$el.click()
+      } else if (this.$route.name === 'Photos' && this.$route.params.album === 'trash') {
+        this.$refs.trashButton.$el.click()
+      } else if (this.$route.name === 'UserAlbums') {
+        this.$refs.albumsButton.$el.click()
+      }
+    },
   },
   async mounted() {
     this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
@@ -163,7 +174,6 @@ export default {
         const response = (await UserService.get(username)).data
         response.avatarUrl = this.cloudinaryCore.url(`${username}/avatar/${response.avatar}`)
         this.shownUser = response
-        console.log(this.shownUser.avatar)
       } catch (err) {
         console.log(err)
         this.$store.dispatch('alert', 'Failed to retrive user.')
@@ -176,6 +186,7 @@ export default {
 <style scoped>
 .avatar {
   border-radius: 50%;
+  border: 2px #2196F3 solid
 }
 .navigation-bottom {
   position: absolute;

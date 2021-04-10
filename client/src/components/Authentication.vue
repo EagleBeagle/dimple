@@ -158,7 +158,7 @@
 
 <script>
 import UserService from '@/services/UserService'
-
+import { Cloudinary } from 'cloudinary-core'
 export default {
   data: () => ({
     step: 1,
@@ -197,6 +197,10 @@ export default {
             email: this.emailSignIn,
             password: this.passwordSignIn
           })
+          const cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
+          if (response.data.avatar) {
+            response.data.avatar = cloudinaryCore.url(`${response.data.username}/avatar/${response.data.avatar}`)
+          }
           localStorage.setItem('user', JSON.stringify(response.data))
           this.$store.dispatch('setUser', response.data)
           this.$router.push({ name: 'Photos', params: { username: response.data.username, album: 'all' } })

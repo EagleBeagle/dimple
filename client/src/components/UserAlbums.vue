@@ -2,7 +2,8 @@
 <v-container class="px-8 album-container" fluid>
     <v-row justify="start">
       <v-col class="pb-0" style="text-align: left">
-        <div class="text-h3 font-weight-regular my-2">Your Albums</div>
+        <div v-if="$route.params.username === user.username" class="text-h3 font-weight-regular my-2">Your Albums</div>
+        <div v-else class="text-h3 font-weight-regular my-2">{{ $route.params.username }}'s albums</div>
       </v-col>
     </v-row>
     <v-row class="pa-0">

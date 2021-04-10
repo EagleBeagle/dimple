@@ -21,6 +21,10 @@ module.exports = app => {
     verifyAuth.isLoggedIn,
     UserController.get)
 
+  app.get('/user',
+    verifyAuth.isLoggedIn,
+    UserController.search)
+
   app.put('/user/:username/avatar',
     verifyAuth.isLoggedIn,
     multerUploads,

@@ -62,7 +62,11 @@ module.exports = {
         },
         order: [
           ['createdAt', 'DESC']
-        ]
+        ],
+        include: [{
+          model: User,
+          attributes: ['avatar']
+        }]
       }
       if (limit) {
         queryObject.limit = limit

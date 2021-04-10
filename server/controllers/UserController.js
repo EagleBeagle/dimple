@@ -1,6 +1,7 @@
 const db = require('../config/db.config.js')
 const User = db.user
 const Image = db.image
+const Op = db.Sequelize.Op
 const jwt = require('jsonwebtoken')
 const passport = require('passport')
 const bcrypt = require('bcryptjs')
@@ -136,6 +137,40 @@ module.exports = {
         avatar: user.avatar,
         imageCount
       })
+    } catch (err) {
+      console.log(err)
+      res.status(500).send()
+    }
+  },
+
+  async search (req, res) {
+    try {
+      const search = req.query.search
+      const userResults = await User.findAll({
+        where: {
+          username: {
+            [Op.and]: {
+              [Op.regexp]: `^${search}.*`,
+              [Op.ne]: req.user.username
+            }
+          }
+        }
+      })
+      const users = []
+      for (let i = 0; i < userResults.length; i++) {
+        users.push({
+          username: userResults[i].username,
+          avatar: userResults[i].avatar,
+          imageCount: await Image.count({
+            where: {
+              fk_username: userResults[i].username,
+              visibility: true
+            }
+          })
+        })
+      }
+      console.log(users)
+      return res.status(200).send(users)
     } catch (err) {
       console.log(err)
       res.status(500).send()

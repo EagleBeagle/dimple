@@ -15,5 +15,9 @@ export default {
 
   get(username) {
     return Api().get(`/user/${username}`)
+  },
+
+  search(text) {
+    return Api().get(`/user?search=${text}`)
   }
 }

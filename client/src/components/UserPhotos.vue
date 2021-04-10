@@ -52,6 +52,7 @@ export default {
     }
   },
   async mounted() {
+    console.log('Uj')
     this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
     await this.getAlbum()
     this.images = await this.getImages({})
@@ -64,7 +65,7 @@ export default {
     ])
   },
   watch: {
-    '$route.params.album': async function () {
+    '$route.params': async function () {
       this.images = []
       await this.getAlbum()
       const images = await this.getImages({})
