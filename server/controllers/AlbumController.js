@@ -123,6 +123,26 @@ module.exports = {
     }
   },
 
+  async update (req, res) {
+    try {
+      const albumId = req.params.id
+      const images = req.body.images
+      const album = await Album.findByPk(albumId)
+      console.log(images)
+      if (!album) {
+        return res.status(404).send('Album not found')
+      }
+      if (album.fk_username !== req.user.username) {
+        return res.status(403).send('Unauthorized')
+      }
+      await album.addImages(images)
+      return res.status(200).send(album)
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('An error happened while editing the album')
+    }
+  },
+
   async delete (req, res) { // most csak saját user, később admin is
     try {
       const id = req.params.id

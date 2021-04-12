@@ -180,11 +180,18 @@ module.exports = {
         },
         order: [],
         attributes: {
-          include: [[
-            db.Sequelize.literal(`(
+          include: [
+            [
+              db.Sequelize.literal(`(
               SELECT COUNT(*) FROM favourites WHERE imageId = id
             )`), 'favouriteCount'
-          ]]
+            ],
+            [
+              db.Sequelize.literal(`(
+              SELECT COUNT(*) FROM comments WHERE imageId = image.id
+            )`), 'commentCount'
+            ]
+          ]
         }
       }
       if ((username && albumName) ||

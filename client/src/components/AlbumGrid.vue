@@ -19,12 +19,12 @@
                   <v-expand-transition v-if="!inDialog">
                     <v-row justify="space-around" v-if="hover">
                       <v-col cols="3" class="pa-0">
-                        <v-icon v-on:click.stop large color="white" class="album-setting-icon">
+                        <v-icon v-on:click.stop large color="white" class="album-setting-icon" @click="$emit('addPhotos', album)">
                           mdi-plus
                         </v-icon>
                       </v-col>
                       <v-col cols="3" class="pa-0 mb-1">
-                        <v-icon v-on:click.stop large color="white" class="album-setting-icon">
+                        <v-icon v-on:click.stop large color="white" class="album-setting-icon" :disabled="!album.visibility" @click="$emit('share', album)">
                           mdi-share
                         </v-icon>
                       </v-col>

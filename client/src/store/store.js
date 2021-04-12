@@ -18,7 +18,8 @@ export default new Vuex.Store({
       order: 'desc'
     },
     visibility: 'all',
-    searching: false
+    searching: false,
+    updateShownPhotos: false
   },
   actions: {
     alert({ commit }, text) {
@@ -50,6 +51,9 @@ export default new Vuex.Store({
     },
     setSearching({ commit }, searching) {
       commit ('setSearching', searching)
+    },
+    updateShownPhotos({ commit }) {
+      commit ('updateShownPhotos')
     }
   },
   mutations: {
@@ -86,7 +90,9 @@ export default new Vuex.Store({
     },
     setSearching(state, searching) {
       state.searching = searching
-      console.log(searching)
+    },
+    updateShownPhotos(state) {
+      state.updateShownPhotos = !state.updateShownPhotos
     }
   }
 })

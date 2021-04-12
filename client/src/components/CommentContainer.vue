@@ -178,8 +178,12 @@ export default {
           imageId: this.image.id,
           to: this.oldestDate
         })).data
-        console.log(this.oldestDate)
-        console.log(comments)
+        comments.map(comment => {
+          if (comment.user.avatar) {
+            comment.user.avatar = this.cloudinaryCore.url(`${comment.fk_username}/avatar/${comment.user.avatar}`)
+          }
+          return comment
+        })
         this.comments = [...comments, ...this.comments]
         return comments
       } catch (err) {

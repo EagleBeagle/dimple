@@ -61,7 +61,8 @@ export default {
     ...mapState([
       'user',
       'sort',
-      'visibility'
+      'visibility',
+      'updateShownPhotos'
     ])
   },
   watch: {
@@ -82,6 +83,11 @@ export default {
       this.images = await this.getImages({})
       this.rerenderPhotoGrid()
       window.scrollTo(0, 0)
+    },
+    async updateShownPhotos() {
+      this.images = await this.getImages({})
+      this.rerenderPhotoGrid()
+      
     }
   },
   methods: {
@@ -108,7 +114,7 @@ export default {
         if (this.$route.params.album === 'all') {
           filter.user = this.$route.params.username
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+            image.url = `https://res.cloudinary.com/dimplecloud/image/upload/${image.fk_username}/${image.id}` // ezt így is lehet...
             return image
           })
           if (images.length) {

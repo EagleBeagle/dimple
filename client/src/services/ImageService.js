@@ -34,6 +34,16 @@ export default {
     return CloudinaryApi().post('', data, config) */
   },
 
+  async checkUrl(url) {
+    try {
+      await axios.get(url)
+      return true
+    } catch {
+      console.log('hopá hopááá')
+      return false
+    }
+  },
+
   update(id, data) {
     console.log(id)
     return Api().put(`image/${id}`, data)

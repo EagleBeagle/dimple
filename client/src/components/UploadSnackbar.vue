@@ -104,6 +104,7 @@ export default {
     
     window.addEventListener('unload', async () => {
       if (!this.uploading) return
+      console.log('Hát geci')
       try {
         for (let i = 0; i < this.imageUploadData.length; i++) {
           if (!this.fileMetadata[i].finalized) {

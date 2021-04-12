@@ -9,13 +9,13 @@
                 <v-img 
                   class="image"
                   aspect-ratio="1"
-                  :src="image.url" @error="imageError(index)">
+                  :src="image.url">
                   <v-fade-transition>
                     <v-overlay
                       v-if="hover"
                       absolute
                       color="#000000"
-                      opacity="0.2">
+                      opacity="0.3">
                       <v-btn
                         v-if="$route.name !== 'Explore'"
                         v-on:click.stop
@@ -27,7 +27,29 @@
                         <v-icon>mdi-close</v-icon>
                       </v-btn>
                       <v-icon v-if="image.trashed" size="200px" class="restore" color="rgb(255, 255, 255, 0.5)" >mdi-restore</v-icon>
-                      <div v-if="image.trashed" class="overlay-content text-h6">
+                      <div class="overlay-content text-h6">
+                        <v-container class="pa-2">
+                          <v-row justify="start" class="mx-1">
+                            <v-col cols="6" class="pa-0 text-h5 white--text" style="text-align: left">
+                              {{ image.fk_username }}
+                            </v-col>
+                            <v-spacer></v-spacer>
+                            <v-col cols="2" class="pa-0 text-body-1 white--text mr-2" align-self="center">
+                              <v-icon class="pr-1">
+                                mdi-star-outline
+                              </v-icon>
+                              <span>{{ image.favouriteCount }}</span>
+                            </v-col>
+                            <v-col cols="2" class="pa-0 text-body-1 white--text" align-self="center">
+                              <v-icon class="pr-1">
+                                mdi-comment-outline
+                              </v-icon>
+                              <span>{{ image.commentCount }}</span>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </div>
+                      <div v-if="image.trashed" class="overlay-trash text-h6">
                         Click to restore
                       </div>
                     </v-overlay>
@@ -99,7 +121,7 @@ export default {
   width: 100%;
 }
 
-.overlay-content {
+.overlay-trash {
   position: absolute;
   top: 80%;
   left: 50%;
@@ -121,5 +143,12 @@ export default {
 .restore {
   top:50%;
   transform:translate(0,-50%);
+}
+
+.overlay-content {
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  color: rgba(133, 132, 132, 0.7);
 }
 </style>

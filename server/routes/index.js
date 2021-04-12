@@ -44,6 +44,10 @@ module.exports = app => {
     verifyAuth.isLoggedIn,
     AlbumController.get)
 
+  app.put('/album/:id',
+    verifyAuth.isLoggedIn,
+    AlbumController.update)
+
   app.delete('/album/:id',
     verifyAuth.isLoggedIn,
     AlbumController.delete)

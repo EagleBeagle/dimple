@@ -7,7 +7,7 @@
   <v-card class="album-container">
     <v-card-title class="headline">
       <span v-if="albums.length > 0">This photo is in {{ `${albums.length} ${albums.length === 1 ? 'album' : 'albums'}` }}</span>
-      <span v-else>This photo is not in any albums yet</span>
+      <span v-else class="text-h6">This photo is not in any albums yet</span>
       <v-spacer></v-spacer>
       <v-icon @click="close()">
         mdi-close
@@ -108,10 +108,8 @@ export default {
       this.$router.push({ name: 'Photos', params: { username: album.fk_username,  album: album.id } })
     },
     updateAlbums(selectedAlbums) {
-      this.albums = selectedAlbums.map(selectedAlbum => {
-        selectedAlbum.images.push(this.image)
-        return selectedAlbum
-      })
+      this.albums = selectedAlbums
+      console.log(this.albums)
     },
     close() {
       this.dialog = false

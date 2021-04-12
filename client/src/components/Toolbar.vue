@@ -1,47 +1,37 @@
 <template>
     <v-app-bar dense app fixed flat clipped-right style="top: 64px" class="toolbar" color="grey lighten-3">
       <v-toolbar-items>
-        <v-menu offset-y tile>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              depressed
-              rounded
-              v-bind="attrs"
-              v-on="on"
-              color="grey lighten-3"
-              class="text-subtitle-1 text-capitalize">
-              <v-icon color="blue">
-                mdi-plus
-              </v-icon>
-              New
-            </v-btn>
-          </template>
-          <v-list>
-            <form
-                name ="form"
-                autocomplete="off">
-                  <v-list-item :disabled="$store.state.uploadInProgress ? true : false" @click="$refs.fileInput.click()">
-                    <v-list-item-title>Photo</v-list-item-title>
-                  </v-list-item>
-                <input
-                  type="file"
-                  style="display: none"
-                  ref="fileInput"
-                  accept="image/jpeg, image/png"
-                  multiple
-                  @change="onFileChosen">
-              </form>
-            <v-list-item @click="dialog = true">
-              <v-list-item-title>Album</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-        <new-album-dialog :show="dialog" v-on:close="dialog = false"/>
-        
-        <span v-if="$route.name === 'Photos'">
-          
-        </span>
-
+        <v-btn
+          v-if="$route.name === 'UserAlbums' && user.username === $route.params.username"
+          depressed
+          rounded
+          color="grey lighten-3"
+          class="text-subtitle-1 text-capitalize"
+          @click="showNewAlbumDialog = true">
+          <v-icon color="blue">
+            mdi-plus
+          </v-icon>
+          New
+        </v-btn>
+        <v-btn
+          v-if="$route.name === 'Photos' && !['all', 'favourites', 'trash'].includes($route.params.album)  && user.username === $route.params.username"
+          depressed
+          rounded
+          color="grey lighten-3"
+          class="text-subtitle-1 text-capitalize"
+          @click="addPhotosToAlbum()">
+          <v-icon color="blue" class="pr-1">
+            mdi-plus-box-multiple
+          </v-icon>
+          Add Photos
+          <add-photos-dialog
+          v-if="showAddPhotosDialog" 
+          :show="showAddPhotosDialog" 
+          :album="albumToAddPhotos" 
+          @updatePhotos="updatePhotos"
+          @close="showAddPhotosDialog = false" />
+        </v-btn>
+        <new-album-dialog :show="showNewAlbumDialog" v-on:close="showNewAlbumDialog = false"/>
       </v-toolbar-items>
       <v-spacer />
       <v-toolbar-items>
@@ -132,14 +122,19 @@
 
 <script>
 import NewAlbumDialog from '@/components/NewAlbumDialog'
+import AddPhotosDialog from '@/components/AddPhotosDialog'
+import AlbumService from '@/services/AlbumService'
 import { mapState } from 'vuex'
 export default {
   components: {
     NewAlbumDialog,
+    AddPhotosDialog
   },
   data () {
     return {
-      dialog: false
+      showNewAlbumDialog: false,
+      showAddPhotosDialog: false,
+      albumToAddPhotos: null
     }
   },
   computed: {
@@ -153,15 +148,24 @@ export default {
     console.log(this.$route.name)
   },
   methods: {
-    onFileChosen(event) {
-      console.log(event.target.files)
-      this.$store.dispatch('imageChosen', event.target.files)
-    },
     changeSort(sort) {
       this.$store.dispatch('changeSort', sort)
     },
     changeVisibility(visibility) {
       this.$store.dispatch('changeVisibility', visibility)
+    },
+    async addPhotosToAlbum() {
+      try {
+        this.albumToAddPhotos = (await AlbumService.get({ id: this.$route.params.album })).data
+        console.log(this.albumToAddPhotos)
+        this.showAddPhotosDialog = true
+      } catch (err) {
+        console.log(err)
+        this.$store.dispatch('alert', 'Error while trying to add photos to album')
+      }
+    },
+    updatePhotos() {
+      this.$store.dispatch('updateShownPhotos')
     }
   }
 }

@@ -113,10 +113,29 @@
     </v-container>
     </v-toolbar-items>
     <v-spacer></v-spacer>
+    <form
+      name ="form"
+      autocomplete="off">
+        <v-btn
+          :disabled="$store.state.uploadInProgress ? true : false" @click="$refs.fileInput.click()"
+          color="white"
+          light
+          x-large
+          class="white--text"
+          icon>
+          <v-icon x-large color="white">
+            mdi-cloud-upload
+          </v-icon>
+        </v-btn>
+      <input
+        type="file"
+        style="display: none"
+        ref="fileInput"
+        accept="image/jpeg, image/png"
+        multiple
+        @change="onFileChosen">
+    </form>
     <v-toolbar-items>
-      <v-btn class="white--text" depressed tile color="blue" light @click="signOut()">
-        Sign out
-      </v-btn>
       <div>
       <v-img :src="user.avatar" class="avatar ml-1" :class="user.avatar ? null: 'no-avatar'" style="cursor: pointer" aspect-ratio="1" width="52px"
         @click="$router.push({ name: 'Photos', params: { username: user.username, album: 'all' } }).catch(() => {})">
@@ -125,6 +144,9 @@
         </v-icon>
       </v-img>
       </div>
+      <v-btn class="white--text" depressed tile color="blue" light @click="signOut()">
+        Sign out
+      </v-btn>
     </v-toolbar-items>
   </v-app-bar> 
 </template>
@@ -200,6 +222,10 @@ export default {
         console.log('jaaja')
         e.preventDefault()
       }
+    },
+    onFileChosen(event) {
+      console.log(event.target.files)
+      this.$store.dispatch('imageChosen', event.target.files)
     },
     goToUser(searchedUser) {
       this.searchText = ''

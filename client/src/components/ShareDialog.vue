@@ -4,7 +4,8 @@
   width="500">
   <v-card>
     <v-card-title>
-      <span class="text-h5">Share Photo</span>
+      <span v-if="image" class="text-h5">Share Photo</span>
+      <span v-else-if="album" class="text-h5">Share Album</span>
       <v-spacer>
       </v-spacer>
       <v-icon @click="close()">
@@ -18,7 +19,7 @@
             <shareNetwork
               network="email"
               :url="url"
-              :title="`Dimple: ${user.username} would like to share a photo with you!`">
+              :title="image ? `Dimple: ${user.username} would like to share a photo with you!` : `Dimple: ${user.username} would like to share an album with you!`">
               <v-btn 
                 large
                 fab
@@ -35,7 +36,7 @@
             <shareNetwork
               network="facebook"
               :url="url"
-              :title="`${user.username} would like to share a photo with you!`">
+              :title="image ? `${user.username} would like to share a photo with you!` : `${user.username} would like to share an album with you!`">
               <v-btn
                 large
                 fab
@@ -52,7 +53,7 @@
             <shareNetwork
               network="messenger"
               :url="url"
-              :title="`${user.username} would like to share a photo with you!`">
+              :title="image ? `${user.username} would like to share a photo with you!` : `${user.username} would like to share an album with you!`">
               <v-btn
                 large
                 fab
@@ -69,7 +70,7 @@
             <shareNetwork
               network="reddit"
               :url="url"
-              :title="`Dimple: ${user.username} would like to share a photo with you!`">
+              :title="image ? `Dimple: ${user.username} would like to share a photo with you!` : `Dimple: ${user.username} would like to share an album with you!`">
               <v-btn
                 large
                 fab
@@ -86,7 +87,7 @@
             <shareNetwork
               network="twitter"
               :url="url"
-              :title="`Dimple: ${user.username} would like to share a photo with you!`">
+              :title="image ? `Dimple: ${user.username} would like to share a photo with you!` : `Dimple: ${user.username} would like to share an album with you!`">
               <v-btn
                 large
                 fab
@@ -124,7 +125,8 @@ import { mapState } from 'vuex'
 export default {
   props: [
     'show',
-    'image'
+    'image',
+    'album'
   ],
   computed: {
     dialog: {
@@ -141,7 +143,11 @@ export default {
     ])
   },
   mounted() {
-    this.url = `${window.location.origin}/photos/${this.image.fk_username}/${this.image.id}`
+    if (this.image) {
+      this.url = `${window.location.origin}/photos/${this.image.fk_username}/${this.image.id}`
+    } else if (this.album) {
+      this.url = `${window.location.origin}/user/${this.album.fk_username}/photos/${this.album.id}`
+    }
   },
   data () {
     return {

@@ -22,6 +22,10 @@ export default {
     return Api().get(`album?${queryString}`)
   },
 
+  update (id, images) {
+    return Api().put(`album/${id}`, images)
+  },
+
   download (id) {
     return Api().get(`album/${id}/download`)
   },

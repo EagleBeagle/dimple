@@ -10,10 +10,23 @@
       <album-grid
         v-if="renderAlbumGrid"
         :albums="albums"
+        @addPhotos="addPhotos"
+        @share="share"
         @open="openAlbum"
         @download="downloadAlbum"
         @delete="deleteAlbum" />
     </v-row>
+    <share-dialog 
+      v-if="showShareDialog"
+      :show="showShareDialog"
+      :album="albumToShare"
+      @close="showShareDialog = false" />
+    <add-photos-dialog
+        v-if="showAddPhotosDialog" 
+        :show="showAddPhotosDialog" 
+        :album="albumToAddPhotos" 
+        @updatePhotos="updatePhotos"
+        @close="showAddPhotosDialog = false" />
   </v-container>
   
 </template>
@@ -21,16 +34,24 @@
 <script>
 import AlbumService from '@/services/AlbumService'
 import AlbumGrid from '@/components/AlbumGrid'
+import ShareDialog from '@/components/ShareDialog'
+import AddPhotosDialog from '@/components/AddPhotosDialog'
 import { mapState } from 'vuex'
 import { Cloudinary } from 'cloudinary-core';
 export default {
   components: {
-    AlbumGrid
+    AlbumGrid,
+    ShareDialog,
+    AddPhotosDialog
   },
   data () {
     return {
       albums: [],
-      renderAlbumGrid: true
+      albumToShare: null,
+      albumToAddPhotos: null,
+      renderAlbumGrid: true,
+      showShareDialog: false,
+      showAddPhotosDialog: false
     }
   },
   mounted() {
@@ -104,6 +125,22 @@ export default {
       this.$nextTick(() => {
         this.renderAlbumGrid = true;
       });
+    },
+    addPhotos(album) {
+      this.albumToAddPhotos = album
+      this.showAddPhotosDialog = true
+    },
+    share(album) {
+      this.albumToShare = album
+      this.showShareDialog = true 
+    },
+    updatePhotos(selectedPhotos) {
+      selectedPhotos.forEach(selectedPhoto => {
+        if (this.albumToAddPhotos.imageCount < 4) {
+          this.albumToAddPhotos.images.push(this.cloudinaryCore.url(`${this.albumToAddPhotos.fk_username}/${selectedPhoto}`))
+        }
+        this.albumToAddPhotos.imageCount++
+      })
     }
   }
 }

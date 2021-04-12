@@ -11,6 +11,7 @@
     "axios": "^0.21.0",
     "cloudinary-vue": "^1.1.2",
     "core-js": "^3.6.5",
+    "image-url-validator": "^1.0.4",
     "vue": "^2.6.11",
     "vue-infinite-loading": "^2.4.5",
     "vue-kinesis": "^1.1.7",
