@@ -163,7 +163,7 @@ export default {
 
         this.comments = comments.map(comment => {
           if (comment.user.avatar) {
-            comment.user.avatar = this.cloudinaryCore.url(`${comment.fk_username}/avatar/${comment.user.avatar}`)
+            comment.user.avatar = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${comment.fk_username}/avatar/${comment.user.avatar}`
           }
           return comment
         })
@@ -180,7 +180,7 @@ export default {
         })).data
         comments.map(comment => {
           if (comment.user.avatar) {
-            comment.user.avatar = this.cloudinaryCore.url(`${comment.fk_username}/avatar/${comment.user.avatar}`)
+            comment.user.avatar = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${comment.fk_username}/avatar/${comment.user.avatar}`
           }
           return comment
         })

@@ -98,7 +98,7 @@ export default {
         filter.user = this.$route.params.username
         const images = (await ImageService.get(filter)).data.filter((image) => {
           if (!this.albumImages.includes(image.id)) {
-            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
             return image
           }
         })

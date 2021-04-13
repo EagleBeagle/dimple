@@ -42,7 +42,9 @@ module.exports = {
       queryObject.attributes.include.push([
         db.Sequelize.literal(`(
           SELECT COUNT(*) FROM albumimage
-          WHERE albumimage.albumId = album.id AND (SELECT trashed FROM images WHERE id = albumimage.imageId ) = 0
+          WHERE albumimage.albumId = album.id AND 
+          (SELECT trashed FROM images WHERE id = albumimage.imageId ) = 0 AND 
+          (SELECT cancellationToken FROM images WHERE id = albumimage.imageId ) IS NULL
         )`), 'imageCount'
       ])
       if (id) {
@@ -55,7 +57,8 @@ module.exports = {
           if (album.fk_username !== req.user.username) {
             album.dataValues.imageCount = await album.countImages({
               where: {
-                visibility: true
+                visibility: true,
+                cancellationToken: null
               }
             })
           }
@@ -90,7 +93,8 @@ module.exports = {
           albums[i].dataValues.images = await albums[i].getImages({
             order: db.Sequelize.literal('rand()'),
             where: {
-              trashed: false
+              trashed: false,
+              cancellationToken: null
             },
             limit: 4,
             attributes: ['id', 'fk_username'],
@@ -101,7 +105,8 @@ module.exports = {
             order: db.Sequelize.literal('rand()'),
             where: {
               trashed: false,
-              visibility: true
+              visibility: true,
+              cancellationToken: null
             },
             limit: 4,
             attributes: ['id', 'fk_username'],
@@ -111,7 +116,8 @@ module.exports = {
         if (albums[i].fk_username !== req.user.username) {
           albums[i].dataValues.imageCount = await albums[i].countImages({
             where: {
-              visibility: true
+              visibility: true,
+              cancellationToken: null
             }
           })
         }
@@ -173,6 +179,9 @@ module.exports = {
       }
       if (album.fk_username === username || album.visibility) {
         const imageIds = (await album.getImages({
+          where: {
+            cancellationToken: null
+          },
           attributes: ['id'],
           joinTableAttributes: []
         })).map(result => `${album.fk_username}/${result.id}`)

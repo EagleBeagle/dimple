@@ -62,7 +62,7 @@ module.exports = app => {
     ImageControllerValidator.initiateUpload,
     ImageController.initiateUpload)
 
-  app.post('/image/finalize',
+  app.put('/image/:id/finalize',
     verifyAuth.isLoggedIn,
     ImageController.finalizeUpload)
 

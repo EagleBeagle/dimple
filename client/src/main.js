@@ -8,6 +8,7 @@ import Cloudinary from 'cloudinary-vue'
 import InfiniteLoading from 'vue-infinite-loading'
 import VueSocialSharing from 'vue-social-sharing'
 import VueTimeago from 'vue-timeago'
+import Vue2Animate from 'vue2-animate/dist/vue2-animate.min.css'
 
 Vue.config.productionTip = false
 Vue.use(VueKinesis)
@@ -24,6 +25,7 @@ Vue.use(VueTimeago, {
 
 Vue.use(InfiniteLoading)
 Vue.use(VueSocialSharing)
+Vue.use(Vue2Animate)
 
 new Vue({
   vuetify,

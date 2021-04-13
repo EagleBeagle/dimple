@@ -55,12 +55,8 @@
           <div class="text-h6 pl-3 ml-3">
               <span v-if="uploadCount === 1">Uploading 1 photo</span>
               <span v-if="uploadCount > 1">Uploading {{ uploadCount }} photos</span>
-            <v-fade-transition>
               <span v-if="showFailure">Some uploads failed</span>
-            </v-fade-transition>
-            <v-fade-transition>
               <span v-if="showSuccess">Upload successful</span>
-            </v-fade-transition>
           </div>
         </v-col>
         <v-spacer></v-spacer>
@@ -141,6 +137,7 @@ export default {
         this.uploading = true
         this.uploadCount = this.imageUploadData.length
         this.overallUploadCount = this.imageUploadData.length
+        this.cancellationTokens = []
         for (let i = 0; i < this.imageUploadData.length; i++) {
           const file = this.imageUploadData[i].formData.get('file')
           this.fileMetadata.push({
@@ -166,11 +163,12 @@ export default {
 
           for (let i = 0; i < response.length; i++) {
             try {
-              console.log(response[i].status)
               if (response[i] && response[i].status === 200) {
                 this.fileMetadata[i].finalized = true
+                console.log('finalizálvalalaldsaldsadsa')
                 console.log('itt')
               } else {
+                console.log('cancelt hívunk')
                 await ImageService.cancelUpload(this.imageUploadData[i].formData.get('public_id'), this.cancellationTokens[i])
               }
             } catch(err) {
@@ -184,12 +182,12 @@ export default {
           this.uploading = false
           this.showLoadingCircle = false
 
-          this.$store.dispatch('finishUpload')
           if (this.failure) {
             this.showFailure = true
           } else {
             this.showSuccess = true
           }
+          this.$store.dispatch('finishUpload')
           setTimeout(() => {
               this.show = false
               this.clear()

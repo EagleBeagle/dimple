@@ -91,7 +91,7 @@ export default {
         }
         this.albums = (await AlbumService.get(filter)).data.map(album => {
           album.images = album.images.map(image => {
-            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
             return image
           })
           return album
@@ -137,7 +137,7 @@ export default {
     updatePhotos(selectedPhotos) {
       selectedPhotos.forEach(selectedPhoto => {
         if (this.albumToAddPhotos.imageCount < 4) {
-          this.albumToAddPhotos.images.push(this.cloudinaryCore.url(`${this.albumToAddPhotos.fk_username}/${selectedPhoto}`))
+          this.albumToAddPhotos.images.push(`https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${this.albumToAddPhotos.fk_username}/${selectedPhoto}`)
         }
         this.albumToAddPhotos.imageCount++
       })

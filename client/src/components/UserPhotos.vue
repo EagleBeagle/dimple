@@ -5,7 +5,7 @@
         <div class="text-h3 font-weight-regular mt-2 mb-0">{{ album.name }}</div>
       </v-col>
       <v-col v-if="album" xs="12" sm="12" md="12" lg="12" class="py-0 my-0" style="text-align: left">
-        <div class="text-subtitle-1 my-0">{{ album.description }}</div>
+        <div class="text-h5 my-0 font-weight-light">{{ album.description }}</div>
       </v-col>
       <v-col v-if="!album && $route.params.album === 'all'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
         <div class="text-h3 font-weight-regular my-2">All Photos</div>
@@ -17,13 +17,15 @@
         <div class="text-h3 font-weight-regular my-2">Trash</div>
       </v-col>
     </v-row>
+    <v-divider class="my-2"></v-divider>
     <photo-grid
       v-if="renderPhotoGrid"
-      :images="images" 
+      :images="images"
+      :interactionDisabled="interactionDisabled"
       @delete="deleteImage" 
       @reachedBottom="infiniteHandler"
       @imageClicked="imageClicked" />
-    <photo-deletion-dialog :show="showDeletionDialog" @close="showDeletionDialog = false" @confirm="deletionConfirmed"/>
+    <photo-deletion-dialog :show="showDeletionDialog" :deleteAll="shouldDeleteAll" @close="deletionDialogClosed" @confirm="deletionConfirmed" @deleteAll="deleteAll"/>
   </v-container>
 </template>
 
@@ -48,21 +50,25 @@ export default {
       lastDate: null,
       newestDate: null,
       showDeletionDialog: false,
-      photoToDelete: null
+      photoToDelete: null,
+      shouldDeleteAll: false,
+      interactionDisabled: false
     }
   },
   async mounted() {
     console.log('Uj')
     this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
     await this.getAlbum()
-    this.images = await this.getImages({})
   },
   computed: {
     ...mapState([
       'user',
       'sort',
       'visibility',
-      'updateShownPhotos'
+      'updateShownPhotos',
+      'newPhotoId',
+      'triggerRestoreAll',
+      'triggerDeleteAll'
     ])
   },
   watch: {
@@ -70,24 +76,61 @@ export default {
       this.images = []
       await this.getAlbum()
       const images = await this.getImages({})
+      this.rerenderPhotoGrid()
       if (images) {
         this.images.push(...images)
       }
     },
     async sort() {
+      this.images = []
       this.images = await this.getImages({})
       this.rerenderPhotoGrid()
       window.scrollTo(0, 0)
     },
     async visibility() {
+      this.images = []
       this.images = await this.getImages({})
       this.rerenderPhotoGrid()
       window.scrollTo(0, 0)
     },
     async updateShownPhotos() {
+      this.images = []
       this.images = await this.getImages({})
       this.rerenderPhotoGrid()
-      
+    },
+    async newPhotoId() {
+      try {
+        const newPhoto = (await ImageService.get({ id: this.newPhotoId })).data
+        newPhoto.url = `https://res.cloudinary.com/dimplecloud/image/upload/${newPhoto.fk_username}/${newPhoto.id}`
+        const albumIds = (await AlbumService.get({ imageId: newPhoto.id })).data.map(album => album.id)
+        albumIds.push('all')
+        if (albumIds.includes(this.$route.params.album)) {
+          if (this.sort.order === 'desc') {
+            this.images.unshift(newPhoto)
+          }
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async triggerRestoreAll() {
+      const imagesToRestore = [...this.images]
+      this.interactionDisabled = true
+      for (let i = 0; i < imagesToRestore.length; i++) {
+        try {
+          await ImageService.removeFromTrash(imagesToRestore[i].id)
+          this.images = this.images.filter(image => image.id !== imagesToRestore[i].id )
+        } catch (err) {
+          console.log(err)
+          this.$store.dispatch('alert', 'An error happened while restoring a photo')
+        }
+      }
+      this.interactionDisabled = false
+      this.$store.dispatch('alert', 'All photos restored')
+    },
+    async triggerDeleteAll() {
+      this.shouldDeleteAll = true
+      this.showDeletionDialog = true
     }
   },
   methods: {
@@ -104,6 +147,7 @@ export default {
       }
     },
     async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
+      console.log('GETIMAGES HíVVVVVVVVAAAAAAAAAAAAAAA')
       try {
         filter.sort = `${this.sort.category}:${this.sort.order}`
         if (this.visibility === 'public') {
@@ -114,7 +158,7 @@ export default {
         if (this.$route.params.album === 'all') {
           filter.user = this.$route.params.username
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = `https://res.cloudinary.com/dimplecloud/image/upload/${image.fk_username}/${image.id}` // ezt így is lehet...
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
             return image
           })
           if (images.length) {
@@ -125,7 +169,7 @@ export default {
           filter.user = this.$route.params.username
           filter.favourites = true
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
             return image
           })
           if (images.length) {
@@ -135,7 +179,7 @@ export default {
         } else if (this.$route.params.album === 'trash') {
           filter.trash = true
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
             return image
           })
           if (images.length) {
@@ -146,7 +190,7 @@ export default {
           filter.album = this.$route.params.album
           console.log('itt')
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
             return image
           })
           console.log(images)
@@ -203,19 +247,48 @@ export default {
       }
     },
 
+
     async deletionConfirmed() {
       try {
+        this.interactionDisabled = true
         await ImageService.delete(this.photoToDelete.id)
         this.$store.dispatch('alert', 'Photo deleted successfully.')
         this.images = this.images.filter(image => image.id !== this.photoToDelete.id)
         this.photoToDelete = null
+        this.interactionDisabled = false
       } catch(err) {
         console.log(err)
         this.photoToDelete = null
+        this.interactionDisabled = false
         this.$store.dispatch('alert', 'An error occured during deletion.')
       }
     },
     
+    async deleteAll() {
+      try {
+        const imagesToDelete = [...this.images]
+        this.interactionDisabled = true
+        for (let i = 0; i < imagesToDelete.length; i++) {
+          await ImageService.delete(imagesToDelete[i].id)
+          this.images = this.images.filter(image => image.id !== imagesToDelete[i].id)
+        }
+        
+        this.interactionDisabled = false
+        this.$store.dispatch('alert', 'All photos deleted')
+        this.shouldDeleteAll = false
+      } catch(err) {
+        console.log(err)
+        this.interactionDisabled = false
+        this.shouldDeleteAll = false
+        this.$store.dispatch('alert', 'An error occured during deletion.')
+      }
+    },
+
+    deletionDialogClosed() {
+      this.showDeletionDialog = false
+      this.shouldDeleteAll = false
+    },
+
     async infiniteHandler($state) {
       let images
       if (this.lastDate) {

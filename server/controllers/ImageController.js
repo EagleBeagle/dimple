@@ -33,6 +33,19 @@ module.exports = {
       console.log(timestamp)
       console.log(publicId)
       console.log(signature)
+      setTimeout(async () => {
+        const updatedImage = await Image.findByPk(publicId)
+        if (updatedImage && updatedImage.cancellationToken) {
+          console.log('Need to be cleared')
+          try {
+            await cloudinary.uploader.destroy(`${req.user.username}/${updatedImage.id}`)
+            await updatedImage.destroy()
+          } catch (err) {
+            console.log(err)
+          }
+        }
+      }, 65 * 60 * 1000)
+      console.log(cancellationToken)
       res.status(201).send({
         timestamp,
         signature,
@@ -47,19 +60,17 @@ module.exports = {
 
   async finalizeUpload (req, res) {
     try {
-      const publicId = req.body.publicId
-      const url = req.body.url
-      console.log(publicId)
-      console.log(url)
-      const image = await Image.findByPk(publicId)
-      if (image) {
-        await image.update({
-          url: url
-        })
-        res.status(200).send()
-      } else {
-        res.status(404).send('Image with given ID not found')
+      const imageId = req.params.id
+      const image = await Image.findByPk(imageId)
+      if (!image) {
+        return res.status(404).send('Image not found')
       }
+      if (image.fk_username !== req.user.username) {
+        return res.status(403).send('Unauthorized')
+      }
+      image.cancellationToken = null
+      await image.save()
+      res.status(200).send()
     } catch (err) {
       console.log(err)
       res.status(500).send('An error happened during upload verification')
@@ -176,7 +187,8 @@ module.exports = {
       const explore = req.query.explore
       const queryObject = {
         where: {
-          trashed: false
+          trashed: false,
+          cancellationToken: null
         },
         order: [],
         attributes: {
@@ -215,12 +227,13 @@ module.exports = {
         return res.status(400).send('Invalid query')
       }
       if (id) {
-        images = await Image.findByPk(id)
-        if (!images) {
+        queryObject.where.id = id
+        images = await Image.findOne(queryObject)
+        if (!images || images.cancellationToken) {
           return res.status(400).send('Invalid id')
         }
         if (images.visibility || images.fk_username === req.user.username) {
-          images.dataValues.favouriteCount = await images.countFavourite()
+          console.log('itt')
           images.dataValues.favouritedByUser = await images.hasFavourite(req.user.id)
           return res.status(200).send(images)
         } else {
@@ -295,6 +308,13 @@ module.exports = {
       } else {
         images = await Image.findAll(queryObject)
       }
+      /* const validImages = []
+      for (let i = 0; i < images.length; i++) {
+        try {
+          await cloudinary.uploader.explicit(`${images[i].fk_username}/${images[i].id}`, { type: 'upload' })
+          validImages.push(images[i])
+        } catch {}
+      } */
       res.status(200).send(images)
     } catch (err) {
       console.log(err)

@@ -224,8 +224,9 @@ export default {
       }
     },
     onFileChosen(event) {
-      console.log(event.target.files)
-      this.$store.dispatch('imageChosen', event.target.files)
+      const files = [...event.target.files]
+      this.$store.dispatch('imageChosen', files)
+      event.target.value = null
     },
     goToUser(searchedUser) {
       this.searchText = ''

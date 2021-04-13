@@ -155,6 +155,8 @@ export default {
   },
   watch: {
     async imageData(value) {
+      console.log('dialóg kéne maybe')
+      console.log(value)
       if (value) {
         this.clearFields()
         this.imagePreviews = []

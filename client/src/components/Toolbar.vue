@@ -2,6 +2,30 @@
     <v-app-bar dense app fixed flat clipped-right style="top: 64px" class="toolbar" color="grey lighten-3">
       <v-toolbar-items>
         <v-btn
+          v-if="$route.name === 'Photos' && user.username === $route.params.username && $route.params.album === 'trash'"
+          depressed
+          rounded
+          color="grey lighten-3"
+          class="text-none text-subtitle-1"
+          @click="$store.dispatch('triggerRestoreAll')">
+          <v-icon color="blue">
+            mdi-restore
+          </v-icon>
+          Restore all
+        </v-btn>
+        <v-btn
+          v-if="$route.name === 'Photos' && user.username === $route.params.username && $route.params.album === 'trash'"
+          depressed
+          rounded
+          color="grey lighten-3"
+          class="text-none text-subtitle-1"
+          @click="$store.dispatch('triggerDeleteAll')">
+          <v-icon color="blue">
+            mdi-delete-forever
+          </v-icon>
+          Delete all
+        </v-btn>
+        <v-btn
           v-if="$route.name === 'UserAlbums' && user.username === $route.params.username"
           depressed
           rounded

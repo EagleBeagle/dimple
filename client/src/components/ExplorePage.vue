@@ -46,7 +46,7 @@ export default {
         filter.sort = `date:desc`
         filter.explore = true
         const images = (await ImageService.get(filter)).data.map((image) => {
-          image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+          image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
           return image
         })
         if (images.length) {

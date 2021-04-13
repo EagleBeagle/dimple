@@ -120,7 +120,8 @@ module.exports = {
       if (req.user.username === user.username) {
         imageCount = await Image.count({
           where: {
-            fk_username: user.username
+            fk_username: user.username,
+            cancellationToken: null
           }
         })
         console.log(imageCount)
@@ -128,7 +129,8 @@ module.exports = {
         imageCount = await Image.count({
           where: {
             fk_username: user.username,
-            visibility: true
+            visibility: true,
+            cancellationToken: null
           }
         })
       }
@@ -164,7 +166,8 @@ module.exports = {
           imageCount: await Image.count({
             where: {
               fk_username: userResults[i].username,
-              visibility: true
+              visibility: true,
+              cancellationToken: null
             }
           })
         })

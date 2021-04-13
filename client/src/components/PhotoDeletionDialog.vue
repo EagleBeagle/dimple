@@ -6,10 +6,12 @@
     <v-card-title class="headline">
       Are you sure?
     </v-card-title>
-    <v-card-text class="text-body-1">
+    <v-card-text class="text-body-1" v-if="deleteAll">
+      If you permanently delete these photos, you won't be able to restore them later.
+    </v-card-text>
+    <v-card-text class="text-body-1" v-else>
       If you permanently delete this photo, you won't be able to restore it later.
     </v-card-text>
-
     <v-divider></v-divider>
 
     <v-card-actions>
@@ -35,7 +37,8 @@
 <script>
 export default {
   props: [
-    'show'
+    'show',
+    'deleteAll'
   ],
   computed: {
     dialog: {
@@ -57,7 +60,11 @@ export default {
       this.dialog = false
     },
     confirm() {
-      this.$emit('confirm')
+      if (this.deleteAll) {
+        this.$emit('deleteAll')
+      } else {
+        this.$emit('confirm')
+      }
       this.dialog = false
     }
   }

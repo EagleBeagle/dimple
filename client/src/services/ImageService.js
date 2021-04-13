@@ -17,7 +17,12 @@ export default {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
             if (onProgress) onProgress(percentCompleted, i)
             return percentCompleted
-          }
+          },
+          timeout: 60 * 60 * 1000
+        }).then(async (result) => {
+            await Api().put(`image/${data[i].get('public_id')}/finalize`)
+            store.dispatch('setNewPhotoId', data[i].get('public_id'))
+            return result
         }).catch(() => {
           onError(i)
         })
@@ -39,7 +44,6 @@ export default {
       await axios.get(url)
       return true
     } catch {
-      console.log('hopá hopááá')
       return false
     }
   },

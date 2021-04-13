@@ -19,7 +19,10 @@ export default new Vuex.Store({
     },
     visibility: 'all',
     searching: false,
-    updateShownPhotos: false
+    updateShownPhotos: false,
+    newPhotoId: null,
+    triggerRestoreAll: false,
+    triggerDeleteAll: false
   },
   actions: {
     alert({ commit }, text) {
@@ -54,6 +57,15 @@ export default new Vuex.Store({
     },
     updateShownPhotos({ commit }) {
       commit ('updateShownPhotos')
+    },
+    setNewPhotoId({ commit }, newPhotoId) {
+      commit ('setNewPhotoId', newPhotoId)
+    },
+    triggerRestoreAll({ commit }) {
+      commit ('triggerRestoreAll')
+    },
+    triggerDeleteAll({ commit }) {
+      commit ('triggerDeleteAll')
     }
   },
   mutations: {
@@ -93,6 +105,15 @@ export default new Vuex.Store({
     },
     updateShownPhotos(state) {
       state.updateShownPhotos = !state.updateShownPhotos
+    },
+    setNewPhotoId(state, newPhotoId) {
+      state.newPhotoId = newPhotoId
+    },
+    triggerRestoreAll(state) {
+      state.triggerRestoreAll = !state.triggerRestoreAll
+    },
+    triggerDeleteAll(state) {
+      state.triggerDeleteAll = !state.triggerDeleteAll
     }
   }
 })

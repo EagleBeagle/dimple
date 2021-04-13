@@ -93,7 +93,7 @@ export default {
         console.log(this.image.id)
         this.albums = (await AlbumService.get({ imageId: this.image.id })).data.map(album => {
           album.images = album.images.map(image => {
-            image.url = this.cloudinaryCore.url(`${image.fk_username}/${image.id}`)
+            image.url = image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
             return image
           })
           return album
