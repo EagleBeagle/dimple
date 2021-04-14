@@ -1,7 +1,7 @@
 <template>
   <v-container class="pa-0 ma-0 photo-container" fluid>
       <v-row justify="start">
-        <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3" v-for="(image, index) in images" :key="image.id" style="animation-duration: 0.3s">
+        <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3" v-for="(image, index) in images" :key="index" style="animation-duration: 0.3s">
           <kinesis-container v-if="!invalidImageIndices.has(index)">
             <kinesis-element :strength="10" type="depth">
               <v-hover v-slot="{hover}">

@@ -178,6 +178,7 @@ export default {
         this.shownUser = response
       } catch (err) {
         console.log(err)
+        this.$router.push({ name: 'Error' }).catch(() => {})
         this.$store.dispatch('alert', 'Failed to retrive user.')
       }
     }

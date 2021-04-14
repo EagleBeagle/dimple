@@ -8,6 +8,8 @@ import UserPhotos from '../components/UserPhotos'
 import UserPage from '../components/UserPage'
 import PhotoPage from '../components/PhotoPage'
 import ExplorePage from '../components/ExplorePage'
+import ErrorPage from '../components/ErrorPage'
+import NotFoundPage from '../components/NotFoundPage'
 
 Vue.use(VueRouter)
 
@@ -48,6 +50,16 @@ const routes = [
     path: '/explore',
     name: 'Explore',
     component: ExplorePage
+  },
+  {
+    path: '/error',
+    name: 'Error',
+    component: ErrorPage
+  },
+  {
+    path: '*',
+    name: 'NotFound',
+    component: NotFoundPage
   }
 ]
 
@@ -77,7 +89,7 @@ router.beforeEach((to, from, next) => {
     return next(`/user/${store.state.user.username}/photos/all`)
   }
   
-
+  store.dispatch('setErrorHappening', false)
   next();
 })
 

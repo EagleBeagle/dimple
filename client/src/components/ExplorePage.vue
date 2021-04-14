@@ -55,6 +55,7 @@ export default {
         return images
       } catch (err) {
         console.log(err)
+        this.$router.push({ name: 'error' }).catch(() => {})
       }
     },
     async imageClicked(image) { // ezt kell még todozni

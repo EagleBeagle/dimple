@@ -144,6 +144,7 @@ export default {
         }
       } catch (err) {
         console.log(err)
+        this.$router.push({ name: 'Error' }).catch(() => {})
       }
     },
     async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
@@ -201,6 +202,7 @@ export default {
         }
       } catch (err) {
         console.log(err)
+        this.$router.push({ name: 'Error' }).catch(() => {})
       }
     },
     async imageClicked(image) { // ezt kell még todozni
@@ -304,7 +306,7 @@ export default {
       } else {
         images = await this.getImages({})
       }
-      if (images.length) {
+      if (images && images.length) {
         this.images.push(...images)
         $state.loaded()
       } else {

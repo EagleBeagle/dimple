@@ -22,7 +22,8 @@ export default new Vuex.Store({
     updateShownPhotos: false,
     newPhotoId: null,
     triggerRestoreAll: false,
-    triggerDeleteAll: false
+    triggerDeleteAll: false,
+    errorHappening: true
   },
   actions: {
     alert({ commit }, text) {
@@ -66,6 +67,9 @@ export default new Vuex.Store({
     },
     triggerDeleteAll({ commit }) {
       commit ('triggerDeleteAll')
+    },
+    setErrorHappening({ commit }, errorHappening) {
+      commit ('setErrorHappening', errorHappening)
     }
   },
   mutations: {
@@ -114,6 +118,9 @@ export default new Vuex.Store({
     },
     triggerDeleteAll(state) {
       state.triggerDeleteAll = !state.triggerDeleteAll
+    },
+    setErrorHappening(state, errorHappening) {
+      state.errorHappening = errorHappening
     }
   }
 })

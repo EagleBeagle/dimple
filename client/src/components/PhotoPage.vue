@@ -1,5 +1,5 @@
 <template>
-  <div class="photo-page">
+  <div v-if="!errorHappening" class="photo-page">
     <v-container
       fluid 
       class="photo-background pt-0 pb-0"
@@ -246,6 +246,9 @@
       <comment-container v-if="image" :image="image" @writting="switchWrittingComment" @count="updateCommentCount" />
     </v-container>
   </div>
+  <div v-else style="height: 100%">
+    <error-page />
+  </div>
 </template>
 
 <script>
@@ -256,11 +259,13 @@ import { Cloudinary } from 'cloudinary-core';
 import ShareDialog from '@/components/ShareDialog'
 import AlbumDialog from '@/components/AlbumDialog'
 import CommentContainer from '@/components/CommentContainer'
+import ErrorPage from '@/components/ErrorPage'
 export default {
   components: {
     ShareDialog,
     AlbumDialog,
-    CommentContainer
+    CommentContainer,
+    ErrorPage
   },
   data () {
     return {
@@ -280,7 +285,8 @@ export default {
   computed: {
     ...mapState([
       'user',
-      'searching'
+      'searching',
+      'errorHappening'
     ])
   },
   watch: {
@@ -321,7 +327,8 @@ export default {
         this.image = image
       } catch (err) {
         console.log(err)
-        if (err.response.status === 403) {
+        this.$store.dispatch('setErrorHappening', true)
+        if (err.response && err.response.status === 403) {
           this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all'}})
         }
       }
@@ -336,7 +343,8 @@ export default {
         console.log(this.photoOwner)
       } catch (err) {
         console.log(err)
-        if (err.response.status === 403) {
+        this.$store.dispatch('setErrorHappening', true)
+        if (err.response && err.response.status === 403) {
           this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all'}})
         }
       }
@@ -412,7 +420,7 @@ export default {
             console.log('popularity:asc')
           }
         } catch (err) {
-          console.log(err)
+          this.$store.dispatch('setErrorHappening', true)
         }
       } else { // todo todooo
 
@@ -428,7 +436,7 @@ export default {
         this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query })
         await this.getNeighbouringImages()
       } catch (err) {
-        console.log(err)
+        this.$store.dispatch('setErrorHappening', true)
         this.$store.dispatch('alert', 'An error happened while trying to go left')
       }
     },
@@ -446,7 +454,7 @@ export default {
           this.lastSwitchedPhotoTime = Date.now()
           await this.getNeighbouringImages()
         } catch (err) {
-          console.log(err)
+          this.$store.dispatch('setErrorHappening', true)
           this.$store.dispatch('alert', 'An error happened while trying to go left')
         }
       }
@@ -465,7 +473,7 @@ export default {
           this.lastSwitchedPhotoTime = Date.now()
           await this.getNeighbouringImages()
         } catch (err) {
-          console.log(err)
+          this.$store.dispatch('setErrorHappening', true)
           this.$store.dispatch('alert', 'An error happened while trying to go left')
         }
       }
