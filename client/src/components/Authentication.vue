@@ -8,23 +8,9 @@
               <v-row>
                 <v-col cols="12" sm="8">
                   <v-card-text class="mt-12">
-                    <h1 class="text-center display-2 blue--text">
+                    <h1 class="text-center text-h2 font-weight-regular mb-8 blue--text">
                       Sign in to Dimple
                     </h1>
-                    <h4 class="text-center mlt-4">
-                      via email, or any of the following services
-                    </h4>
-                    <div class="text-center" mt-4 style="margin-top: 10px">
-                      <v-btn class="mx-2" fab color="black" outlined>
-                        <v-icon>mdi-facebook</v-icon>
-                      </v-btn>
-                      <v-btn class="mx-2" fab color="black" outlined>
-                        <v-icon>mdi-google</v-icon>
-                      </v-btn>
-                      <v-btn class="mx-2" fab color="black" outlined>
-                        <v-icon>mdi-linkedin</v-icon>
-                      </v-btn>
-                    </div>
                     <v-form
                       ref="form"
                       v-model="valid"
@@ -48,12 +34,12 @@
                         color="blue"
                         />
                     </v-form>
-                    <h3 class="text-center mt-3">
+                    <h3 class="text-center mt-3 text-subtitle-1 font-weight-bold">
                       Forgot your password?
                     </h3>
                   </v-card-text>
                   <div class="text-center mt-3">
-                    <v-btn rounded color="blue" dark @click="signIn()">
+                    <v-btn depressed color="blue" dark @click="signIn()">
                       Sign In
                     </v-btn>
                   </div>
@@ -89,24 +75,10 @@
                   </div>
                 </v-col>
                 <v-col cols="12" sm="8">
-                  <v-card-text class="mt-12">
-                    <h1 class="text-center display-2 blue--text">
+                  <v-card-text class="mt-9">
+                    <h1 class="text-center text-h2 font-weight-regular mb-5 blue--text">
                       Create Account
                     </h1>
-                    <div class="text-center" mt-4 style="margin-top: 10px">
-                      <v-btn class="mx-2" fab color="black" outlined>
-                        <v-icon>mdi-facebook</v-icon>
-                      </v-btn>
-                      <v-btn class="mx-2" fab color="black" outlined>
-                        <v-icon>mdi-google</v-icon>
-                      </v-btn>
-                      <v-btn class="mx-2" fab color="black" outlined>
-                        <v-icon>mdi-linkedin</v-icon>
-                      </v-btn>
-                    </div>
-                    <h4 class="text-center mt-4">
-                      via email, or any of the following services
-                    </h4>
                     <v-form
                       ref="form"
                       v-model="valid"
@@ -141,8 +113,8 @@
                         />
                     </v-form>
                   </v-card-text>
-                  <div class="text-center mt-n5">
-                    <v-btn rounded color="blue" class="white--text" :disabled="!valid" @click="signUp()">
+                  <div class="text-center mt-3">
+                    <v-btn depressed color="blue" class="white--text" :disabled="!valid" @click="signUp()">
                       Sign Up
                     </v-btn>
                   </div>
