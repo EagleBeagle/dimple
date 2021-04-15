@@ -9,16 +9,19 @@ const cloudinary = require('../config/cloudinary.config.js')
 const DatauriParser = require('datauri/parser')
 const path = require('path')
 const { v4: uuidv4 } = require('uuid')
+const emailTransporter = require('../config/email.config.js')
 
 module.exports = {
   async signup (req, res) {
     try {
       const { email, username } = req.body
       const password = await bcrypt.hash(req.body.password, 10)
+      const confirmationToken = uuidv4()
       const user = await User.create({
         email,
         username,
-        password
+        password,
+        confirmationToken
       })
       const payload = {
         id: user.id,
@@ -27,11 +30,28 @@ module.exports = {
       }
       const jwtToken = jwt.sign(payload, process.env.JWT_SECRET)
 
+      await emailTransporter.sendMail({
+        from: {
+          name: 'Dimple',
+          address: process.env.GMAIL_ADDRESS
+        },
+        to: user.email,
+        subject: 'Verify Your Email Address',
+        html: `<p>Hi ${username}!</p>
+               <p>To confirm that this Dimple account belongs to you, please
+                 <a href="https://${req.hostname}/user/confirm/${confirmationToken}">
+                   click here
+                 </a>
+               to verify.</p>
+               <p>The Dimple Team</p>`
+      })
+
       res.status(201).send({
         id: user.id,
         username,
         avatar: user.avatar,
-        jwtToken
+        jwtToken,
+        confirmationToken
       })
     } catch (err) {
       console.log(err)
@@ -46,6 +66,34 @@ module.exports = {
       } else {
         res.status(500).send('an error happened during signup')
       }
+    }
+  },
+
+  async confirm (req, res) {
+    try {
+      const confirmationToken = req.params.confirmationToken
+      const user = await User.findOne({ where: { confirmationToken } })
+      if (!user) {
+        return res.status(404).send('User not found')
+      }
+      user.confirmationToken = null
+      await user.save()
+      const payload = {
+        id: user.id,
+        email: user.email,
+        username: user.username
+      }
+      const jwtToken = jwt.sign(payload, process.env.JWT_SECRET)
+      res.status(200).send({
+        id: user.id,
+        username: user.username,
+        avatar: user.avatar,
+        jwtToken,
+        confirmationToken: user.confirmationToken
+      })
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('Error during user confirmation')
     }
   },
 
@@ -73,11 +121,66 @@ module.exports = {
             id: user.id,
             username: user.username,
             avatar: user.avatar,
-            jwtToken
+            jwtToken,
+            confirmationToken: user.confirmationToken
           })
         })
       }
     )(req, res)
+  },
+
+  async forgotPassword (req, res) {
+    try {
+      const email = req.body.email
+      const user = await User.findOne({ where: { email } })
+      if (!user) {
+        return res.status(404).send('No user with given email exists')
+      }
+      const resetPasswordToken = uuidv4()
+      user.resetPasswordToken = resetPasswordToken
+      const dateNow = new Date()
+      user.resetPasswordTokenExpiration = dateNow.setDate(dateNow.getDate() + 2)
+      await user.save()
+      await emailTransporter.sendMail({
+        from: {
+          name: 'Dimple',
+          address: process.env.GMAIL_ADDRESS
+        },
+        to: user.email,
+        subject: 'Dimple Password Reset',
+        html: `<p>Hi ${user.username}!</p>
+               <p>We have received a request to reset your password, which can be done by
+                 <a href="https://${req.hostname}/user/resetpassword/${resetPasswordToken}">
+                   clicking here.
+                 </a>
+               </p>
+               <p>
+               If you didn't request to reset your password then you may safely ignore this email - your password will not be changed.</p>
+               <p>The Dimple Team</p>`
+      })
+      res.status(200).send()
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('Error while trying to initiate password reset')
+    }
+  },
+
+  async resetPassword (req, res) {
+    try {
+      const resetPasswordToken = req.params.resetPasswordToken
+      const user = await User.findOne({ where: { resetPasswordToken } })
+      if (!user || !user.resetPasswordTokenExpiration || user.resetPasswordTokenExpiration < new Date()) {
+        return res.status(400).send('Invalid request')
+      }
+      const password = await bcrypt.hash(req.body.password, 10)
+      user.password = password
+      user.resetPasswordToken = null
+      await user.save()
+      res.status(200).send()
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('Error while during password reset')
+    }
   },
 
   async changeAvatar (req, res) {
@@ -156,7 +259,8 @@ module.exports = {
               [Op.ne]: req.user.username
             }
           }
-        }
+        },
+        limit: 20
       })
       const users = []
       for (let i = 0; i < userResults.length; i++) {

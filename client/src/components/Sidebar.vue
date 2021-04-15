@@ -149,7 +149,7 @@ export default {
   methods: {
     goTo(route, params) {
       if (this.$route.name !== route || (this.$route.name === 'Photos' && this.$route.params.album !== params.album)) {
-        this.$router.push({ name: route, params })
+        this.$router.push({ name: route, params }).catch(() => {})
       }
     },
     async changeAvatar(event) {
@@ -178,8 +178,11 @@ export default {
         this.shownUser = response
       } catch (err) {
         console.log(err)
-        this.$router.push({ name: 'Error' }).catch(() => {})
-        this.$store.dispatch('alert', 'Failed to retrive user.')
+        if (err.response && err.response.status === 404) {
+          this.$router.push({ name: 'ContentNotFoundError' }).catch(() => {})
+        } else {
+          this.$router.push({ name: 'GenericError' }).catch(() => {})
+        }
       }
     }
   }

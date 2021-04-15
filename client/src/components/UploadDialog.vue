@@ -228,6 +228,9 @@ export default {
         this.show = false
       } catch (err) {
         console.log(err)
+        this.$store.dispatch('alert', 'An error happened during upload initialization')
+        this.clearFields()
+        this.show = false
       }
     },
     select(id) {

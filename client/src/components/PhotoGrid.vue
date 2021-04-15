@@ -1,7 +1,7 @@
 <template>
   <v-container class="pa-0 ma-0 photo-container" fluid>
-      <v-row justify="start">
-        <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3" v-for="(image, index) in images" :key="index" style="animation-duration: 0.3s">
+      <transition-group name="zoom" class="row wrap justify-start">
+        <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3 item" v-for="(image, index) in images" :key="image.id" style="animation-duration: 0.3s">
           <kinesis-container v-if="!invalidImageIndices.has(index)">
             <kinesis-element :strength="10" type="depth">
               <v-hover v-slot="{hover}">
@@ -27,7 +27,7 @@
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
                         <v-icon v-if="image.trashed" size="200px" class="restore" color="rgb(255, 255, 255, 0.5)" >mdi-restore</v-icon>
-                        <div class="overlay-content text-h6">
+                        <div v-if="!image.trashed" class="overlay-content text-h6">
                           <v-container class="pa-2">
                             <v-row justify="start" class="mx-1">
                               <v-col cols="6" class="pa-0 text-h5 white--text" style="text-align: left">
@@ -60,7 +60,7 @@
             </kinesis-element>
           </kinesis-container>
         </v-col>
-      </v-row>
+      </transition-group>
       <infinite-loading @infinite="infiniteHandler">
         <span slot="no-more"></span>
         <span slot="no-results"></span>
@@ -115,6 +115,8 @@ export default {
 
 .image-div {
   cursor: pointer;
+  transition: all 0.5s;
+  display: inline-block;
 }
 
 .v-overlay__content {
@@ -151,5 +153,9 @@ export default {
   width: 100%;
   bottom: 0px;
   color: rgba(133, 132, 132, 0.7);
+}
+
+.zoom-leave-active {
+  position: absolute;
 }
 </style>

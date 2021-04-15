@@ -225,7 +225,11 @@ export default {
           this.$refs.commentText.blur()
         } catch (err) {
           console.log(err)
-          this.$store.dispatch('alert', 'Failed to create new comment.')
+          if (err.response.status === 403) {
+            this.$store.dispatch('alert', 'Confirm your email address to write comments.')
+          } else {
+            this.$store.dispatch('alert', 'Failed to create new comment.')
+          }
         }
       }
     },

@@ -66,7 +66,7 @@
                       <v-row justify="start">
                         <v-col cols="3" class="pa-0">
                           <v-img :src="searchedUser.avatar" class="avatar ml-1" :class="searchedUser.avatar ? null: 'no-avatar'" aspect-ratio="1" width="50px">
-                            <v-icon v-if="!searchedUser.avatar" size="50px" class="no-avatar-icon">
+                            <v-icon v-if="!searchedUser.avatar" size="37px" class="no-avatar-icon">
                               mdi-account
                             </v-icon>
                           </v-img>
@@ -117,7 +117,7 @@
       name ="form"
       autocomplete="off">
         <v-btn
-          :disabled="$store.state.uploadInProgress ? true : false" @click="$refs.fileInput.click()"
+          :disabled="$store.state.uploadInProgress ? true : false" @click="!user.confirmationToken ? $refs.fileInput.click() : showAlertDialog = true"
           color="white"
           light
           x-large
@@ -127,6 +127,13 @@
             mdi-cloud-upload
           </v-icon>
         </v-btn>
+        <alert-dialog 
+          v-if="showAlertDialog" 
+          :show="showAlertDialog"
+          :title="'Whoops'"
+          :text="'You need to confirm your email address before you can start uploading photos.'"
+          @close="showAlertDialog = false">
+        </alert-dialog>
       <input
         type="file"
         style="display: none"
@@ -139,7 +146,7 @@
       <div>
       <v-img :src="user.avatar" class="avatar ml-1" :class="user.avatar ? null: 'no-avatar'" style="cursor: pointer" aspect-ratio="1" width="52px"
         @click="$router.push({ name: 'Photos', params: { username: user.username, album: 'all' } }).catch(() => {})">
-        <v-icon v-if="!user.avatar" size="52px" class="no-avatar-icon">
+        <v-icon v-if="!user.avatar" size="40px" class="no-avatar-icon">
           mdi-account
         </v-icon>
       </v-img>
@@ -155,14 +162,19 @@
 import { mapState } from 'vuex'
 import UserService from '@/services/UserService'
 import { Cloudinary } from 'cloudinary-core'
+import AlertDialog from '@/components/AlertDialog'
 export default {
   data() {
     return {
       searchText: '',
       searchFocused: false,
       searchResults: [],
-      loading: false
+      loading: false,
+      showAlertDialog: false
     }
+  },
+  components: {
+    AlertDialog
   },
   computed: {
     ...mapState([
@@ -201,7 +213,7 @@ export default {
       this.$store.dispatch('unsetUser')
       this.$store.dispatch('changeSort', { category: 'date', order: 'desc' })
       this.$store.dispatch('changeVisibility', 'all')
-      this.$router.push({ name: 'Authentication' })
+      this.$router.push({ name: 'Authentication' }).catch(() => {})
     },
     async enableSearchFocus() {
       this.searchFocused = true
@@ -245,6 +257,7 @@ export default {
 }
 .avatar {
   border-radius: 50%;
+  background-color: white;
   border: 2px #2196F3 solid;
 }
 
@@ -256,8 +269,7 @@ export default {
   position: absolute;
   background-color: white;
   top: 50%;
-  left: 50%;
-  transform:translate(-50%,-50%);
+  transform:translate(-60%,-50%);
 }
 
 .search-card {

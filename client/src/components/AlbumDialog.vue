@@ -105,7 +105,7 @@ export default {
       }
     },
     openAlbum(album) {
-      this.$router.push({ name: 'Photos', params: { username: album.fk_username,  album: album.id } })
+      this.$router.push({ name: 'Photos', params: { username: album.fk_username,  album: album.id } }).catch(() => {})
     },
     updateAlbums(selectedAlbums) {
       this.albums = selectedAlbums

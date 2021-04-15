@@ -8,8 +8,11 @@ import UserPhotos from '../components/UserPhotos'
 import UserPage from '../components/UserPage'
 import PhotoPage from '../components/PhotoPage'
 import ExplorePage from '../components/ExplorePage'
-import ErrorPage from '../components/ErrorPage'
-import NotFoundPage from '../components/NotFoundPage'
+import GenericErrorPage from '../components/GenericErrorPage'
+import NotFoundErrorPage from '../components/NotFoundErrorPage'
+import ConfirmUser from '../components/ConfirmUser'
+import ForgotPassword from '../components/ForgotPassword'
+import ResetPassword from '../components/ResetPassword'
 
 Vue.use(VueRouter)
 
@@ -23,6 +26,16 @@ const routes = [
     path: '/auth',
     name: 'Authentication',
     component: Auth
+  },
+  {
+    path: '/forgotpassword',
+    name: 'ForgotPassword',
+    component: ForgotPassword
+  },
+  {
+    path: '/user/resetpassword/:resetPasswordToken',
+    name: 'ResetPassword',
+    component: ResetPassword
   },
   {
     path: '/photos/:username/:id',
@@ -47,19 +60,29 @@ const routes = [
     ]
   },
   {
+    path: '/user/confirm/:confirmationToken',
+    name: 'Confirm',
+    component: ConfirmUser
+  },
+  {
     path: '/explore',
     name: 'Explore',
     component: ExplorePage
   },
   {
     path: '/error',
-    name: 'Error',
-    component: ErrorPage
+    name: 'GenericError',
+    component: GenericErrorPage
+  },
+  {
+    path: '/notfounderror',
+    name: 'ContentNotFoundError',
+    component: NotFoundErrorPage
   },
   {
     path: '*',
-    name: 'NotFound',
-    component: NotFoundPage
+    name: 'PageNotFoundError',
+    component: NotFoundErrorPage
   }
 ]
 
@@ -70,23 +93,28 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/auth'];
-  const authRequired = !publicPages.includes(to.path);
+  const publicPages = ['Authentication', 'Confirm', 'ForgotPassword', 'ResetPassword'];
+  const authRequired = !publicPages.includes(to.name);
   const loggedIn = JSON.parse(localStorage.getItem('user'))
   if (loggedIn && !store.state.user.username) {
     store.dispatch('setUser', loggedIn)
   }
 
+  if (!loggedIn) {
+    store.dispatch('unsetUser')
+  }
+
   if (authRequired && !loggedIn) {
+    console.log('itt')
     return next('/auth');
   }
 
   if (to.path === '/auth' && loggedIn) {
-    return next(`/user/${store.state.user.username}/photos/all`);
+    return next(`/explore`);
   }
 
   if (to.path === '/' && loggedIn) {
-    return next(`/user/${store.state.user.username}/photos/all`)
+    return next(`/explore`)
   }
   
   store.dispatch('setErrorHappening', false)

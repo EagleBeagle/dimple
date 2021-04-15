@@ -51,7 +51,7 @@ module.exports = {
         queryObject.where.id = req.query.id
         const album = await Album.findOne(queryObject)
         if (!album) {
-          return res.status(403).send('Invalid id')
+          return res.status(404).send('Album not found')
         }
         if (album.fk_username === req.user.username || album.visibility) {
           if (album.fk_username !== req.user.username) {

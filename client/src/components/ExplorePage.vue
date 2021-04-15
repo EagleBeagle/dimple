@@ -5,6 +5,7 @@
         <div class="text-h2 font-weight-regular mt-2 mb-0">Explore</div>
       </v-col>
     </v-row>
+    <v-divider class="my-3 mt-8 mx-16"></v-divider>
     <photo-grid
       :images="images" 
       @reachedBottom="infiniteHandler"
@@ -31,7 +32,6 @@ export default {
   },
   async mounted() {
     this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
-    this.images = await this.getImages({})
   },
   computed: {
     ...mapState([
@@ -55,7 +55,7 @@ export default {
         return images
       } catch (err) {
         console.log(err)
-        this.$router.push({ name: 'error' }).catch(() => {})
+        this.$router.push({ name: 'GenericError' }).catch(() => {})
       }
     },
     async imageClicked(image) { // ezt kell még todozni
@@ -71,7 +71,7 @@ export default {
           page: 'explore',
           order: `date:desc`
         }
-      })
+      }).catch(() => {})
     },
     async infiniteHandler($state) {
       let images

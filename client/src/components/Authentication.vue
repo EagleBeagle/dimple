@@ -34,20 +34,21 @@
                         color="blue"
                         />
                     </v-form>
-                    <h3 class="text-center mt-3 text-subtitle-1 font-weight-bold">
+                    <h3 class="text-center mt-3 text-subtitle-1 font-weight-bold" style="cursor: pointer" @click="$router.push({ name: 'ForgotPassword' }).catch(() => {})">
                       Forgot your password?
                     </h3>
                   </v-card-text>
                   <div class="text-center mt-3">
-                    <v-btn depressed color="blue" dark @click="signIn()">
-                      Sign In
-                    </v-btn>
+                    <v-btn depressed color="blue" dark width="95px" @click="signIn()">
+                      <span v-if="!loading">Sign In</span>
+                      <v-progress-circular v-else size="25" indeterminate></v-progress-circular>
+                    </v-btn>  
                   </div>
                 </v-col>
                 <v-col cols="12" sm="4" class="blue">
                   <v-card-text class="white--text mt-12">
-                    <h1 class="text-center display-1">Hi!</h1>
-                    <h5 class="text-center">Save your photos to Dimple and access them from any device, anywhere</h5>
+                    <h1 class="text-center text-h4">Hi!</h1>
+                    <h5 class="text-center  text-subtitle-2 font-weight-regular">Save your photos to Dimple and access them from any device, anywhere</h5>
                   </v-card-text>
                   <div class="text-center">
                     <v-btn rounded outlined="" dark @click="step++">
@@ -61,10 +62,10 @@
               <v-row class="fill-height">
                 <v-col cols="12" sm="4" class="blue">
                   <v-card-text class="white--text mt-12">
-                    <h1 class="text-center display-1">
+                    <h1 class="text-center text-h4">
                       Welcome Back!
                     </h1>
-                    <h5 class="text-center">
+                    <h5 class="text-center text-subtitle-2 font-weight-regular">
                       Sign in to continue managing your photo collection
                     </h5>
                   </v-card-text>
@@ -114,8 +115,9 @@
                     </v-form>
                   </v-card-text>
                   <div class="text-center mt-3">
-                    <v-btn depressed color="blue" class="white--text" :disabled="!valid" @click="signUp()">
-                      Sign Up
+                    <v-btn depressed color="blue" class="white--text" :disabled="!valid" width="100px" @click="signUp()">
+                      <span v-if="!loading">Sign Up</span>
+                      <v-progress-circular v-else size="25" indeterminate></v-progress-circular>
                     </v-btn>
                   </div>
                 </v-col>
@@ -139,6 +141,7 @@ export default {
     emailSignUp: null,
     passwordSignUp: null,
     valid: true,
+    loading: false,
     usernameRules: [
         v => !!v || "The username can't stay empty.",
         v => (v && v.length > 3) || 'The username has to be at least 4 characters long.',
@@ -164,6 +167,7 @@ export default {
             this.$store.dispatch('alert', 'Please fill in both fields')
             return
           }
+          this.loading = true
           const response = await UserService.signIn({
             email: this.emailSignIn,
             password: this.passwordSignIn
@@ -173,8 +177,10 @@ export default {
           }
           localStorage.setItem('user', JSON.stringify(response.data))
           this.$store.dispatch('setUser', response.data)
-          this.$router.push({ name: 'Photos', params: { username: response.data.username, album: 'all' } })
+          this.loading = false
+          this.$router.push({ name: 'Photos', params: { username: response.data.username, album: 'all' } }).catch(() => {})
         } catch (err) {
+          this.loading = false
           let errorMessage
           if (err.response.data.error === 'account doesnt exist') {
             errorMessage = 'No account exists with the given credentials'
@@ -187,6 +193,7 @@ export default {
     async signUp() {
       if(this.$refs.form.validate()) {
         try {
+          this.loading = true
           const response = await UserService.signUp({
             username: this.usernameSignUp,
             email: this.emailSignUp,
@@ -194,8 +201,11 @@ export default {
           })
           localStorage.setItem('user', JSON.stringify(response.data))
           this.$store.dispatch('setUser', response.data)
-          this.$router.push({ name: 'Photos', params: { username: response.data.username, album: 'all' } })
+          this.loading = false
+          this.$store.dispatch('alert', 'Account created successfully')
+          this.$router.push({ name: 'Explore' }).catch(() => {})
         } catch (err) {
+          this.loading = false
           console.log(err)
           this.$store.dispatch('alert', 'An error has happened during sign up')
         }

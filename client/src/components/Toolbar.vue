@@ -31,12 +31,19 @@
           rounded
           color="grey lighten-3"
           class="text-subtitle-1 text-capitalize"
-          @click="showNewAlbumDialog = true">
+          @click="!user.confirmationToken ? showNewAlbumDialog = true : showAlertDialog = true">
           <v-icon color="blue">
             mdi-plus
           </v-icon>
           New
         </v-btn>
+        <alert-dialog 
+          v-if="showAlertDialog" 
+          :show="showAlertDialog"
+          :title="'Whoops'"
+          :text="'You need to confirm your email address before you can start creating albums.'"
+          @close="showAlertDialog = false">
+        </alert-dialog>
         <v-btn
           v-if="$route.name === 'Photos' && !['all', 'favourites', 'trash'].includes($route.params.album)  && user.username === $route.params.username"
           depressed
@@ -147,17 +154,20 @@
 <script>
 import NewAlbumDialog from '@/components/NewAlbumDialog'
 import AddPhotosDialog from '@/components/AddPhotosDialog'
+import AlertDialog from '@/components/AlertDialog'
 import AlbumService from '@/services/AlbumService'
 import { mapState } from 'vuex'
 export default {
   components: {
     NewAlbumDialog,
-    AddPhotosDialog
+    AddPhotosDialog,
+    AlertDialog
   },
   data () {
     return {
       showNewAlbumDialog: false,
       showAddPhotosDialog: false,
+      showAlertDialog: false,
       albumToAddPhotos: null
     }
   },

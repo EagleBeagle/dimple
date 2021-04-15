@@ -1,11 +1,12 @@
 <template>
 <v-container class="px-8 album-container" fluid>
     <v-row justify="start">
-      <v-col class="pb-0" style="text-align: left">
+      <v-col class style="text-align: left">
         <div v-if="$route.params.username === user.username" class="text-h3 font-weight-regular my-2">Your Albums</div>
         <div v-else class="text-h3 font-weight-regular my-2">{{ $route.params.username }}'s albums</div>
       </v-col>
     </v-row>
+    <v-divider class="my-2"></v-divider>
     <v-row class="pa-0">
       <album-grid
         v-if="renderAlbumGrid"
@@ -77,7 +78,7 @@ export default {
   },
   methods: {
     openAlbum(album) {
-      this.$router.push({ name: 'Photos', params: { username: album.fk_username,  album: album.id } })
+      this.$router.push({ name: 'Photos', params: { username: album.fk_username,  album: album.id } }).catch(() => {})
     },
     async getAlbums() {
       try {

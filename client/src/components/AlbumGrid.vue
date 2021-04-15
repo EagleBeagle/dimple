@@ -1,7 +1,7 @@
 <template>
 <v-container class="pa-0 album-container" fluid>
-    <v-row justify="start">
-      <v-col cols="12" sm="6" md="4" lg="3" class="pa-4" v-for="album in albums" :key="album.id">
+    <transition-group name="zoom" class="row wrap justify-start">
+      <v-col cols="12" sm="6" md="4" lg="3" class="pa-4 album" v-for="album in albums" :key="album.id" style="animation-duration: 0.3s">
         <v-hover v-slot="{hover}">
           <v-card  tile @click="$emit('open', album)" :hover="inDialog" height="100%">
             <div class="overlay-div">
@@ -100,7 +100,7 @@
           </v-card>
         </v-hover>
       </v-col>
-    </v-row>
+    </transition-group>
   </v-container>
   
 </template>
@@ -151,6 +151,11 @@ export default {
 
 .album-setting-icon {
   cursor: pointer;
+}
+
+.album {
+  transition: all 0.6s;
+  display: inline-block;
 }
 
 </style>

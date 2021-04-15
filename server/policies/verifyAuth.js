@@ -1,8 +1,6 @@
 const db = require('../config/db.config.js')
 const User = db.user
 const passport = require('passport')
-const passportJWT = require('passport-jwt')
-const ExtractJwt = passportJWT.ExtractJwt
 
 module.exports = {
   isLoggedIn (req, res, next) {
@@ -16,6 +14,19 @@ module.exports = {
         next()
       }
     })(req, res, next)
+  },
+
+  async isConfirmed (req, res, next) {
+    try {
+      const user = await User.findByPk(req.user.id)
+      if (user.confirmationToken) {
+        return res.status(403).send('Unauthorized')
+      }
+      next()
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('an error happened checking for user confirmation status')
+    }
   },
 
   async isAdmin (req, res, next) {

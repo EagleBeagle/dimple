@@ -9,6 +9,18 @@ export default {
     return Api().post('/signin', credentials)
   },
 
+  confirm(confirmationToken) {
+    return Api().put(`/user/confirm/${confirmationToken}`)
+  },
+
+  forgotPassword(email) {
+    return Api().put(`/user/forgotpassword`, email)
+  },
+
+  resetPassword(resetPasswordToken, password) {
+    return Api().put(`/user/resetpassword/${resetPasswordToken}`, { password })
+  },
+
   changeAvatar(username, formData) {
     return Api().put(`/user/${username}/avatar`, formData)
   },

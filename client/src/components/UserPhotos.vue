@@ -106,7 +106,9 @@ export default {
         albumIds.push('all')
         if (albumIds.includes(this.$route.params.album)) {
           if (this.sort.order === 'desc') {
-            this.images.unshift(newPhoto)
+            this.images = [newPhoto, ...this.images]
+          } else {
+            this.images = [...this.images, newPhoto]
           }
         }
       } catch (err) {
@@ -144,7 +146,6 @@ export default {
         }
       } catch (err) {
         console.log(err)
-        this.$router.push({ name: 'Error' }).catch(() => {})
       }
     },
     async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
@@ -202,7 +203,11 @@ export default {
         }
       } catch (err) {
         console.log(err)
-        this.$router.push({ name: 'Error' }).catch(() => {})
+        if (err.response && err.response.status === 404) {
+          this.$router.push({ name: 'ContentNotFoundError' }).catch(() => {})
+        } else {
+          this.$router.push({ name: 'GenericError' }).catch(() => {})
+        }
       }
     },
     async imageClicked(image) { // ezt kell még todozni
@@ -219,7 +224,7 @@ export default {
             page: 'user',
             order: `${this.sort.category}:${this.sort.order}`
           }
-        })
+        }).catch(() => {})
       } else {
         try {
           await ImageService.removeFromTrash(image.id)

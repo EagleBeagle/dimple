@@ -103,7 +103,7 @@
             'settings-container-sm': $vuetify.breakpoint.smOnly,
             'settings-container-xs': $vuetify.breakpoint.xsOnly}">
           <v-row justify="center" align-content="center" v-if="image">
-            <v-col cols="3" sm="3" v-if="image.fk_username !== user.username">
+            <v-col v-if="image.fk_username !== user.username" :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4">
               <v-icon v-if="!image.favouritedByUser" large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="favourite()">
                 mdi-star-outline
               </v-icon>
@@ -112,24 +112,24 @@
               </v-icon>
               <album-dialog v-if="showAlbumDialog" :show="showAlbumDialog" :image="image" @close="showAlbumDialog = false"></album-dialog>
             </v-col>
-            <v-col cols="3" sm="3">
+            <v-col v-if="image.fk_username === user.username" :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showAlbumDialog = true">
                 mdi-image-album
               </v-icon>
               <album-dialog v-if="showAlbumDialog" :show="showAlbumDialog" :image="image" @close="showAlbumDialog = false"></album-dialog>
             </v-col>
-            <v-col cols="3" sm="3" v-if="image && image.visibility">
+            <v-col :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4" v-if="image && image.visibility">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showShareDialog = true">
                 mdi-share
               </v-icon>
               <share-dialog v-if="showShareDialog" :show="showShareDialog" :image="image" @close="showShareDialog = false"></share-dialog>
             </v-col>
-            <v-col cols="3" sm="3">
+            <v-col :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="downloadImage">
                 mdi-download
               </v-icon>
             </v-col>
-            <v-col cols="3" sm="3" v-if="image.fk_username === user.username">
+            <v-col :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4" v-if="image.fk_username === user.username">
               <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="deleteImage">
                 mdi-delete
               </v-icon>
@@ -247,7 +247,7 @@
     </v-container>
   </div>
   <div v-else style="height: 100%">
-    <error-page />
+    <generic-error-page />
   </div>
 </template>
 
@@ -259,13 +259,13 @@ import { Cloudinary } from 'cloudinary-core';
 import ShareDialog from '@/components/ShareDialog'
 import AlbumDialog from '@/components/AlbumDialog'
 import CommentContainer from '@/components/CommentContainer'
-import ErrorPage from '@/components/ErrorPage'
+import GenericErrorPage from '@/components/GenericErrorPage'
 export default {
   components: {
     ShareDialog,
     AlbumDialog,
     CommentContainer,
-    ErrorPage
+    GenericErrorPage
   },
   data () {
     return {
@@ -320,7 +320,7 @@ export default {
             name: 'Photos',
             params: {
               album: 'trash'
-          }})
+          }}).catch(() => {})
           return
         }
         image.url = image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
@@ -329,7 +329,7 @@ export default {
         console.log(err)
         this.$store.dispatch('setErrorHappening', true)
         if (err.response && err.response.status === 403) {
-          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all'}})
+          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all'}}).catch(() => {})
         }
       }
     },
@@ -345,7 +345,7 @@ export default {
         console.log(err)
         this.$store.dispatch('setErrorHappening', true)
         if (err.response && err.response.status === 403) {
-          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all'}})
+          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all'}}).catch(() => {})
         }
       }
     },
@@ -433,7 +433,7 @@ export default {
         } else if (side === 'right') {
           this.image = this.rightImages[index]
         }
-        this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query })
+        this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query }).catch(() => {})
         await this.getNeighbouringImages()
       } catch (err) {
         this.$store.dispatch('setErrorHappening', true)
@@ -450,7 +450,7 @@ export default {
         }
         try {
           this.image = this.leftImages[this.leftImages.length - 1]
-          this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query })
+          this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query }).catch(() => {})
           this.lastSwitchedPhotoTime = Date.now()
           await this.getNeighbouringImages()
         } catch (err) {
@@ -469,7 +469,7 @@ export default {
         }
         try {
           this.image = this.rightImages[0]
-          this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query })
+          this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query }).catch(() => {})
           this.lastSwitchedPhotoTime = Date.now()
           await this.getNeighbouringImages()
         } catch (err) {
@@ -500,11 +500,11 @@ export default {
       try {
         if (!this.image.trashed) {
           await ImageService.putToTrash(this.image.id)
-          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all' } })
+          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all' } }).catch(() => {})
           this.$store.dispatch('alert', 'Photo has been moved to trash.')
         } else {
           await ImageService.delete(this.image.id)
-          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all' } })
+          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all' } }).catch(() => {})
           this.$store.dispatch('alert', 'Photo deleted successfully.')
         }
       } catch(err) {
@@ -550,7 +550,11 @@ export default {
         this.image.favouritedByUser = true
       } catch (err) {
         console.log(err)
-        this.$store.dispatch('alert', 'An error occured while favouriting the phozo')
+        if (err.response.status === 403) {
+          this.$store.dispatch('alert', 'Confirm your email address to make photos your favourites.')
+        } else {
+          this.$store.dispatch('alert', 'An error occured while favouriting the photo')
+        }
       }
     },
     async unfavourite() {
@@ -560,7 +564,7 @@ export default {
         this.image.favouritedByUser = false
       } catch (err) {
         console.log(err)
-        this.$store.dispatch('alert', 'An error occured while unfavouriting the phozo')
+        this.$store.dispatch('alert', 'An error occured while unfavouriting the photo')
       }
     }
   },

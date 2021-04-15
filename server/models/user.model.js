@@ -10,6 +10,18 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       unique: 'email'
     },
+    confirmationToken: {
+      type: Sequelize.STRING,
+      unique: 'confirmationToken'
+    },
+    resetPasswordToken: {
+      type: Sequelize.STRING,
+      unique: 'resetPasswordToken'
+    },
+    resetPasswordTokenExpiration: {
+      type: Sequelize.DATE(6),
+      defaultValue: Sequelize.NOW
+    },
     avatar: {
       type: Sequelize.STRING
     },
