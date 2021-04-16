@@ -250,7 +250,7 @@ module.exports = {
         if (username !== req.user.username) {
           queryObject.where.visibility = true
         }
-      } else if (!username && !favourites && !explore && !albumName) { // ide jön majd minden retek
+      } else if (!username && !favourites && !explore && !albumName) {
         queryObject.where.fk_username = req.user.username
       }
       if (sort) {
@@ -274,7 +274,7 @@ module.exports = {
       if (limit) {
         queryObject.limit = Number(limit)
       } else {
-        queryObject.limit = 20
+        queryObject.limit = 500
       }
       if (albumName) {
         const album = await Album.findByPk(albumName)

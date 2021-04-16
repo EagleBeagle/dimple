@@ -142,8 +142,19 @@
         multiple
         @change="onFileChosen">
     </form>
+    <v-btn
+      v-if="user.admin" @click="$router.push({ name: 'AdminPage' })"
+      color="white"
+      light
+      x-large
+      class="white--text mx-1"
+      icon>
+      <v-icon x-large color="white">
+        mdi-application-cog
+      </v-icon>
+    </v-btn>
     <v-toolbar-items>
-      <div>
+      <div class="pr-2">
       <v-img :src="user.avatar" class="avatar ml-1" :class="user.avatar ? null: 'no-avatar'" style="cursor: pointer" aspect-ratio="1" width="52px"
         @click="$router.push({ name: 'Photos', params: { username: user.username, album: 'all' } }).catch(() => {})">
         <v-icon v-if="!user.avatar" size="40px" class="no-avatar-icon">
@@ -152,7 +163,7 @@
       </v-img>
       </div>
       <v-btn class="white--text" depressed tile color="blue" light @click="signOut()">
-        Sign out
+        Log out
       </v-btn>
     </v-toolbar-items>
   </v-app-bar> 

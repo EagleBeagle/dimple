@@ -133,15 +133,24 @@ module.exports = {
     try {
       const albumId = req.params.id
       const images = req.body.images
+      const visibility = req.body.visibility
       const album = await Album.findByPk(albumId)
-      console.log(images)
+      if (!images && typeof visibility === 'undefined') {
+        return res.status(400).send()
+      }
       if (!album) {
         return res.status(404).send('Album not found')
       }
       if (album.fk_username !== req.user.username) {
         return res.status(403).send('Unauthorized')
       }
-      await album.addImages(images)
+      if (images) {
+        await album.addImages(images)
+      }
+      if (typeof visibility !== 'undefined') {
+        album.visibility = visibility
+        await album.save()
+      }
       return res.status(200).send(album)
     } catch (err) {
       console.log(err)

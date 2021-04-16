@@ -96,19 +96,19 @@
       <v-divider class="mx-2"></v-divider>
     </v-list>
     <v-container class="pa-0 navigation-bottom" v-if="shownUser">
-        <v-row justify="center">
-        </v-row>
-        <v-row justify="center">
-          <v-col cols="5" class="blue--text pa-0 text-h3 font-weight-light" style="text-align: center">
-            {{ shownUser.imageCount }}
-          </v-col>
-        </v-row>
-        <v-row justify="center">
-          <v-col cols="8" class="pa-0 text-h4 font-weight-light" style="text-align: center">
-            Photos
-          </v-col>
-        </v-row>
-      </v-container>
+      <v-row justify="center">
+      </v-row>
+      <v-row justify="center">
+        <v-col cols="5" class="blue--text pa-0 text-h3 font-weight-light" style="text-align: center">
+          {{ shownUser.imageCount }}
+        </v-col>
+      </v-row>
+      <v-row justify="center">
+        <v-col cols="8" class="pa-0 text-h4 font-weight-light" style="text-align: center">
+          Photos
+        </v-col>
+      </v-row>
+    </v-container>
   </v-navigation-drawer>
 </template>
 
@@ -150,6 +150,8 @@ export default {
     goTo(route, params) {
       if (this.$route.name !== route || (this.$route.name === 'Photos' && this.$route.params.album !== params.album)) {
         this.$router.push({ name: route, params }).catch(() => {})
+      } else {
+        this.$router.push({ query: {} }).catch(() => {})
       }
     },
     async changeAvatar(event) {

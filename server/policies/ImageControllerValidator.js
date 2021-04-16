@@ -59,7 +59,7 @@ module.exports = {
       from: Joi.date().less('now'),
       to: Joi.date().less('now'),
       album: Joi.number(),
-      limit: Joi.number().max(100),
+      limit: Joi.number().max(500),
       sort: Joi.string().valid('date:desc', 'date:asc', 'popularity:asc', 'popularity:desc'),
       user: Joi.string().min(4).max(25),
       id: Joi.string().uuid(),

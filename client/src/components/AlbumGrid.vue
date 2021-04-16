@@ -1,6 +1,6 @@
 <template>
 <v-container class="pa-0 album-container" fluid>
-    <transition-group name="zoom" class="row wrap justify-start">
+    <transition-group name="fade" class="row wrap justify-start">
       <v-col cols="12" sm="6" md="4" lg="3" class="pa-4 album" v-for="album in albums" :key="album.id" style="animation-duration: 0.3s">
         <v-hover v-slot="{hover}">
           <v-card  tile @click="$emit('open', album)" :hover="inDialog" height="100%">
@@ -24,7 +24,8 @@
                         </v-icon>
                       </v-col>
                       <v-col cols="3" class="pa-0 mb-1">
-                        <v-icon v-on:click.stop large color="white" class="album-setting-icon" :disabled="!album.visibility" @click="$emit('share', album)">
+                        <v-icon v-on:click.stop large color="white" class="album-setting-icon"
+                          @click="album.visibility ? $emit('share', album) : showAlertDialog = true">
                           mdi-share
                         </v-icon>
                       </v-col>
@@ -101,16 +102,30 @@
         </v-hover>
       </v-col>
     </transition-group>
+    <alert-dialog
+      v-if="showAlertDialog"
+      :show="showAlertDialog"
+      @close="showAlertDialog = false"
+      title="Whoops"
+      text="Private albums can't be shared. Change the visibility of the album to public if you still want to share it."/>
   </v-container>
-  
 </template>
 
 <script>
+import AlertDialog from '@/components/AlertDialog'
 export default {
   props: [
     'albums',
     'inDialog'
   ],
+  data() {
+    return {
+      showAlertDialog: false
+    }
+  },
+  components: {
+    AlertDialog
+  },
   mounted() {
   }
 }

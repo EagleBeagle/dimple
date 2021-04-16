@@ -28,6 +28,12 @@
         :album="albumToAddPhotos" 
         @updatePhotos="updatePhotos"
         @close="showAddPhotosDialog = false" />
+    <delete-confirm-dialog 
+      v-if="showDeletionDialog"
+      :show="showDeletionDialog" 
+      type="album"
+      @close="deletionCancelled" 
+      @confirm="deletionConfirmed" />
   </v-container>
   
 </template>
@@ -37,22 +43,26 @@ import AlbumService from '@/services/AlbumService'
 import AlbumGrid from '@/components/AlbumGrid'
 import ShareDialog from '@/components/ShareDialog'
 import AddPhotosDialog from '@/components/AddPhotosDialog'
+import DeleteConfirmDialog from '@/components/DeleteConfirmDialog'
 import { mapState } from 'vuex'
 import { Cloudinary } from 'cloudinary-core';
 export default {
   components: {
     AlbumGrid,
     ShareDialog,
-    AddPhotosDialog
+    AddPhotosDialog,
+    DeleteConfirmDialog
   },
   data () {
     return {
       albums: [],
       albumToShare: null,
       albumToAddPhotos: null,
+      albumToDelete: null,
       renderAlbumGrid: true,
       showShareDialog: false,
-      showAddPhotosDialog: false
+      showAddPhotosDialog: false,
+      showDeletionDialog: false,
     }
   },
   mounted() {
@@ -112,14 +122,26 @@ export default {
       }
     },
     async deleteAlbum(id) {
+      this.albumToDelete = id
+      this.showDeletionDialog = true
+    },
+    async deletionConfirmed() {
       try {
-        await AlbumService.delete(id)
-        this.albums = this.albums.filter(album => album.id !== id)
+        await AlbumService.delete(this.albumToDelete)
+        this.albums = this.albums.filter(album => album.id !== this.albumToDelete)
+        this.showDeletionDialog = false
         this.$store.dispatch('alert', 'Album deleted successfully.')
+        this.albumToDelete = null
       } catch (err) {
         console.log(err)
+        this.albumToDelete = null
+        this.showDeletionDialog = false
         this.$store.dispatch('alert', 'An error occured during deletion')
       }
+    },
+    deletionCancelled() {
+      this.showDeletionDialog = false
+      this.albumToDelete = null
     },
     rerenderAlbumGrid() {
       this.renderAlbumGrid = false;

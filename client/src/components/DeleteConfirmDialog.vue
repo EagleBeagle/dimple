@@ -3,14 +3,20 @@
   v-model="dialog"
   width="500">
   <v-card>
-    <v-card-title class="headline">
+    <v-card-title class="text-h5" v-if="type === 'photo'">
       Are you sure?
     </v-card-title>
-    <v-card-text class="text-body-1" v-if="deleteAll">
+    <v-card-title class="text-h5" v-if="type === 'album'">
+      Confirmation
+    </v-card-title>
+    <v-card-text class="text-body-1" v-if="deleteAll && type === 'photo'">
       If you permanently delete these photos, you won't be able to restore them later.
     </v-card-text>
-    <v-card-text class="text-body-1" v-else>
+    <v-card-text class="text-body-1" v-else-if="type === 'photo'">
       If you permanently delete this photo, you won't be able to restore it later.
+    </v-card-text>
+    <v-card-text class="text-body-1" v-else-if="type === 'album'">
+      Do you really want to delete this album? (Don't worry, none of the contents will be deleted.)
     </v-card-text>
     <v-divider></v-divider>
 
@@ -38,7 +44,8 @@
 export default {
   props: [
     'show',
-    'deleteAll'
+    'deleteAll',
+    'type'
   ],
   computed: {
     dialog: {
@@ -65,7 +72,6 @@ export default {
       } else {
         this.$emit('confirm')
       }
-      this.dialog = false
     }
   }
 }

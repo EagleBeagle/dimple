@@ -4,8 +4,30 @@
       <v-col v-if="album" xs="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
         <div class="text-h3 font-weight-regular mt-2 mb-0">{{ album.name }}</div>
       </v-col>
-      <v-col v-if="album" xs="12" sm="12" md="12" lg="12" class="py-0 my-0" style="text-align: left">
+      <v-col v-if="album" cols="12" sm="6" md="6" lg="6" class="py-0 my-0" style="text-align: left">
         <div class="text-h5 my-0 font-weight-light">{{ album.description }}</div>
+      </v-col>
+      <v-spacer v-if="album"></v-spacer>
+      <v-col v-if="album" cols="12" sm="6" md="6" lg="6" :style="$vuetify.breakpoint.smAndUp ? 'text-align: right' : 'text-align: left'" class="py-0 text-h5 font-weight-light" align-self="center">
+        <span class="pt-2">Viewing privacy:</span>
+          <v-menu top offset-y nudge-top="10">
+            <template v-slot:activator="{ on, attrs }">
+              <span style="cursor: pointer" v-bind="attrs" v-on="on">
+                <span class="blue--text ml-3">{{ album.visibility ? 'Public' : 'Private' }}</span>
+                <v-icon color="blue">
+                  mdi-chevron-up
+                </v-icon>
+              </span>
+            </template>
+            <v-list>
+              <v-list-item @click="updateAlbumVisibility(true)">
+                <v-list-item-title :class="album.visibility ? 'font-weight-bold' : null">Public</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="updateAlbumVisibility(false)">
+                <v-list-item-title :class="!album.visibility ? 'font-weight-bold' : null">Private</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
       </v-col>
       <v-col v-if="!album && $route.params.album === 'all'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
         <div class="text-h3 font-weight-regular my-2">All Photos</div>
@@ -25,13 +47,19 @@
       @delete="deleteImage" 
       @reachedBottom="infiniteHandler"
       @imageClicked="imageClicked" />
-    <photo-deletion-dialog :show="showDeletionDialog" :deleteAll="shouldDeleteAll" @close="deletionDialogClosed" @confirm="deletionConfirmed" @deleteAll="deleteAll"/>
+    <delete-confirm-dialog 
+      :show="showDeletionDialog" 
+      :deleteAll="shouldDeleteAll" 
+      type="photo"
+      @close="deletionDialogClosed" 
+      @confirm="deletionConfirmed" 
+      @deleteAll="deleteAll" />
   </v-container>
 </template>
 
 <script>
 import PhotoGrid from '@/components/PhotoGrid'
-import PhotoDeletionDialog from '@/components/PhotoDeletionDialog'
+import DeleteConfirmDialog from '@/components/DeleteConfirmDialog'
 import ImageService from '@/services/ImageService'
 import AlbumService from '@/services/AlbumService'
 import { Cloudinary } from 'cloudinary-core'
@@ -39,7 +67,7 @@ import { mapState } from 'vuex'
 export default {
   components: {
     PhotoGrid,
-    PhotoDeletionDialog
+    DeleteConfirmDialog
   },
   data () {
     return {
@@ -73,29 +101,23 @@ export default {
   },
   watch: {
     '$route.params': async function () {
-      this.images = []
+      window.scrollTo(0, 0)
       await this.getAlbum()
-      const images = await this.getImages({})
+      this.images = await this.getImages({ limit: 20 })
       this.rerenderPhotoGrid()
-      if (images) {
-        this.images.push(...images)
-      }
     },
     async sort() {
-      this.images = []
-      this.images = await this.getImages({})
+      this.images = await this.getImages({ limit: 20 })
       this.rerenderPhotoGrid()
       window.scrollTo(0, 0)
     },
     async visibility() {
-      this.images = []
-      this.images = await this.getImages({})
+      this.images = await this.getImages({ limit: 20 })
       this.rerenderPhotoGrid()
       window.scrollTo(0, 0)
     },
     async updateShownPhotos() {
-      this.images = []
-      this.images = await this.getImages({})
+      this.images = await this.getImages({ limit: 20 })
       this.rerenderPhotoGrid()
     },
     async newPhotoId() {
@@ -149,7 +171,6 @@ export default {
       }
     },
     async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
-      console.log('GETIMAGES HíVVVVVVVVAAAAAAAAAAAAAAA')
       try {
         filter.sort = `${this.sort.category}:${this.sort.order}`
         if (this.visibility === 'public') {
@@ -165,6 +186,8 @@ export default {
           })
           if (images.length) {
             this.lastDate = images[images.length - 1].createdAt
+            const query = JSON.parse(JSON.stringify(this.$route.query))
+            query.last = this.lastDate
           }
           return images
         } else if (this.$route.params.album === 'favourites') {
@@ -220,6 +243,7 @@ export default {
           },
           query: {
             in: this.$route.params.album,
+            user: this.$route.params.username,
             visibility: this.visibility,
             page: 'user',
             order: `${this.sort.category}:${this.sort.order}`
@@ -258,6 +282,7 @@ export default {
     async deletionConfirmed() {
       try {
         this.interactionDisabled = true
+        this.showDeletionDialog = false
         await ImageService.delete(this.photoToDelete.id)
         this.$store.dispatch('alert', 'Photo deleted successfully.')
         this.images = this.images.filter(image => image.id !== this.photoToDelete.id)
@@ -267,6 +292,7 @@ export default {
         console.log(err)
         this.photoToDelete = null
         this.interactionDisabled = false
+        this.showDeletionDialog = false
         this.$store.dispatch('alert', 'An error occured during deletion.')
       }
     },
@@ -275,6 +301,7 @@ export default {
       try {
         const imagesToDelete = [...this.images]
         this.interactionDisabled = true
+        this.showDeletionDialog = false
         for (let i = 0; i < imagesToDelete.length; i++) {
           await ImageService.delete(imagesToDelete[i].id)
           this.images = this.images.filter(image => image.id !== imagesToDelete[i].id)
@@ -285,6 +312,7 @@ export default {
         this.shouldDeleteAll = false
       } catch(err) {
         console.log(err)
+        this.showDeletionDialog = false
         this.interactionDisabled = false
         this.shouldDeleteAll = false
         this.$store.dispatch('alert', 'An error occured during deletion.')
@@ -295,21 +323,60 @@ export default {
       this.showDeletionDialog = false
       this.shouldDeleteAll = false
     },
-
+    async updateAlbumVisibility(visibility) {
+      if (visibility !== this.album.visibility) {
+        try {
+          await AlbumService.update(this.album.id, { visibility })
+          this.album.visibility = visibility
+        } catch (err) {
+          console.log(err)
+          this.$store.dispatch('alert', 'An error occured while changing viewing privacy')
+        }
+      }
+    },
     async infiniteHandler($state) {
       let images
       if (this.lastDate) {
         if (this.sort.order === 'desc') {
           images = await this.getImages({
-            to: this.lastDate
+            to: this.lastDate,
+            limit: 20
           })
         } else {
           images = await this.getImages({
-            from: this.lastDate
+            from: this.lastDate,
+            limit: 20
           })
         }
       } else {
-        images = await this.getImages({})
+        images = await this.getImages({ limit: 20 })
+        const last = this.$route.query.last
+        if (last) {
+          const lastDate = new Date(last)
+          const createdDates = images.map(image => new Date(image.createdAt).toISOString())
+          if (!createdDates.includes(lastDate.toISOString())) {
+            if (this.sort.order === 'desc') {
+              const imagesToLast = await this.getImages({
+                from: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString()
+              })
+              console.log(last)
+              console.log(new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString())
+              if (imagesToLast) {
+                images = imagesToLast
+              }
+            } else {
+              const imagesToLast = await this.getImages({
+                to: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() + 1)).toISOString()
+              })
+              if (imagesToLast) {
+                images = imagesToLast
+              }
+            }
+            setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight)
+            }, 1)
+          }
+        }
       }
       if (images && images.length) {
         this.images.push(...images)

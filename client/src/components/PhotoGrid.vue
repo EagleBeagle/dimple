@@ -1,6 +1,6 @@
 <template>
   <v-container class="pa-0 ma-0 photo-container" fluid>
-      <transition-group name="zoom" class="row wrap justify-start">
+      <transition-group name="fade" class="row wrap justify-start">
         <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3 item" v-for="(image, index) in images" :key="image.id" style="animation-duration: 0.3s">
           <kinesis-container v-if="!invalidImageIndices.has(index)">
             <kinesis-element :strength="10" type="depth">
@@ -17,7 +17,7 @@
                         color="#000000"
                         opacity="0.3">
                         <v-btn
-                          v-if="$route.name !== 'Explore'"
+                          v-if="$route.name !== 'Explore' && ($route.name === 'Photos' && $route.params.album !== 'favourites')"
                           v-on:click.stop
                           icon
                           large
@@ -155,7 +155,7 @@ export default {
   color: rgba(133, 132, 132, 0.7);
 }
 
-.zoom-leave-active {
+.fade-leave-active {
   position: absolute;
 }
 </style>

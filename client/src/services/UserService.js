@@ -29,7 +29,13 @@ export default {
     return Api().get(`/user/${username}`)
   },
 
-  search(text) {
-    return Api().get(`/user?search=${text}`)
+  search(text, admin) {
+    let queryString = `&search=${text}`
+    if (admin) {
+      queryString = `&admin=true${queryString}`
+    } else {
+      queryString += '&limit=20'
+    }
+    return Api().get(`/user?${queryString}`)
   }
 }

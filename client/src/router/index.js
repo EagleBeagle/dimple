@@ -13,6 +13,7 @@ import NotFoundErrorPage from '../components/NotFoundErrorPage'
 import ConfirmUser from '../components/ConfirmUser'
 import ForgotPassword from '../components/ForgotPassword'
 import ResetPassword from '../components/ResetPassword'
+import AdminPage from '../components/AdminPage'
 
 Vue.use(VueRouter)
 
@@ -78,6 +79,11 @@ const routes = [
     path: '/notfounderror',
     name: 'ContentNotFoundError',
     component: NotFoundErrorPage
+  },
+  {
+    path: '/admin',
+    name: 'AdminPage',
+    component: AdminPage
   },
   {
     path: '*',

@@ -10,16 +10,15 @@
             'photo-background-xs': $vuetify.breakpoint.xsOnly}">
       <v-row justify="end">
         <v-col
-          cols="2" sm="2" align-self="center" 
-          style="text-align: start; cursor: pointer"
-          v-if="goBackParams"
-          @click="backToStream()">
-          <span style="color: white">
-          <v-icon color="white">
+          v-if="$route.query.page"
+          cols="10" sm="10" align-self="center" 
+          style="text-align: start; cursor: pointer">
+          <v-btn depressed color="rgb(71, 71, 71)" tile class="text-none text-body-1 font-weight-regular pa-0 px-1" style="color: white" @click="backToStream()">
+            <v-icon color="white">
             mdi-arrow-left
-          </v-icon>
+            </v-icon>
           Back to photostream
-          </span>
+          </v-btn>
         </v-col>
         <v-spacer></v-spacer>
         <v-col cols="2" sm="1" style="text-align: end">
@@ -372,11 +371,11 @@ export default {
              if (query.in === 'all') {
               leftFilter.user = this.image.fk_username
               rightFilter.user = this.image.fk_username
-            } else if (query.in === 'favourites') {
+            } else if (query.in === 'favourites' && query.user) {
               leftFilter.favourites = true
               rightFilter.favourites = true
-              leftFilter.user = this.user.username
-              rightFilter.user = this.user.username
+              leftFilter.user = query.user
+              rightFilter.user = query.user
             } else if (query.in === 'trash') {
               leftFilter.trash = true
               rightFilter.trash = true
@@ -479,7 +478,13 @@ export default {
       }
     },
     backToStream() {
-      console.log('todon')
+      const page = this.$route.query.page
+      const album = this.$route.query.in
+      if (page === 'user' && album) {
+        this.$router.push({ name: 'Photos', params: { album }, query: { last: this.image.createdAt } }).catch(() => {})
+      } else if (page === 'explore') {
+        this.$router.push({ name: 'Explore', query: { last: this.image.createdAt } }).catch(() => {})
+      }
     },
     async downloadImage() {
       try {

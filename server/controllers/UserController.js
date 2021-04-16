@@ -50,6 +50,7 @@ module.exports = {
         id: user.id,
         username,
         avatar: user.avatar,
+        admin: user.admin,
         jwtToken,
         confirmationToken
       })
@@ -88,6 +89,7 @@ module.exports = {
         id: user.id,
         username: user.username,
         avatar: user.avatar,
+        admin: user.admin,
         jwtToken,
         confirmationToken: user.confirmationToken
       })
@@ -121,6 +123,7 @@ module.exports = {
             id: user.id,
             username: user.username,
             avatar: user.avatar,
+            admin: user.admin,
             jwtToken,
             confirmationToken: user.confirmationToken
           })
@@ -227,7 +230,6 @@ module.exports = {
             cancellationToken: null
           }
         })
-        console.log(imageCount)
       } else {
         imageCount = await Image.count({
           where: {
@@ -251,32 +253,60 @@ module.exports = {
   async search (req, res) {
     try {
       const search = req.query.search
-      const userResults = await User.findAll({
+      const admin = req.query.admin
+      const limit = req.query.limit
+      const queryObject = {
         where: {
           username: {
             [Op.and]: {
-              [Op.regexp]: `^${search}.*`,
-              [Op.ne]: req.user.username
+              [Op.regexp]: `^${search}.*`
             }
           }
         },
-        limit: 20
-      })
-      const users = []
-      for (let i = 0; i < userResults.length; i++) {
-        users.push({
-          username: userResults[i].username,
-          avatar: userResults[i].avatar,
-          imageCount: await Image.count({
-            where: {
-              fk_username: userResults[i].username,
-              visibility: true,
-              cancellationToken: null
-            }
-          })
-        })
+        limit: limit ? Number(limit) : null
       }
-      console.log(users)
+      if (!admin) {
+        queryObject.where.username[Op.and][Op.ne] = req.user.username
+      }
+      const userResults = await User.findAll(queryObject)
+      const users = []
+      if (admin) {
+        if (req.user.admin) {
+          for (let i = 0; i < userResults.length; i++) {
+            users.push({
+              username: userResults[i].username,
+              email: userResults[i].email,
+              confirmed: !userResults[i].confirmationToken,
+              admin: userResults[i].admin,
+              createdAt: userResults[i].createdAt,
+              imageCount: await Image.count({
+                where: {
+                  fk_username: userResults[i].username,
+                  visibility: true,
+                  cancellationToken: null
+                }
+              })
+            })
+          }
+          return res.status(200).send(users)
+        } else {
+          return res.status(403).send()
+        }
+      } else {
+        for (let i = 0; i < userResults.length; i++) {
+          users.push({
+            username: userResults[i].username,
+            avatar: userResults[i].avatar,
+            imageCount: await Image.count({
+              where: {
+                fk_username: userResults[i].username,
+                visibility: true,
+                cancellationToken: null
+              }
+            })
+          })
+        }
+      }
       return res.status(200).send(users)
     } catch (err) {
       console.log(err)
