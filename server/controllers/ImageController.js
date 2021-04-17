@@ -116,7 +116,7 @@ module.exports = {
       if (!image) {
         return res.status(400).send('Invalid request')
       }
-      if (image.fk_username !== username) {
+      if (image.fk_username !== username && !req.user.admin) {
         return res.status(403).send('Unauthorized')
       }
       if (albums) {
@@ -147,7 +147,7 @@ module.exports = {
     }
   },
 
-  async deleteImage (req, res) { // most csak saját user, később admin is
+  async deleteImage (req, res) {
     try {
       const imageId = req.params.imageId
       const username = req.user.username
@@ -155,7 +155,7 @@ module.exports = {
       if (!image) {
         return res.status(404).send('Invalid id')
       }
-      if (image.fk_username === username) {
+      if (image.fk_username === username || req.user.admin) {
         const response = await cloudinary.uploader.destroy(`${req.user.username}/${image.id}`)
         if (response.result !== 'ok' && response.result !== 'not found') {
           return res.status(400).send('cloudinary error')
@@ -185,6 +185,32 @@ module.exports = {
       const favourites = req.query.favourites
       const trash = req.query.trash
       const explore = req.query.explore
+      const admin = req.query.admin
+
+      if (admin) {
+        if (req.user.admin) {
+          const images = await Image.findAll({
+            attributes: {
+              include: [
+                [
+                  db.Sequelize.literal(`(
+                  SELECT COUNT(*) FROM favourites WHERE imageId = id
+                )`), 'favouriteCount'
+                ],
+                [
+                  db.Sequelize.literal(`(
+                  SELECT COUNT(*) FROM comments WHERE imageId = image.id
+                )`), 'commentCount'
+                ]
+              ]
+            },
+            joinTableAttributes: []
+          })
+          return res.status(200).send(images)
+        } else {
+          return res.status(403).send()
+        }
+      }
       const queryObject = {
         where: {
           trashed: false,
@@ -232,8 +258,7 @@ module.exports = {
         if (!images || images.cancellationToken) {
           return res.status(400).send('Invalid id')
         }
-        if (images.visibility || images.fk_username === req.user.username) {
-          console.log('itt')
+        if (images.visibility || images.fk_username === req.user.username || req.user.admin) {
           images.dataValues.favouritedByUser = await images.hasFavourite(req.user.id)
           return res.status(200).send(images)
         } else {

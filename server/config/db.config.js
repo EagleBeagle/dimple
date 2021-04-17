@@ -58,7 +58,7 @@ db.comment.belongsTo(db.user, {
   targetKey: 'username'
 })
 
-db.image.hasMany(db.comment)
+db.image.hasMany(db.comment, { onDelete: 'cascade' })
 db.comment.belongsTo(db.image)
 
 db.image.belongsToMany(db.user, { as: 'favourite', through: 'favourites' })

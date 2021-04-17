@@ -49,7 +49,6 @@ export default {
   },
 
   update(id, data) {
-    console.log(id)
     return Api().put(`image/${id}`, data)
   } ,
 
@@ -96,6 +95,9 @@ export default {
     }
     if (data.explore) {
       queryString += `&explore=${data.explore}` 
+    }
+    if (data.admin) {
+      queryString += `&admin=${data.admin}` 
     }
     return Api().get(`image?${queryString}`)
   },

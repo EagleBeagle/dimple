@@ -1,6 +1,8 @@
 const db = require('../config/db.config.js')
 const User = db.user
 const Image = db.image
+const Comment = db.comment
+const Album = db.album
 const Op = db.Sequelize.Op
 const jwt = require('jsonwebtoken')
 const passport = require('passport')
@@ -182,7 +184,47 @@ module.exports = {
       res.status(200).send()
     } catch (err) {
       console.log(err)
-      res.status(500).send('Error while during password reset')
+      res.status(500).send('Error during password reset')
+    }
+  },
+
+  async update (req, res) {
+    try {
+      const username = req.params.username
+      const admin = req.body.admin
+      await User.update({ admin }, { where: { username } })
+      res.status(200).send()
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('Error during user update')
+    }
+  },
+
+  async delete (req, res) {
+    try {
+      const username = req.params.username
+      const user = await User.findOne({ where: { username } })
+      if (user) {
+        const images = await Image.findAll({ where: { fk_username: user.username } })
+        console.log(images)
+        for (let i = 0; i < images.length; i++) {
+          const response = await cloudinary.uploader.destroy(`${user.username}/${images[i].id}`)
+          if (response.result !== 'ok' && response.result !== 'not found') {
+            return res.status(400).send('cloudinary error')
+          }
+          await images[i].destroy()
+        }
+        await Comment.destroy({ where: { fk_username: user.username } })
+        await Album.destroy({ where: { fk_username: user.username } })
+      } else {
+        return res.status(404).send('User not found')
+      }
+
+      await user.destroy()
+      res.status(200).send()
+    } catch (err) {
+      console.log(err)
+      res.status(500).send('Error during user update')
     }
   },
 

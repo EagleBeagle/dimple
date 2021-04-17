@@ -66,7 +66,8 @@ module.exports = {
       favourites: Joi.boolean(),
       trash: Joi.boolean(),
       visibility: Joi.boolean(),
-      explore: Joi.boolean()
+      explore: Joi.boolean(),
+      admin: Joi.boolean()
     })
     const { error } = schema.validate(req.query)
     if (error) {

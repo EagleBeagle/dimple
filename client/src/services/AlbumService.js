@@ -19,6 +19,9 @@ export default {
     if (typeof data.visibility !== 'undefined') {
       queryString += `&visibility=${data.visibility}`
     }
+    if (data.admin) {
+      queryString += `&admin=${data.admin}`
+    }
     return Api().get(`album?${queryString}`)
   },
 

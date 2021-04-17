@@ -53,6 +53,15 @@ module.exports = {
       const fromDate = req.query.from
       const toDate = req.query.to
       const limit = Number(req.query.limit)
+      const admin = req.query.admin
+      if (admin) {
+        if (req.user.admin) {
+          const comments = await Comment.findAll()
+          return res.status(200).send(comments)
+        } else {
+          return res.status(403).send()
+        }
+      }
       if (!imageId) {
         return res.status(400).send('invalid image')
       }
@@ -81,7 +90,7 @@ module.exports = {
         queryObject.where.createdAt[Op.lt] = toDate
       }
       const image = await Image.findByPk(imageId)
-      if (!image || (!image.visibility && image.fk_username !== req.user.username)) {
+      if ((!image || (!image.visibility && image.fk_username !== req.user.username)) && !req.user.admin) {
         return res.status(400).send('invalid image')
       }
       const comments = await image.getComments(queryObject)
@@ -104,7 +113,7 @@ module.exports = {
       if (!comment) {
         return res.status(404).send('invalid comment')
       }
-      if (comment.fk_username !== req.user.username) {
+      if (comment.fk_username !== req.user.username && !req.user.admin) {
         return res.status(403).send('Unauthorized')
       }
       await comment.destroy()

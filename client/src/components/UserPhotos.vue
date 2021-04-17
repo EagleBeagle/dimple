@@ -30,10 +30,12 @@
           </v-menu>
       </v-col>
       <v-col v-if="!album && $route.params.album === 'all'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
-        <div class="text-h3 font-weight-regular my-2">All Photos</div>
+        <div v-if="$route.params.username === user.username" class="text-h3 font-weight-regular my-2">All Photos</div>
+        <div v-else class="text-h3 font-weight-regular my-2">{{ $route.params.username }}'s Photos</div>
       </v-col>
       <v-col v-if="!album && $route.params.album === 'favourites'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
-        <div class="text-h3 font-weight-regular my-2">Favourites</div>
+        <div v-if="$route.params.username === user.username" class="text-h3 font-weight-regular my-2">Favourites</div>
+        <div v-else class="text-h3 font-weight-regular my-2">{{ $route.params.username }}'s Favourites</div>
       </v-col>
       <v-col v-if="!album && $route.params.album === 'trash'" xs="12" sm="12" md="12" lg="12" style="text-align: left">
         <div class="text-h3 font-weight-regular my-2">Trash</div>

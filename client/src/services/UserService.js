@@ -37,5 +37,13 @@ export default {
       queryString += '&limit=20'
     }
     return Api().get(`/user?${queryString}`)
+  },
+
+  update(username, data) {
+    return Api().put(`/user/${username}`, data)
+  },
+  
+  delete(username) {
+    return Api().delete(`/user/${username}`)
   }
 }

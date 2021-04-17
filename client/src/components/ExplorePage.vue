@@ -35,9 +35,7 @@ export default {
   },
   computed: {
     ...mapState([
-      'user',
-      'sort',
-      'visibility'
+      'user'
     ])
   },
   methods: {

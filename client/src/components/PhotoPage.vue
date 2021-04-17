@@ -328,7 +328,7 @@ export default {
         console.log(err)
         this.$store.dispatch('setErrorHappening', true)
         if (err.response && err.response.status === 403) {
-          this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all'}}).catch(() => {})
+          this.$router.push({ name: 'ContentNotFoundError' }).catch(() => {})
         }
       }
     },

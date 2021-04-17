@@ -26,6 +26,7 @@ module.exports = {
       const user = req.query.user
       const imageId = req.query.image
       const visibility = req.query.visibility
+      const admin = req.query.admin
       const queryObject = {
         where: {},
         order: [
@@ -36,6 +37,25 @@ module.exports = {
         }
       }
       let albums
+      if (admin) {
+        if (req.user.admin) {
+          const albums = await Album.findAll({
+            attributes: {
+              include: [
+                [
+                  db.Sequelize.literal(`(
+                    SELECT COUNT(*) FROM albumimage
+                    WHERE albumimage.albumId = album.id
+                  )`), 'imageCount'
+                ]
+              ]
+            }
+          })
+          return res.status(200).send(albums)
+        } else {
+          return res.status(403).send()
+        }
+      }
       if ((id && user) || (id && imageId) || (user && imageId) || (!id && !user && !imageId)) {
         return res.status(400).send('Invalid query')
       }
@@ -141,7 +161,7 @@ module.exports = {
       if (!album) {
         return res.status(404).send('Album not found')
       }
-      if (album.fk_username !== req.user.username) {
+      if (album.fk_username !== req.user.username && !req.user.admin) {
         return res.status(403).send('Unauthorized')
       }
       if (images) {
@@ -158,7 +178,7 @@ module.exports = {
     }
   },
 
-  async delete (req, res) { // most csak saját user, később admin is
+  async delete (req, res) {
     try {
       const id = req.params.id
       const username = req.user.username
@@ -166,7 +186,7 @@ module.exports = {
       if (!album) {
         return res.status(404).send('Invalid id')
       }
-      if (album.fk_username === username) {
+      if (album.fk_username === username || req.user.admin) {
         await album.destroy()
         return res.status(200).send()
       } else {

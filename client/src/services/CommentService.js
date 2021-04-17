@@ -18,6 +18,9 @@ export default {
     if (data.limit) {
       queryString += `&limit=${data.limit}` 
     }
+    if (data.admin) {
+      queryString += `&admin=${data.admin}` 
+    }
     return Api().get(`comment?${queryString}`)
   },
 

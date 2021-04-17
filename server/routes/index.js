@@ -21,6 +21,16 @@ module.exports = app => {
     verifyAuth.isLoggedIn,
     UserController.get)
 
+  app.put('/user/:username',
+    verifyAuth.isLoggedIn,
+    verifyAuth.isAdmin,
+    UserController.update)
+
+  app.delete('/user/:username',
+    verifyAuth.isLoggedIn,
+    verifyAuth.isAdmin,
+    UserController.delete)
+
   app.put('/user/confirm/:confirmationToken',
     UserController.confirm)
 
