@@ -146,7 +146,7 @@
     </v-container>
     <v-container class="mt-12 mt-sm-1" v-if="image">
       <v-row justify="center">
-        <v-col cols="12" sm="6" xl="7" class="pa-0">
+        <v-col cols="12" sm="6" xl="7" class="pa-sm-0 pt-xs-1">
           <v-container class="pa-0 pr-xl-6">
             <v-row justify="center" justify-sm="end">
               <v-col cols="4" sm="3" md="3" lg="2" xl="2" class="pl-xl-16 pr-xl-0">
@@ -179,21 +179,21 @@
         <v-col cols="12" sm="6" xl="5" align-self="center" class="pa-0">
           <v-container class="pa-0 pr-xl-16">
             <v-row justify="center" justify-sm="start">
-              <v-col cols="12" align-self="center">
-                <v-container class="pa-0" style="text-align: start">
+              <v-col cols="12" align-self="center" class="pa-0">
+                <v-container class="pa-0" :style="$vuetify.breakpoint.smAndUp ? 'text-align: start' : 'text-align: center'">
                   <v-row justify="center">
-                    <v-col cols="5" sm="4" xl="2" align-self="center" class="pa-0 text-subtitle-1 blue--text">
+                    <v-col cols="4" sm="4" xl="2" align-self="center" class="pa-0 text-subtitle-1 blue--text">
                       {{ image.favouriteCount }}
                     </v-col>
-                    <v-col cols="5" sm="4" xl="9" align-self="center" class="pa-0 text-subtitle-1 blue--text">
+                    <v-col cols="4" sm="4" xl="9" align-self="center" class="pa-0 text-subtitle-1 blue--text">
                       {{ commentCount }}
                     </v-col>
                   </v-row>
                   <v-row justify="center">
-                    <v-col cols="5" sm="4" xl="2" align-self="center" class="pa-0 text-body-2">
+                    <v-col cols="4" sm="4" xl="2" align-self="center" class="pa-0 text-body-2">
                       Faves
                     </v-col>
-                    <v-col cols="5" sm="4" xl="9" align-self="center" class="pa-0 text-body-2">
+                    <v-col cols="4" sm="4" xl="9" align-self="center" class="pa-0 text-body-2">
                       Comments
                     </v-col>
                   </v-row>

@@ -1,5 +1,5 @@
 <template>
-<v-container class="pa-0">
+<v-container class="px-xs-4 pa-sm-0">
    <v-row justify="center">
       <v-col cols="12" sm="9" md="7" lg="6" xl="4" class="pa-0">
         <div

@@ -1,23 +1,29 @@
 <template>
 <v-dialog
   v-model="dialog"
-  :width="$vuetify.breakpoint.smAndUp ? '20%' : '100%'"
+  :width="$vuetify.breakpoint.xsOnly ? '100%' : $vuetify.breakpoint.smOnly ? '50%' : $vuetify.breakpoint.mdOnly ? '30%' : '20%'"
   scrollable>
   <v-card>
     <v-card-title class="headline">
       Add to albums
     </v-card-title>
     <v-card-text class="album-card pa-0">
-      <v-container class="px-4 pt-0">
+      <v-container v-if="albums.length" class="px-4 pt-0">
         <span v-for="(album, index) in albums" :key="index">
           <v-hover v-slot="{ hover }">
-            <v-row justify="start" @click="selected(album)" class="album" :class="hover ? 'hovered' : null">
+            <v-row justify="start" @click="selected(album)" style="cursor: pointer" :class="hover ? 'hovered' : null">
               <v-col cols="2">
                 <v-img v-if="album.images.length > 0" :src="album.images[0].url" aspect-ratio="1"></v-img>
                 <v-img v-else aspect-ratio="1" style="border: 1px solid grey">
-                  <v-icon small :style="$vuetify.breakpoint.lgAndUp ? 'top: 10%' : null">
-                    mdi-image-multiple
-                  </v-icon>
+                  <v-container class="pa-0" fill-height>
+                    <v-row>
+                      <v-col cols="12" class="pa-0">
+                        <v-icon small>
+                          mdi-image-multiple
+                        </v-icon>
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-img>
               </v-col>
               <v-col cols="8" class="text-body-1 pa-0" align-self="center" style="text-align: start">
@@ -35,6 +41,13 @@
           </v-hover>
         </span>
       </v-container>
+      <v-container v-else fill-height class="px-4 pt-0">
+        <v-row justify="start">
+          <v-col cols="12" class="grey--text text-h5">
+            You don't have any albums yet
+          </v-col>
+        </v-row>
+      </v-container>
     </v-card-text>
 
     <v-divider></v-divider>
@@ -44,6 +57,7 @@
       <v-btn
         depressed
         class="blue--text"
+        :disabled="!albums || albums.length === 0"
         @click="save()">
         SAVE
       </v-btn>
@@ -98,7 +112,8 @@ export default {
       try {
         this.albums = (await AlbumService.get({ user: this.user.username })).data.map(album => {
           album.images = album.images.map(image => {
-            image.url = image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/v1/${image.fk_username}/${image.id}`
+            console.log(image.url)
             return image
           })
           this.selectedAlbums.forEach(selectedAlbum => {
@@ -157,13 +172,10 @@ export default {
 .album-card {
   max-height: 25vh;
 }
-
 .album-card::-webkit-scrollbar {display:none;}
-
 .hovered {
   background-color: rgb(197, 199, 201);
 }
-
 .album {
   cursor: pointer;
 }

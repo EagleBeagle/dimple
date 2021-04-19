@@ -45,5 +45,9 @@ export default {
   
   delete(username) {
     return Api().delete(`/user/${username}`)
+  },
+  
+  getAdminInfo() {
+    return Api().get('/admin')
   }
 }

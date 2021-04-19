@@ -1,10 +1,10 @@
 <template>
-  <v-navigation-drawer app clipped style="top: 64px">
+  <v-navigation-drawer app clipped permanent :mini-variant="$vuetify.breakpoint.smAndDown" style="top: 64px">
     <v-list nav class="pa-0">
       <v-list-item class="px-2 mb-0" v-if="shownUser">
         <v-container class="pa-0 py-2">
           <v-row justify="start">
-            <v-col cols="4" class="pa-0 pl-2">
+            <v-col cols="12" md="4" class="pa-xs-3 pa-sm-3">
               <v-hover v-slot="{hover}">
                 <v-img
                   class="avatar"
@@ -13,7 +13,7 @@
                   aspect-ratio="1" 
                   width="80px" 
                   :src="shownUser.avatar ? shownUser.avatarUrl : null" @click="(shownUser.username === user.username && $refs.fileInput) ? $refs.fileInput.click() : null">
-                  <v-icon v-if="!shownUser.avatar" size="60px" class="no-avatar-icon">
+                  <v-icon v-if="!shownUser.avatar" :size="$vuetify.breakpoint.smAndDown ? '30px' : '60px'" class="no-avatar-icon">
                     mdi-account
                   </v-icon>
                   <v-fade-transition>
@@ -48,7 +48,7 @@
                 </v-img>
               </v-hover>
             </v-col>
-            <v-col cols="8" class="pa-0" align-self="center">
+            <v-col v-if="$vuetify.breakpoint.mdAndUp" cols="8" class="pa-0" align-self="center">
               <span class="text-h5 font-weight-medium" style="text-align: start">{{ shownUser.username }}</span>
             </v-col>
           </v-row>
@@ -73,7 +73,7 @@
             <v-icon>mdi-image-multiple</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>All Photos</v-list-item-title>
+            <v-list-item-title>Photos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item ref="favesButton" @click="goTo('Photos', { username: $route.params.username, album: 'favourites' })">
@@ -99,13 +99,14 @@
       <v-row justify="center">
       </v-row>
       <v-row justify="center">
-        <v-col cols="5" class="blue--text pa-0 text-h3 font-weight-light" style="text-align: center">
+        <v-col cols="5" class="blue--text pa-0 font-weight-light" style="text-align: center" :class="$vuetify.breakpoint.mdAndUp ? 'text-h3' : 'text-h5'">
           {{ shownUser.imageCount }}
         </v-col>
       </v-row>
       <v-row justify="center">
-        <v-col cols="8" class="pa-0 text-h4 font-weight-light" style="text-align: center">
-          Photos
+        <v-col cols="8" class="pa-0 font-weight-light" style="text-align: center" :class="$vuetify.breakpoint.mdAndUp ? 'text-h4' : 'text-body-2'">
+          <span v-if="shownUser.imageCount > 1">Photos</span>
+          <span v-else>Photo</span>
         </v-col>
       </v-row>
     </v-container>
@@ -125,22 +126,17 @@ export default {
   },
   computed: {
     ...mapState([
-      'user'
+      'user',
+      'updateShownUser'
     ])
   },
   watch: {
     '$route.params': async function () {
       await this.getUser()
-      if (this.$route.name === 'Photos' && this.$route.params.album === 'all') {
-        this.$refs.photosButton.$el.click()
-      } else if (this.$route.name === 'Photos' && this.$route.params.album === 'favourites') {
-        this.$refs.favesButton.$el.click()
-      } else if (this.$route.name === 'Photos' && this.$route.params.album === 'trash') {
-        this.$refs.trashButton.$el.click()
-      } else if (this.$route.name === 'UserAlbums') {
-        this.$refs.albumsButton.$el.click()
-      }
     },
+    'updateShownUser': async function () {
+      await this.getUser()
+    }
   },
   async mounted() {
     this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
@@ -178,6 +174,7 @@ export default {
         const response = (await UserService.get(username)).data
         response.avatarUrl = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${username}/avatar/${response.avatar}`
         this.shownUser = response
+        console.log(response)
       } catch (err) {
         console.log(err)
         if (err.response && err.response.status === 404) {

@@ -7,6 +7,7 @@
         <router-view  />
       </v-main>
       <v-snackbar
+        v-if="showAlertSnackbar"
         v-model="showAlertSnackbar"
         bottom middle
         timeout="2000"

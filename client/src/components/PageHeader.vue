@@ -1,11 +1,12 @@
 <template>
-  <v-app-bar fixed min-height="64px" clipped-left flat color="blue">
+  <v-app-bar fixed min-height="64px" clipped-left flat color="blue" :style="$vuetify.breakpoint.smAndDown ? 'padding-top: 4px' : null">
     <v-toolbar-title 
-      class="font-weight-bold text-h3 white--text mr-5" 
-      style="cursor: pointer" 
-      @click="$router.push({ name: 'Photos', params: { username: user.username, album: 'all' } }).catch(err => {})">dimple
+      class="font-weight-bold white--text mr-5" 
+      style="cursor: pointer"
+      :class="$vuetify.breakpoint.smAndDown ? 'text-h4' : 'text-h3'"
+      @click="$router.push({ name: 'Explore' }).catch(err => {})">dimple
     </v-toolbar-title>
-    <v-toolbar-items>
+    <v-toolbar-items v-if="$vuetify.breakpoint.mdAndUp">
       <v-btn class="white--text" 
         depressed tile color="blue" 
         light 
@@ -19,9 +20,9 @@
         Explore
       </v-btn>
     </v-toolbar-items>
-    <v-spacer></v-spacer>
-    <v-toolbar-items>
-    <v-container fill-height>
+    <v-spacer v-if="$vuetify.breakpoint.smAndUp"></v-spacer>
+    <v-toolbar-items v-if="$vuetify.breakpoint.smAndUp">
+    <v-container class="pa-0" fill-height>
       <v-menu 
         class="menu"
         tile
@@ -37,7 +38,7 @@
             single-line 
             dense
             full-width 
-            class="text-field" 
+            :class="$vuetify.breakpoint.smOnly ? 'text-field-sm' : 'text-field'" 
             background-color="white"
             placeholder="Search"
             :append-icon="searchText.length ? 'mdi-close-circle' : null"
@@ -120,10 +121,10 @@
           :disabled="$store.state.uploadInProgress ? true : false" @click="!user.confirmationToken ? $refs.fileInput.click() : showAlertDialog = true"
           color="white"
           light
-          x-large
+          :x-large="$vuetify.breakpoint.mdAndUp"
           class="white--text"
           icon>
-          <v-icon x-large color="white">
+          <v-icon :x-large="$vuetify.breakpoint.mdAndUp" color="white">
             mdi-cloud-upload
           </v-icon>
         </v-btn>
@@ -143,13 +144,13 @@
         @change="onFileChosen">
     </form>
     <v-btn
-      v-if="user.admin" @click="$router.push({ name: 'AdminPage' })"
+      v-if="user.admin" @click="$router.push({ name: 'AdminPage' }).catch(() => {})"
       color="white"
       light
-      x-large
-      class="white--text mx-1"
+      :x-large="$vuetify.breakpoint.mdAndUp"
+      class="white--text mx-xs-0 mx-sm-1"
       icon>
-      <v-icon x-large color="white">
+      <v-icon :x-large="$vuetify.breakpoint.mdAndUp" color="white">
         mdi-application-cog
       </v-icon>
     </v-btn>
@@ -162,10 +163,22 @@
         </v-icon>
       </v-img>
       </div>
-      <v-btn class="white--text" depressed tile color="blue" light @click="signOut()">
+      <v-btn v-if="$vuetify.breakpoint.mdAndUp" class="white--text" depressed tile color="blue" light @click="signOut()">
         Log out
       </v-btn>
     </v-toolbar-items>
+    <v-btn
+      v-if="$vuetify.breakpoint.smAndDown"
+      color="white"
+      light
+      :x-large="$vuetify.breakpoint.mdAndUp"
+      class="white--text mx-xs-0 mx-sm-1"
+      icon
+      @click="signOut()">
+      <v-icon :x-large="$vuetify.breakpoint.mdAndUp" color="white">
+        mdi-logout
+      </v-icon>
+    </v-btn>
   </v-app-bar> 
 </template>
 
@@ -265,6 +278,10 @@ export default {
 <style scoped>
 .text-field {
   width: 300px;
+}
+
+.text-field-sm {
+  width: 200px;
 }
 .avatar {
   border-radius: 50%;

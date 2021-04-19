@@ -2,17 +2,18 @@
 <v-dialog
   scrollable
   v-model="show"
-  :width="$vuetify.breakpoint.xs ? '100%' : '50%'">
+  :width="$vuetify.breakpoint.smAndDown ? '100%' : '50%'">
   <v-card>
     <v-card-title>
       <v-container class="ma-0 pa-0">
         <v-row justify="space-between" class="mb-1">
           <v-col cols="3" class="ma-0 pa-0">
-            <span class="headline font-weight-medium" style="white-space: nowrap">Upload New Photos</span>
+            <span class="text-h5 font-weight-medium" style="white-space: nowrap">Upload New Photos</span>
           </v-col>
-          <v-col cols="5" sm="4" md="3" lg="2" class="ma-0 pa-0" align-self="center">
+          <v-spacer></v-spacer>
+          <v-col cols="3" lg="2" class="ma-0 pa-0" align-self="center" v-if="$vuetify.breakpoint.smAndUp">
             <span
-              style="white-space: nowrap; cursor: pointer"
+              style="white-space: nowrap; cursor: pointer; text-align: end"
               class="pl-0 ma-0 pl-5"
               :class="allSelected ? 'blue--text' : null"
               @click="selectAll()"
@@ -24,7 +25,7 @@
     <v-divider></v-divider>
     <v-container style="padding-bottom: 0px; padding-top: 0px">
       <v-row justify="space-around">
-        <v-col cols="3" style="padding: 0px">
+        <v-col cols="3" style="padding: 0px" v-if="$vuetify.breakpoint.smAndUp">
           <v-card-text>
           <v-container class="ml-4">
             <v-row v-if="!selectedCount" justify="center">
@@ -79,17 +80,17 @@
           </v-container>
         </v-card-text>
         </v-col>
-        <v-divider vertical></v-divider>
-        <v-col cols="8" style="padding: 0px">
+        <v-divider v-if="$vuetify.breakpoint.smAndUp" vertical></v-divider>
+        <v-col cols="12" sm="8" style="padding: 0px">
         <v-card-text class="photo-grid" style="height: 400px;">
           <v-container style="upload-container" fluid>
             <v-row justify="start">
-              <v-col cols="12" sm="6" md="4" lg="3" class="pa-2" v-for="(imagePreview, index) in imagePreviews" :key="index">
+              <v-col cols="6" sm="6" md="4" lg="3" class="pa-2" v-for="(imagePreview, index) in imagePreviews" :key="index">
                 <v-img 
                   :src="imagePreview.src" 
                   v-bind:class="[imagePreview.selected ? 'selected' : 'not-selected', 'photo']"
                   aspect-ratio="1"
-                  @click="select(imagePreview.id)">
+                  @click="$vuetify.breakpoint.smAndUp ? select(imagePreview.id) : null">
                 </v-img>
               </v-col>
             </v-row>

@@ -354,5 +354,21 @@ module.exports = {
       console.log(err)
       res.status(500).send()
     }
+  },
+
+  async getAdminInfo (req, res) {
+    try {
+      const cloudinaryInfo = await cloudinary.api.usage()
+      const userCount = await User.count()
+      const photoCount = await Image.count()
+      res.status(200).send({
+        userCount,
+        photoCount,
+        cloudinaryUsage: cloudinaryInfo.credits.used_percent
+      })
+    } catch (err) {
+      console.log(err)
+      res.status(500).send()
+    }
   }
 }

@@ -1,19 +1,24 @@
 <template>
   <v-container class="px-8 photo-container" fluid>
     <v-row v-if="images" justify="start" align="start" class="align-self-start">
-      <v-col v-if="album" xs="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
-        <div class="text-h3 font-weight-regular mt-2 mb-0">{{ album.name }}</div>
+      <v-col v-if="album" cols="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
+        <div class="font-weight-regular mt-2 mb-0" :class="$vuetify.breakpoint.mdAndUp ? 'text-h3' : 'text-h4'">{{ album.name }}</div>
       </v-col>
-      <v-col v-if="album" cols="12" sm="6" md="6" lg="6" class="py-0 my-0" style="text-align: left">
-        <div class="text-h5 my-0 font-weight-light">{{ album.description }}</div>
+      <v-col v-if="album" cols="12" sm="6" class="py-0 my-0" style="text-align: left">
+        <div class="my-0 font-weight-light" :class="$vuetify.breakpoint.mdAndUp ? 'text-h5' : 'text-body-1'">{{ album.description }}</div>
       </v-col>
       <v-spacer v-if="album"></v-spacer>
-      <v-col v-if="album" cols="12" sm="6" md="6" lg="6" :style="$vuetify.breakpoint.smAndUp ? 'text-align: right' : 'text-align: left'" class="py-0 text-h5 font-weight-light" align-self="center">
-        <span class="pt-2">Viewing privacy:</span>
+      <v-col 
+        v-if="album && $route.params.username === user.username" 
+        cols="12" sm="6" 
+        :style="$vuetify.breakpoint.smAndUp ? 'text-align: end' : 'text-align: center'" 
+        class="py-0 pt-2 pt-sm-0 text-h5 font-weight-light" 
+        :align-self="$vuetify.breakpoint.mdAndUp ? 'center' : 'end'">
+        <span class="pt-2" v-if="!$vuetify.breakpoint.smOnly" :class="$vuetify.breakpoint.mdAndUp ? 'text-h5' : 'text-body-1'">Viewing privacy:</span>
           <v-menu top offset-y nudge-top="10">
             <template v-slot:activator="{ on, attrs }">
               <span style="cursor: pointer" v-bind="attrs" v-on="on">
-                <span class="blue--text ml-3">{{ album.visibility ? 'Public' : 'Private' }}</span>
+                <span class="blue--text ml-3" :class="$vuetify.breakpoint.mdAndUp ? 'text-h5' : 'text-body-1'">{{ album.visibility ? 'Public' : 'Private' }}</span>
                 <v-icon color="blue">
                   mdi-chevron-up
                 </v-icon>
@@ -42,6 +47,11 @@
       </v-col>
     </v-row>
     <v-divider class="my-2"></v-divider>
+    <v-row v-if="images && images.length === 0">
+      <v-col cols="12" class="grey--text text-h4 mt-10">
+        <span>No photos</span>
+      </v-col>
+    </v-row>
     <photo-grid
       v-if="renderPhotoGrid"
       :images="images"
@@ -82,7 +92,7 @@ export default {
       showDeletionDialog: false,
       photoToDelete: null,
       shouldDeleteAll: false,
-      interactionDisabled: false
+      interactionDisabled: false,
     }
   },
   async mounted() {
@@ -287,6 +297,7 @@ export default {
         this.showDeletionDialog = false
         await ImageService.delete(this.photoToDelete.id)
         this.$store.dispatch('alert', 'Photo deleted successfully.')
+        this.$store.dispatch('updateShownUser')
         this.images = this.images.filter(image => image.id !== this.photoToDelete.id)
         this.photoToDelete = null
         this.interactionDisabled = false
@@ -311,6 +322,7 @@ export default {
         
         this.interactionDisabled = false
         this.$store.dispatch('alert', 'All photos deleted')
+        this.$store.dispatch('updateShownUser')
         this.shouldDeleteAll = false
       } catch(err) {
         console.log(err)

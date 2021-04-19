@@ -304,8 +304,7 @@ module.exports = {
       if (albumName) {
         const album = await Album.findByPk(albumName)
         if (album) {
-          console.log('itt')
-          if (album.fk_username === req.user.username || album.visibility) {
+          if (album.fk_username === req.user.username || album.visibility || req.user.admin) {
             if (album.fk_username !== req.user.username) {
               queryObject.where.visibility = true
             }

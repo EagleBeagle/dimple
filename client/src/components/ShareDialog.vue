@@ -1,7 +1,7 @@
 <template>
 <v-dialog
   v-model="dialog"
-  width="500">
+  :width="$vuetify.breakpoint.xsOnly ? '100%' : '500'">
   <v-card>
     <v-card-title>
       <span v-if="image" class="text-h5">Share Photo</span>
@@ -15,7 +15,7 @@
     <v-card-text class="pb-0 px-1" style="overflow: hidden">
       <v-container class="pa-0">
         <v-row justify="space-around" class="mx-1">
-          <v-col cols="2">
+          <v-col cols="4" sm="2" class="py-1">
             <shareNetwork
               network="email"
               :url="url"
@@ -32,7 +32,7 @@
               </v-btn>
             </shareNetwork>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="4" sm="2" class="py-1">
             <shareNetwork
               network="facebook"
               :url="url"
@@ -49,7 +49,7 @@
               </v-btn>
             </shareNetwork>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="4" sm="2" class="py-1">
             <shareNetwork
               network="messenger"
               :url="url"
@@ -66,7 +66,7 @@
               </v-btn>
             </shareNetwork>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="4" sm="2" class="py-1">
             <shareNetwork
               network="reddit"
               :url="url"
@@ -83,7 +83,7 @@
               </v-btn>
             </shareNetwork>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="4" sm="2" class="py-1">
             <shareNetwork
               network="twitter"
               :url="url"
@@ -92,7 +92,8 @@
                 large
                 fab
                 depressed
-                color="#1DA1F2">
+                color="#1DA1F2"
+                class="network-icon">
                 <v-icon color="white">
                   mdi-twitter
                 </v-icon>

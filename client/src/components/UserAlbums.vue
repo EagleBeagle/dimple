@@ -7,7 +7,17 @@
       </v-col>
     </v-row>
     <v-divider class="my-2"></v-divider>
-    <v-row class="pa-0">
+    <v-row v-if="loading">
+      <v-col cols="12" class="grey--text text-h4 mt-10">
+        <v-progress-circular
+          size="50"
+          width="5"
+          color="blue"
+          indeterminate
+        ></v-progress-circular>
+      </v-col>
+    </v-row>
+    <v-row v-else-if="albums && albums.length > 0" class="pa-0">
       <album-grid
         v-if="renderAlbumGrid"
         :albums="albums"
@@ -17,12 +27,17 @@
         @download="downloadAlbum"
         @delete="deleteAlbum" />
     </v-row>
+    <v-row v-else-if="albums && albums.length === 0">
+      <v-col cols="12" class="grey--text text-h4 mt-10">
+        You don't have any albums yet
+      </v-col>
+    </v-row>
     <share-dialog 
       v-if="showShareDialog"
       :show="showShareDialog"
       :album="albumToShare"
       @close="showShareDialog = false" />
-    <add-photos-dialog
+    <add-photos-to-album-dialog
         v-if="showAddPhotosDialog" 
         :show="showAddPhotosDialog" 
         :album="albumToAddPhotos" 
@@ -35,14 +50,13 @@
       @close="deletionCancelled" 
       @confirm="deletionConfirmed" />
   </v-container>
-  
 </template>
 
 <script>
 import AlbumService from '@/services/AlbumService'
 import AlbumGrid from '@/components/AlbumGrid'
 import ShareDialog from '@/components/ShareDialog'
-import AddPhotosDialog from '@/components/AddPhotosDialog'
+import AddPhotosToAlbumDialog from '@/components/AddPhotosToAlbumDialog'
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog'
 import { mapState } from 'vuex'
 import { Cloudinary } from 'cloudinary-core';
@@ -50,7 +64,7 @@ export default {
   components: {
     AlbumGrid,
     ShareDialog,
-    AddPhotosDialog,
+    AddPhotosToAlbumDialog,
     DeleteConfirmDialog
   },
   data () {
@@ -63,6 +77,7 @@ export default {
       showShareDialog: false,
       showAddPhotosDialog: false,
       showDeletionDialog: false,
+      loading: false
     }
   },
   mounted() {
@@ -100,6 +115,7 @@ export default {
         } else if (this.visibility === 'private') {
           filter.visibility = false
         }
+        this.loading = true
         this.albums = (await AlbumService.get(filter)).data.map(album => {
           album.images = album.images.map(image => {
             image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
@@ -107,7 +123,9 @@ export default {
           })
           return album
         })
+        this.loading = false
       } catch (err) {
+        this.loading = false
         console.log(err)
         this.$store.dispatch('alert', 'An error has happened while fetching your albums')
       }
@@ -159,9 +177,7 @@ export default {
     },
     updatePhotos(selectedPhotos) {
       selectedPhotos.forEach(selectedPhoto => {
-        if (this.albumToAddPhotos.imageCount < 4) {
-          this.albumToAddPhotos.images.push(`https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${this.albumToAddPhotos.fk_username}/${selectedPhoto}`)
-        }
+        this.albumToAddPhotos.images.push({ url: `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${this.albumToAddPhotos.fk_username}/${selectedPhoto}` })
         this.albumToAddPhotos.imageCount++
       })
     }

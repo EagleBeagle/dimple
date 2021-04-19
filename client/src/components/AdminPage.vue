@@ -6,8 +6,94 @@
       </v-col>
     </v-row>
     <v-divider class="my-2"></v-divider>
+    <v-row justify="space-around">
+      <v-col cols="12" md="6" lg="4" class="pa-0">
+        <v-card class="ma-2 elevation-5 text-h5">
+          <v-card-title>
+            Total Users
+          </v-card-title>
+          <v-card-text>
+            <v-container class="pa-0">
+              <v-row justify="center">
+                <v-col cols="6">
+                  <v-icon size="100px" color="green">
+                    mdi-account-multiple
+                  </v-icon>
+                </v-col>
+                <v-col v-if="!loadingInfo" cols="6" align-self="center" style="font-size: 50px; color: #4CAF50;">
+                  {{ adminInfo.userCount }}
+                </v-col>
+                <v-col v-else cols="6" align-self="center" style="font-size: 50px; color: #4CAF50;">
+                  <v-progress-circular
+                    size="50"
+                    width="7"
+                    indeterminate
+                  ></v-progress-circular>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="12" md="6" lg="4" class="pa-0">
+        <v-card class="ma-2 elevation-5 text-h5">
+          <v-card-title>
+            Total Photos
+          </v-card-title>
+          <v-card-text>
+            <v-container class="pa-0">
+              <v-row justify="center">
+                <v-col cols="6">
+                  <v-icon size="100px" color="blue">
+                    mdi-image-multiple
+                  </v-icon>
+                </v-col>
+                <v-col v-if="!loadingInfo" cols="6" align-self="center" style="font-size: 50px; color: #2196F3;">
+                  {{ adminInfo.photoCount }}
+                </v-col>
+                <v-col v-else cols="6" align-self="center" style="font-size: 50px; color: #2196F3;">
+                  <v-progress-circular
+                    size="50"
+                    width="7"
+                    indeterminate
+                  ></v-progress-circular>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="12" md="12" lg="4" class="pa-0">
+        <v-card class="ma-2 elevation-5 text-h5">
+          <v-card-title>
+            Monthly Cloudinary Usage
+          </v-card-title>
+          <v-card-text>
+            <v-container class="pa-0">
+              <v-row justify="center">
+                <v-col cols="6">
+                  <v-icon size="100px" color="orange">
+                    mdi-cloud
+                  </v-icon>
+                </v-col>
+                <v-col v-if="!loadingInfo" cols="6" align-self="center" style="font-size: 50px; color: #FF9800;">
+                  {{ adminInfo.cloudinaryUsage }}%
+                </v-col>
+                <v-col v-else cols="6" align-self="center" style="font-size: 50px; color: #FF9800;">
+                  <v-progress-circular
+                    size="50"
+                    width="7"
+                    indeterminate
+                  ></v-progress-circular>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
     <v-row>
-      <v-col cols="12" sm="6" class="pa-2">
+      <v-col cols="12" md="6" class="pa-2">
         <v-data-table
           :headers="userHeaders"
           :items="users"
@@ -63,7 +149,7 @@
           </template>
         </v-data-table>
       </v-col>
-      <v-col cols="12" sm="6" class="pa-2">
+      <v-col cols="12" md="6" class="pa-2">
         <v-data-table
           :headers="imageHeaders"
           :items="images"
@@ -136,7 +222,7 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12" sm="6" class="pa-2">
+      <v-col cols="12" md="6" class="pa-2">
         <v-data-table
           :headers="commentHeaders"
           :items="comments"
@@ -177,7 +263,7 @@
           </template>
         </v-data-table>
       </v-col>
-      <v-col cols="12" sm="6" class="pa-2">
+      <v-col cols="12" md="6" class="pa-2">
         <v-data-table
           :headers="albumHeaders"
           :items="albums"
@@ -237,6 +323,8 @@ import { mapState } from 'vuex'
 export default {
   data () {
     return {
+      adminInfo: {},
+      loadingInfo: true,
       users: [],
       userHeaders: [
         { text: 'Username', value: 'username' },
@@ -289,6 +377,7 @@ export default {
     }
   },
   async mounted() {
+    await this.getAdminInfo()
     await this.getUsers()
     await this.getImages()
     await this.getComments()
@@ -300,6 +389,18 @@ export default {
     ])
   },
   methods: {
+    async getAdminInfo() {
+      try {
+        this.loadingInfo = true
+        this.adminInfo = (await UserService.getAdminInfo()).data
+        console.log(this.adminInfo)
+        this.loadingInfo = false
+      } catch (err) {
+        this.loadingInfo = false
+        console.log(err)
+        this.$store.dispatch('alert', 'An error happened while page info')
+      }
+    },
     async getUsers() {
       try {
         this.loadingUsers = true
@@ -330,7 +431,7 @@ export default {
       } catch (err) {
         this.loadingAlbums = false
         console.log(err)
-        this.$store.dispatch('alert', 'An error happened while fetching users')
+        this.$store.dispatch('alert', 'An error happened while fetching albums')
       }
     },
     async getComments() {
@@ -341,7 +442,7 @@ export default {
       } catch (err) {
         this.loadingComments = false
         console.log(err)
-        this.$store.dispatch('alert', 'An error happened while fetching users')
+        this.$store.dispatch('alert', 'An error happened while fetching comments')
       }
     },
     async setAdmin(user, admin) {

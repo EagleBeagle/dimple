@@ -11,7 +11,7 @@
           <v-icon color="blue">
             mdi-restore
           </v-icon>
-          Restore all
+          <span v-if="$vuetify.breakpoint.smAndUp">Restore all</span>
         </v-btn>
         <v-btn
           v-if="$route.name === 'Photos' && user.username === $route.params.username && $route.params.album === 'trash'"
@@ -23,7 +23,7 @@
           <v-icon color="blue">
             mdi-delete-forever
           </v-icon>
-          Delete all
+          <span v-if="$vuetify.breakpoint.smAndUp">Delete all</span>
         </v-btn>
         <v-btn
           v-if="$route.name === 'UserAlbums' && user.username === $route.params.username"
@@ -35,7 +35,7 @@
           <v-icon color="blue">
             mdi-plus
           </v-icon>
-          New
+          <span v-if="$vuetify.breakpoint.smAndUp">New</span>
         </v-btn>
         <alert-dialog 
           v-if="showAlertDialog" 
@@ -54,8 +54,8 @@
           <v-icon color="blue" class="pr-1">
             mdi-plus-box-multiple
           </v-icon>
-          Add Photos
-          <add-photos-dialog
+          <span v-if="$vuetify.breakpoint.smAndUp">Add photos</span>
+          <add-photos-to-album-dialog
           v-if="showAddPhotosDialog" 
           :show="showAddPhotosDialog" 
           :album="albumToAddPhotos" 
@@ -81,7 +81,7 @@
               <v-icon v-else color="blue" class="pr-1">
                 mdi-sort-descending
               </v-icon>
-              Upload date
+              <span v-if="$vuetify.breakpoint.smAndUp">Upload date</span>
               <v-icon color="grey">
                 mdi-chevron-down
               </v-icon>
@@ -120,7 +120,7 @@
               <v-icon v-else color="blue" class="pr-2">
                 mdi-eye-plus
               </v-icon>
-              Visibility
+              <span v-if="$vuetify.breakpoint.smAndUp">Visibility</span>
               <v-icon color="grey">
                 mdi-chevron-down
               </v-icon>
@@ -153,14 +153,14 @@
 
 <script>
 import NewAlbumDialog from '@/components/NewAlbumDialog'
-import AddPhotosDialog from '@/components/AddPhotosDialog'
+import AddPhotosToAlbumDialog from '@/components/AddPhotosToAlbumDialog'
 import AlertDialog from '@/components/AlertDialog'
 import AlbumService from '@/services/AlbumService'
 import { mapState } from 'vuex'
 export default {
   components: {
     NewAlbumDialog,
-    AddPhotosDialog,
+    AddPhotosToAlbumDialog,
     AlertDialog
   },
   data () {

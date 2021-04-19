@@ -73,7 +73,7 @@ module.exports = {
         if (!album) {
           return res.status(404).send('Album not found')
         }
-        if (album.fk_username === req.user.username || album.visibility) {
+        if (album.fk_username === req.user.username || album.visibility || req.user.admin) {
           if (album.fk_username !== req.user.username) {
             album.dataValues.imageCount = await album.countImages({
               where: {

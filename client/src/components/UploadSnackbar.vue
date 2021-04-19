@@ -5,6 +5,7 @@
     color="white"
     timeout="-1"
     v-model="show"
+    v-if="show"
     bottom right
     class="pb-2 pr-2"
     style="text-align: center;"
@@ -188,6 +189,7 @@ export default {
             this.showSuccess = true
           }
           this.$store.dispatch('finishUpload')
+          this.$store.dispatch('updateShownUser')
           setTimeout(() => {
               this.show = false
               this.clear()
@@ -200,48 +202,6 @@ export default {
             }, 2000)
         }
         return
-        /* let response
-        const imageUploadData = value
-        try {
-          this.show = true
-          this.uploading = true
-          response = await ImageService.upload(imageUploadData, this.uploadProgress)
-          this.uploading = false
-          this.progress = 0
-          console.log(response)
-          this.showLoadingCircle = false
-          this.title = 'Upload Complete'
-          this.showSuccess = true
-          setTimeout(() => {
-            this.show = false
-            this.clear()
-          }, 2000)
-          this.$store.dispatch('finishUpload')
-          await ImageService.finalizeUpload({
-            publicId: imageUploadData.get('public_id'),
-            url: response.data.secure_url
-          })
-        } catch (err) {
-          if (!response || response.status !== 200) {
-            try {
-              await ImageService.delete(imageUploadData.get('public_id'))
-            } catch (err) {
-              console.log(err)
-            }
-          }
-          this.uploading = false
-          this.progress = 0
-          this.showFailre = true
-          this.title = 'Upload Failed'
-          this.showLoadingCircle = false
-          this.showFailure = true
-          this.$store.dispatch('finishUpload')
-          console.log(err)
-          setTimeout(() => {
-            this.show = false
-            this.clear()
-          }, 2000)
-        } */
       }
     }
   },

@@ -2,14 +2,14 @@
 <v-dialog
   v-if="album"
   v-model="dialog"
-  :width="$vuetify.breakpoint.smAndUp && images.length > 0 ? '50%' : $vuetify.breakpoint.smAndUp ? '30%' : '100%'"
+  :width="$vuetify.breakpoint.mdAndUp ? '50%' : '100%'"
   scrollable>
   <v-card>
     <v-card-title class="headline">
       Add photos to {{ album.name }}
     </v-card-title>
     <v-card-text class="album-card pa-0">
-      <v-container style="upload-container" fluid>
+      <v-container v-if="images.length" style="upload-container" fluid>
         <v-row justify="start">
           <v-col cols="4" sm="6" md="4" lg="3" class="pa-2" v-for="(image, index) in images" :key="index">
             <v-img 
@@ -25,6 +25,13 @@
             <span slot="no-results"></span>
             <span slot="spinner"></span>
           </infinite-loading>
+        </v-row>
+      </v-container>
+      <v-container v-else style="upload-container" fill-height fluid>
+        <v-row justify="start">
+          <v-col cols="12" class="grey--text text-h5">
+            No photos to add
+          </v-col>
         </v-row>
       </v-container>
     </v-card-text>

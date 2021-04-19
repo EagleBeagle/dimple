@@ -13,6 +13,11 @@ export default {
   components: {
     Sidebar,
     Toolbar,
+  },
+  data() {
+    return {
+      showSidebarOnMobile: false  
+    }
   }
 }
 </script>

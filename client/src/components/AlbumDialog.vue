@@ -2,7 +2,7 @@
 <v-dialog
   v-if="albums"
   v-model="dialog"
-  :width="$vuetify.breakpoint.smAndUp && albums.length > 0 ? '50%' : $vuetify.breakpoint.smAndUp ? '30%' : '100%'"
+  :width="$vuetify.breakpoint.mdAndUp ? '50%' : '100%'"
   scrollable>
   <v-card class="album-container">
     <v-card-title class="headline">
@@ -108,7 +108,11 @@ export default {
       this.$router.push({ name: 'Photos', params: { username: album.fk_username,  album: album.id } }).catch(() => {})
     },
     updateAlbums(selectedAlbums) {
-      this.albums = selectedAlbums
+      this.albums = selectedAlbums.map(selectedAlbum => {
+        selectedAlbum.images.push(this.image)
+        selectedAlbum.imageCount++
+        return selectedAlbum
+      })
       console.log(this.albums)
     },
     close() {

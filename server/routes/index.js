@@ -51,9 +51,8 @@ module.exports = app => {
 
   app.get('/admin',
     verifyAuth.isLoggedIn,
-    verifyAuth.isAdmin, (req, res) => {
-      res.json({ message: 'Welcome to the admin page.' })
-    })
+    verifyAuth.isAdmin,
+    UserController.getAdminInfo)
 
   app.post('/album',
     verifyAuth.isLoggedIn,

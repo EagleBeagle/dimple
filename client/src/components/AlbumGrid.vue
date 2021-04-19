@@ -87,11 +87,11 @@
               </v-row>
             </v-container>
             </v-card-text>
-            <v-card-text v-else-if="album.images.length === 4" class="pa-0 thumbnail">
+            <v-card-text v-else-if="album.images.length >= 4" class="pa-0 thumbnail">
             <div class="vignette"></div>
             <v-container class="py-0">
               <v-row>
-                <v-col cols="6" v-for="(image, index) in album.images" :key="index" class="pa-0">
+                <v-col cols="6" v-for="(image, index) in album.images.slice(0, 4)" :key="index" class="pa-0">
                   <v-img aspect-ratio="1" :src="image.url">
                   </v-img>
                 </v-col>
