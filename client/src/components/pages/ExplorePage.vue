@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import PhotoGrid from '@/components/PhotoGrid'
+import PhotoGrid from '@/components/common/PhotoGrid'
 import ImageService from '@/services/ImageService'
 import { Cloudinary } from 'cloudinary-core'
 import { mapState } from 'vuex'

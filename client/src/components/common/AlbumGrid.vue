@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import AlertDialog from '@/components/AlertDialog'
+import AlertDialog from '@/components/common/AlertDialog'
 export default {
   props: [
     'albums',

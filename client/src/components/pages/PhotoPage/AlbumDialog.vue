@@ -58,8 +58,8 @@
 <script>
 import { Cloudinary } from 'cloudinary-core';
 import AlbumService from '@/services/AlbumService'
-import AlbumGrid from '@/components/AlbumGrid'
-import AddToAlbumsDialog from '@/components/AddToAlbumsDialog'
+import AlbumGrid from '@/components/common/AlbumGrid'
+import AddToAlbumsDialog from '@/components/pages/PhotoPage/AddToAlbumsDialog'
 export default {
   components: { AlbumGrid, AddToAlbumsDialog },
   props: [

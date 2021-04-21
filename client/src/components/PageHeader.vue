@@ -186,7 +186,7 @@
 import { mapState } from 'vuex'
 import UserService from '@/services/UserService'
 import { Cloudinary } from 'cloudinary-core'
-import AlertDialog from '@/components/AlertDialog'
+import AlertDialog from '@/components/common/AlertDialog'
 export default {
   data() {
     return {

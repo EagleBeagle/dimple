@@ -1,8 +1,8 @@
 <template>
   <v-container class="pa-0 ma-0 photo-container" fluid>
       <transition-group name="fade" class="row wrap justify-start">
-        <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3 item" v-for="(image, index) in images" :key="image.id" style="animation-duration: 0.3s">
-          <kinesis-container v-if="!invalidImageIndices.has(index)">
+        <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3 item" v-for="image in images" :key="image.id" style="animation-duration: 0.3s">
+          <kinesis-container>
             <kinesis-element :strength="10" type="depth">
               <v-hover v-slot="{hover}">
                 <v-card class="image-card" elevation="20" @click="!interactionDisabled ? $emit('imageClicked', image) : null">
@@ -66,20 +66,6 @@
         <span slot="no-results"></span>
         <span slot="spinner"></span>
       </infinite-loading>
-      <!-- <v-col xs="cols" sm="6" md="4" lg="3" v-for="image in images" :key="image.id">
-        <kinesis-container>
-          <kinesis-element :strength="10" type="depth">
-            <v-card elevation="20" @click="enlarge(image)">
-              <cld-image
-                class="grid-image"
-                :publicId="`${user.username}/${image.id}`"
-                cloudName="dimplecloud"
-                @load="$redrawVueMasonry()">
-            </cld-image>
-            </v-card>
-          </kinesis-element>
-        </kinesis-container>
-      </v-col> -->
   </v-container>
 </template>
 
@@ -89,18 +75,7 @@ export default {
     'images',
     'interactionDisabled'
   ],
-  data () {
-    return {
-      invalidImageIndices: new Set(),
-      showDialog: false,
-      enlargedImage: null,
-    }
-  },
   methods: {
-    imageError(index) {
-     this.invalidImageIndices.add(index)
-     console.log(this.invalidImageIndices.has(index))
-    },
     infiniteHandler($state) {
       this.$emit('reachedBottom', $state)
     }

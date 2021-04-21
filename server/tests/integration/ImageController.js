@@ -1,6 +1,8 @@
 const request = require('supertest')
 const app = require('../../server.js')
 const sinon = require('sinon')
+const db = require('../../config/db.config.js')
+const User = db.user
 
 describe('ImageController', () => {
   let token
@@ -28,7 +30,7 @@ describe('ImageController', () => {
     sinon.restore()
   })
 
-  describe('PUT /image', () => {
+  describe('POST /image', () => {
     const body = {
       visibility: false,
       albums: []
@@ -43,14 +45,26 @@ describe('ImageController', () => {
 
     it('should respond with status code 403 if user is not logged in', async () => {
       await request(app)
-        .put('/image')
+        .post('/image')
+        .send(body)
+        .expect(403)
+    })
+
+    it('should respond with status code 403 if user is not confirmed', async () => {
+      await request(app)
+        .post('/image')
         .send(body)
         .expect(403)
     })
 
     it('should respond with status code 201 in case of succesful image record creation', async () => {
+      await User.update({ confirmationToken: null }, {
+        where: {
+          username: 'testUser'
+        }
+      })
       const res = await request(app)
-        .put('/image')
+        .post('/image')
         .set('Authorization', 'Bearer ' + token)
         .send(body)
         .expect(201)
@@ -58,14 +72,14 @@ describe('ImageController', () => {
     })
     it('should respond with status code 400 in case of incomplete data', async () => {
       await request(app)
-        .put('/image')
+        .post('/image')
         .set('Authorization', 'Bearer ' + token)
         .send(incompleteBody)
         .expect(400)
     })
     it('should respond with status code 400 in case of invalid data', async () => {
       await request(app)
-        .put('/image')
+        .post('/image')
         .set('Authorization', 'Bearer ' + token)
         .send(bodyInvalidAlbums)
         .expect(400)
@@ -79,7 +93,6 @@ describe('ImageController', () => {
         .expect(403)
     })
     it('should respond with status code 200 in case of succesful deletion', async () => {
-      console.log('imageId:', imageId)
       await request(app)
         .delete(`/image/${imageId}`)
         .set('Authorization', 'Bearer ' + token)

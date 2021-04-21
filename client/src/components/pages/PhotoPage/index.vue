@@ -255,10 +255,10 @@ import { mapState } from 'vuex'
 import ImageService from '@/services/ImageService'
 import UserService from '@/services/UserService'
 import { Cloudinary } from 'cloudinary-core';
-import ShareDialog from '@/components/ShareDialog'
-import AlbumDialog from '@/components/AlbumDialog'
-import CommentContainer from '@/components/CommentContainer'
-import GenericErrorPage from '@/components/GenericErrorPage'
+import ShareDialog from '@/components/common/ShareDialog'
+import AlbumDialog from '@/components/pages/PhotoPage/AlbumDialog'
+import CommentContainer from '@/components/pages/PhotoPage/CommentContainer'
+import GenericErrorPage from '@/components/pages/GenericErrorPage'
 export default {
   components: {
     ShareDialog,
@@ -351,8 +351,7 @@ export default {
     async getNeighbouringImages() {
       const query = this.$route.query
       if (query.page && 
-          query.visibility && 
-          query.order) { // all photos of
+          query.order) {
         try {
           let leftFilter = {
             limit: 2

@@ -161,6 +161,9 @@ export default {
       if (value) {
         this.clearFields()
         this.imagePreviews = []
+        if (this.imageData.length > 50) {
+          this.$store.dispatch('alert', "You can't upload more than 50 photos at a time.")
+        }
         for (let i = 0; i < this.imageData.length; i++) {
           if (this.imageData[i].size >= 10 * 1024 * 1024) {
             this.$store.dispatch('alert', "The maximum file size limit is 10MB.")

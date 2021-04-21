@@ -244,9 +244,6 @@ export default {
       this.uploadCount--
       this.overallUploadCount--
       this.failure = true
-    },
-    expandDownloads() {
-      
     }
   }
 }

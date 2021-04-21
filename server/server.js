@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const logger = require('morgan')
+const Ddos = require('ddos')
 require('dotenv').config()
 
 const app = express()
@@ -18,6 +19,9 @@ app.use(bodyParser.text())
 if (process.env.NODE_ENV !== 'test') {
   app.use(logger('dev'))
 }
+
+const ddos = new Ddos({ burst: 10, limit: 100 })
+app.use(ddos.express)
 
 require('./config/passport.js')
 require('./config/db.config.js')

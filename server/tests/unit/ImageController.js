@@ -188,15 +188,15 @@ describe('ImageController', () => {
       expect(res.status).to.have.been.calledWith(404)
     })
 
-    it('should respond with status code 403 the user is unauthorized for deletion', async () => {
-      sinon.stub(Image, 'findByPk').returns({ cancellationToken: 'token', userId: '2', destroy: () => {} })
+    it('should respond with status code 403 if the user is unauthorized for deletion', async () => {
+      sinon.stub(Image, 'findByPk').returns({ cancellationToken: 'token', fk_username: 'user1', destroy: () => {} })
       sinon.stub(cloudinary.uploader, 'destroy').returns({ result: 'ok' })
       const req = mockRequest({
         params: {
           imageId: '1'
         },
         user: {
-          id: 'another id'
+          username: 'another_user'
         }
       })
       const res = mockResponse()
@@ -237,44 +237,190 @@ describe('ImageController', () => {
     })
   })
 
-  describe('getImages', () => {
-    it('should respond with status code 200 in case of no album criteria and no error', async () => {
+  describe('get', () => {
+    it('should respond with status code 200 if querying correctly for user photos', async () => {
+      sinon.stub(Image, 'findAll').returns({})
+      const req = mockRequest({
+        user: {
+          username: 'user1'
+        },
+        query: {
+          user: 'user1',
+          sort: 'date:desc'
+        }
+      })
+      const res = mockResponse()
+      await ImageController.get(req, res)
+      expect(res.status).to.have.been.calledWith(200)
+    })
+
+    it('should respond with status code 400 if using incorrect query format for user photos', async () => {
       sinon.stub(Image, 'findAll').returns({})
       const req = mockRequest({
         user: {
           id: '1'
+        },
+        query: {
+          user: 'user1',
+          album: 'album1'
         }
       })
       const res = mockResponse()
-      await ImageController.getImages(req, res)
+      await ImageController.get(req, res)
+      expect(res.status).to.have.been.calledWith(400)
+    })
+
+    it('should respond with status code 200 if querying correctly for user favourites', async () => {
+      sinon.stub(Image, 'findAll').returns({})
+      const req = mockRequest({
+        user: {
+          username: 'user1'
+        },
+        query: {
+          user: 'user1',
+          sort: 'date:desc',
+          favourite: true
+        }
+      })
+      const res = mockResponse()
+      await ImageController.get(req, res)
       expect(res.status).to.have.been.calledWith(200)
     })
 
-    it('should respond with status code 200 in case of album criteria and no error', async () => {
+    it('should respond with status code 400 if using incorrect query format for user favourites', async () => {
       sinon.stub(Image, 'findAll').returns({})
-      sinon.stub(Album, 'findByPk').returns({ userId: '1', getImages: () => {} })
+      const req = mockRequest({
+        user: {
+          id: '1'
+        },
+        query: {
+          user: 'user1',
+          album: 'album1',
+          favourites: true
+        }
+      })
+      const res = mockResponse()
+      await ImageController.get(req, res)
+      expect(res.status).to.have.been.calledWith(400)
+    })
+
+    it('should respond with status code 200 if querying correctly for an album', async () => {
+      sinon.stub(Image, 'findAll').returns({})
+      sinon.stub(Album, 'findByPk').returns({ fk_username: 'user1', getImages: () => {} })
       const req = mockRequest({
         query: {
           album: 'album1'
         },
         user: {
-          id: '1'
+          username: 'user1'
         }
       })
       const res = mockResponse()
-      await ImageController.getImages(req, res)
+      await ImageController.get(req, res)
       expect(res.status).to.have.been.calledWith(200)
+    })
+
+    it('should respond with status code 200 if querying for own private album', async () => {
+      sinon.stub(Image, 'findAll').returns({})
+      sinon.stub(Album, 'findByPk').returns({ fk_username: 'user1', getImages: () => {}, visibility: false })
+      const req = mockRequest({
+        query: {
+          album: 'album1'
+        },
+        user: {
+          username: 'user1'
+        }
+      })
+      const res = mockResponse()
+      await ImageController.get(req, res)
+      expect(res.status).to.have.been.calledWith(200)
+    })
+
+    it("should respond with status code 403 if querying for someone else's private album", async () => {
+      sinon.stub(Image, 'findAll').returns({})
+      sinon.stub(Album, 'findByPk').returns({ fk_username: 'user1', getImages: () => {}, visibility: false })
+      const req = mockRequest({
+        query: {
+          album: 'album1'
+        },
+        user: {
+          username: 'user2'
+        }
+      })
+      const res = mockResponse()
+      await ImageController.get(req, res)
+      expect(res.status).to.have.been.calledWith(403)
+    })
+
+    it('should respond with status code 200 if querying for own private photo', async () => {
+      sinon.stub(Image, 'findOne').returns({
+        visibility: false,
+        fk_username: 'user1',
+        dataValues: {},
+        hasFavourite: () => {}
+      })
+      const req = mockRequest({
+        query: {
+          id: 'photo id'
+        },
+        user: {
+          username: 'user1'
+        }
+      })
+      const res = mockResponse()
+      await ImageController.get(req, res)
+      expect(res.status).to.have.been.calledWith(200)
+    })
+
+    it("should respond with status code 403 if querying for someone else's private photo", async () => {
+      sinon.stub(Image, 'findOne').returns({
+        visibility: false,
+        fk_username: 'user1',
+        dataValues: {},
+        hasFavourite: () => {}
+      })
+      const req = mockRequest({
+        query: {
+          id: 'photo id'
+        },
+        user: {
+          username: 'user2'
+        }
+      })
+      const res = mockResponse()
+      await ImageController.get(req, res)
+      expect(res.status).to.have.been.calledWith(403)
+    })
+
+    it("should respond with status code 403 if querying for someone else's private photo", async () => {
+      sinon.stub(Image, 'findAll').returns({})
+      sinon.stub(Album, 'findByPk').returns({ fk_username: 'user1', getImages: () => {}, visibility: false })
+      const req = mockRequest({
+        query: {
+          album: 'album1'
+        },
+        user: {
+          username: 'user2'
+        }
+      })
+      const res = mockResponse()
+      await ImageController.get(req, res)
+      expect(res.status).to.have.been.calledWith(403)
     })
 
     it('should respond with status code 500 in case of database error', async () => {
       sinon.stub(Image, 'findAll').throwsException()
       const req = mockRequest({
         user: {
-          id: '1'
+          username: 'user1'
+        },
+        query: {
+          user: 'user1',
+          sort: 'date:desc'
         }
       })
       const res = mockResponse()
-      await ImageController.getImages(req, res)
+      await ImageController.get(req, res)
       expect(res.status).to.have.been.calledWith(500)
     })
   })

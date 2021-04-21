@@ -154,10 +154,10 @@ module.exports = {
       const albumId = req.params.id
       const images = req.body.images
       const visibility = req.body.visibility
-      const album = await Album.findByPk(albumId)
       if (!images && typeof visibility === 'undefined') {
         return res.status(400).send()
       }
+      const album = await Album.findByPk(albumId)
       if (!album) {
         return res.status(404).send('Album not found')
       }
@@ -184,7 +184,7 @@ module.exports = {
       const username = req.user.username
       const album = await Album.findByPk(id)
       if (!album) {
-        return res.status(404).send('Invalid id')
+        return res.status(404).send('Album not found')
       }
       if (album.fk_username === username || req.user.admin) {
         await album.destroy()

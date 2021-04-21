@@ -11,7 +11,6 @@ module.exports = {
     try {
       const visibility = req.body.visibility
       const albums = req.body.albums
-      console.log(albums)
       const publicId = uuidv4()
       const cancellationToken = uuidv4()
       const image = await Image.create({
@@ -30,13 +29,9 @@ module.exports = {
       await image.addAlbums(storedAlbums)
       const timestamp = Math.round((new Date()).getTime() / 1000)
       const signature = cloudinary.utils.api_sign_request({ timestamp, public_id: publicId, folder: req.user.username }, process.env.CLOUDINARY_API_SECRET)
-      console.log(timestamp)
-      console.log(publicId)
-      console.log(signature)
       setTimeout(async () => {
         const updatedImage = await Image.findByPk(publicId)
         if (updatedImage && updatedImage.cancellationToken) {
-          console.log('Need to be cleared')
           try {
             await cloudinary.uploader.destroy(`${req.user.username}/${updatedImage.id}`)
             await updatedImage.destroy()
@@ -82,7 +77,6 @@ module.exports = {
       const imageId = req.params.imageId
       const username = req.params.username
       const cancellationToken = req.params.cancellationToken
-      console.log('cancelUpload called')
       const image = await Image.findByPk(imageId)
       if (!image) {
         return res.status(404).send('image does not exist')
@@ -171,7 +165,7 @@ module.exports = {
     }
   },
 
-  async getImages (req, res) {
+  async get (req, res) {
     try {
       let images
       const id = req.query.id

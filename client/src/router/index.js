@@ -1,42 +1,36 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import store from '../store/store'
-import Home from '../components/Home.vue'
-import Auth from '../components/Authentication'
-import UserAlbums from '../components/UserAlbums'
-import UserPhotos from '../components/UserPhotos'
-import UserPage from '../components/UserPage'
-import PhotoPage from '../components/PhotoPage'
-import ExplorePage from '../components/ExplorePage'
-import GenericErrorPage from '../components/GenericErrorPage'
-import NotFoundErrorPage from '../components/NotFoundErrorPage'
-import ConfirmUser from '../components/ConfirmUser'
-import ForgotPassword from '../components/ForgotPassword'
-import ResetPassword from '../components/ResetPassword'
-import AdminPage from '../components/AdminPage'
+import store from '@/store/store'
+import AuthenticationPage from '@/components/pages/AuthenticationPage'
+import UserAlbums from '@/components/pages/UserPage/UserAlbums'
+import UserPhotos from '@/components/pages/UserPage/UserPhotos'
+import UserPage from '@/components/pages/UserPage'
+import PhotoPage from '@/components/pages/PhotoPage'
+import ExplorePage from '@/components/pages/ExplorePage'
+import GenericErrorPage from '@/components/pages/GenericErrorPage'
+import NotFoundErrorPage from '@/components/pages/NotFoundErrorPage'
+import ConfirmUser from '@/components/ConfirmUser'
+import ForgotPasswordPage from '@/components/pages/ForgotPasswordPage'
+import ResetPasswordPage from '@/components/pages/ResetPasswordPage'
+import AdminPage from '@/components/pages/AdminPage'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
     path: '/auth',
     name: 'Authentication',
-    component: Auth
+    component: AuthenticationPage
   },
   {
     path: '/forgotpassword',
     name: 'ForgotPassword',
-    component: ForgotPassword
+    component: ForgotPasswordPage
   },
   {
     path: '/user/resetpassword/:resetPasswordToken',
     name: 'ResetPassword',
-    component: ResetPassword
+    component: ResetPasswordPage
   },
   {
     path: '/photos/:username/:id',

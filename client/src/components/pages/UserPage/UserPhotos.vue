@@ -4,7 +4,7 @@
       <v-col v-if="album" cols="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
         <div class="font-weight-regular mt-2 mb-0" :class="$vuetify.breakpoint.mdAndUp ? 'text-h3' : 'text-h4'">{{ album.name }}</div>
       </v-col>
-      <v-col v-if="album" cols="12" sm="6" class="py-0 my-0" style="text-align: left">
+      <v-col v-if="album" cols="12" sm="6" class="py-0 my-0" style="text-align: left; word-wrap: break-word">
         <div class="my-0 font-weight-light" :class="$vuetify.breakpoint.mdAndUp ? 'text-h5' : 'text-body-1'">{{ album.description }}</div>
       </v-col>
       <v-spacer v-if="album"></v-spacer>
@@ -13,7 +13,7 @@
         cols="12" sm="6" 
         :style="$vuetify.breakpoint.smAndUp ? 'text-align: end' : 'text-align: center'" 
         class="py-0 pt-2 pt-sm-0 text-h5 font-weight-light" 
-        :align-self="$vuetify.breakpoint.mdAndUp ? 'center' : 'end'">
+        align-self="end">
         <span class="pt-2" v-if="!$vuetify.breakpoint.smOnly" :class="$vuetify.breakpoint.mdAndUp ? 'text-h5' : 'text-body-1'">Viewing privacy:</span>
           <v-menu top offset-y nudge-top="10">
             <template v-slot:activator="{ on, attrs }">
@@ -49,7 +49,8 @@
     <v-divider class="my-2"></v-divider>
     <v-row v-if="images && images.length === 0">
       <v-col cols="12" class="grey--text text-h4 mt-10">
-        <span>No photos</span>
+        <span v-if="user.username === $route.params.username">No photos</span>
+        <span v-else>No photos to show</span>
       </v-col>
     </v-row>
     <photo-grid
@@ -70,8 +71,8 @@
 </template>
 
 <script>
-import PhotoGrid from '@/components/PhotoGrid'
-import DeleteConfirmDialog from '@/components/DeleteConfirmDialog'
+import PhotoGrid from '@/components/common/PhotoGrid'
+import DeleteConfirmDialog from '@/components/pages/UserPage/DeleteConfirmDialog'
 import ImageService from '@/services/ImageService'
 import AlbumService from '@/services/AlbumService'
 import { Cloudinary } from 'cloudinary-core'

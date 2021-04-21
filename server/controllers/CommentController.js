@@ -13,13 +13,10 @@ module.exports = {
         imageId,
         fk_username: req.user.username
       }
-      if (!text && !imageId) {
+      if (!text || !imageId) {
         return res.status(400).send('invalid request')
       }
       const image = await Image.findByPk(imageId)
-      console.log(image.fk_username)
-      console.log(req.user.username)
-      console.log(image.visibility)
       if (!image || (!image.visibility && image.fk_username !== req.user.username)) {
         return res.status(400).send('invalid image')
       }
@@ -105,11 +102,11 @@ module.exports = {
 
   async delete (req, res) {
     try {
-      const commentId = req.params.commentId
-      if (!commentId) {
-        return res.status(404).send('invalid request')
+      const id = req.params.id
+      if (!id) {
+        return res.status(400).send('invalid request')
       }
-      const comment = await Comment.findByPk(commentId)
+      const comment = await Comment.findByPk(id)
       if (!comment) {
         return res.status(404).send('invalid comment')
       }

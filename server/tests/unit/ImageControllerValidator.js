@@ -9,7 +9,7 @@ const { v4: uuidv4 } = require('uuid')
 
 const ImageControllerValidator = require('../../policies/ImageControllerValidator.js')
 
-describe('ImageControllerValidator.js', () => {
+describe('ImageControllerValidator', () => {
   beforeEach(() => {
     sinon.stub(console, 'log')
   })

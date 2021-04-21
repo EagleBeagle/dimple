@@ -9,7 +9,7 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false
     },
     description: {
-      type: Sequelize.STRING(255)
+      type: Sequelize.STRING(200)
     }
   })
 

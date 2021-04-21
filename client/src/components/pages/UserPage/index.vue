@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import Sidebar from '@/components/Sidebar'
-import Toolbar from '@/components/Toolbar'
+import Sidebar from '@/components/pages/UserPage/Sidebar'
+import Toolbar from '@/components/pages/UserPage/Toolbar'
 export default {
   components: {
     Sidebar,

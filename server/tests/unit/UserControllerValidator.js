@@ -8,7 +8,7 @@ const sinon = require('sinon')
 
 const UserControllerValidator = require('../../policies/UserControllerValidator.js')
 
-describe('UserControllerValidator.test.js', () => {
+describe('UserControllerValidator', () => {
   beforeEach(() => {
     sinon.stub(console, 'log')
   })

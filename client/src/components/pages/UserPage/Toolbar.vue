@@ -152,9 +152,9 @@
 </template>
 
 <script>
-import NewAlbumDialog from '@/components/NewAlbumDialog'
-import AddPhotosToAlbumDialog from '@/components/AddPhotosToAlbumDialog'
-import AlertDialog from '@/components/AlertDialog'
+import NewAlbumDialog from '@/components/pages/UserPage/NewAlbumDialog'
+import AddPhotosToAlbumDialog from '@/components/pages/UserPage/AddPhotosToAlbumDialog'
+import AlertDialog from '@/components/common/AlertDialog'
 import AlbumService from '@/services/AlbumService'
 import { mapState } from 'vuex'
 export default {

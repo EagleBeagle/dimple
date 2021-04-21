@@ -29,7 +29,8 @@
     </v-row>
     <v-row v-else-if="albums && albums.length === 0">
       <v-col cols="12" class="grey--text text-h4 mt-10">
-        You don't have any albums yet
+        <span v-if="user.username === $route.params.username">You don't have any albums yet</span>
+        <span v-else>No albums to show</span>
       </v-col>
     </v-row>
     <share-dialog 
@@ -54,10 +55,10 @@
 
 <script>
 import AlbumService from '@/services/AlbumService'
-import AlbumGrid from '@/components/AlbumGrid'
-import ShareDialog from '@/components/ShareDialog'
-import AddPhotosToAlbumDialog from '@/components/AddPhotosToAlbumDialog'
-import DeleteConfirmDialog from '@/components/DeleteConfirmDialog'
+import AlbumGrid from '@/components/common/AlbumGrid'
+import ShareDialog from '@/components/common/ShareDialog'
+import AddPhotosToAlbumDialog from '@/components/pages/UserPage/AddPhotosToAlbumDialog'
+import DeleteConfirmDialog from '@/components/pages/UserPage/DeleteConfirmDialog'
 import { mapState } from 'vuex'
 import { Cloudinary } from 'cloudinary-core';
 export default {

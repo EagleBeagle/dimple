@@ -33,6 +33,8 @@
               outlined
               label="Description"
               value="The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through."
+              maxlength="200"
+              no-resize
               v-model="description"
               hint="Say something about this album"
             ></v-textarea>
@@ -101,7 +103,7 @@ export default {
       try {
         const response = await AlbumService.create({
           name: this.name,
-          visibility: this.visibility == 'Public' ? 1 : 0,
+          visibility: this.visibility == 'Public' ? true : false,
           description: this.description,
           userId: localStorage.getItem('user').id
         })

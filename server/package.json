@@ -18,6 +18,7 @@
     "cloudinary": "^1.23.0",
     "cors": "^2.8.5",
     "datauri": "^3.0.0",
+    "ddos": "^0.2.1",
     "dotenv": "^8.2.0",
     "eslint-plugin-node": "^11.1.0",
     "express": "^4.17.1",

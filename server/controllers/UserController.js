@@ -206,7 +206,6 @@ module.exports = {
       const user = await User.findOne({ where: { username } })
       if (user) {
         const images = await Image.findAll({ where: { fk_username: user.username } })
-        console.log(images)
         for (let i = 0; i < images.length; i++) {
           const response = await cloudinary.uploader.destroy(`${user.username}/${images[i].id}`)
           if (response.result !== 'ok' && response.result !== 'not found') {
