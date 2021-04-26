@@ -6,7 +6,7 @@ module.exports = {
       username: Joi.string().min(4).max(25).regex(
         /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/
       ).required(),
-      email: Joi.string().email().max(60).required(),
+      email: Joi.string().email().max(320).required(),
       password: Joi.string().regex(/^(?!\$).*/).min(8).max(32).required()
     })
     const { error } = schema.validate(req.body)
@@ -53,7 +53,7 @@ module.exports = {
 
   signin (req, res, next) {
     const schema = Joi.object({
-      email: Joi.string().email().max(60).required(),
+      email: Joi.string().email().max(320).required(),
       password: Joi.string().regex(/^(?!\$).*/).min(8).max(32).required()
     })
     const { error } = schema.validate(req.body)
@@ -68,7 +68,7 @@ module.exports = {
 
   forgotPassword (req, res, next) {
     const schema = Joi.object({
-      email: Joi.string().email().max(60).required()
+      email: Joi.string().email().max(320).required()
     })
     const { error } = schema.validate(req.body)
     if (error) {

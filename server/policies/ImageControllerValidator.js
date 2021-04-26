@@ -94,7 +94,7 @@ module.exports = {
 
   deleteImage (req, res, next) {
     const schema = Joi.object({
-      imageId: Joi.string().uuid().required()
+      id: Joi.string().uuid().required()
     })
     const { error } = schema.validate(req.params)
     if (error) {

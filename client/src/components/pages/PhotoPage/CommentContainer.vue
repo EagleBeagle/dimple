@@ -223,6 +223,9 @@ export default {
           this.newComment = ''
           this.replyTo = null
           this.$refs.commentText.blur()
+          this.count++
+          this.$emit('count', this.count)
+          this.$store.dispatch('alert', 'Comment created successfully.')
         } catch (err) {
           console.log(err)
           if (err.response.status === 403) {
@@ -239,6 +242,7 @@ export default {
         this.comments = this.comments.filter(comment => comment.id !== id)
         this.count--
         this.$emit('count', this.count)
+        this.$store.dispatch('alert', 'Comment deleted successfully.')
       } catch (err) {
         console.log(err)
         this.$store.dispatch('alert', 'Failed to delete comment.')

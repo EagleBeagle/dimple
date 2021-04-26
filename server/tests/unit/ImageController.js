@@ -161,7 +161,7 @@ describe('ImageController', () => {
       sinon.stub(cloudinary.uploader, 'destroy').returns({ result: 'ok' })
       const req = mockRequest({
         params: {
-          imageId: '1'
+          id: '1'
         },
         user: {
           id: '2'

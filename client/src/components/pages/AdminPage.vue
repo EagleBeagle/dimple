@@ -119,7 +119,7 @@
               mdi-check
             </v-icon>
             <v-icon
-              color="red"
+              color="red lighten-2"
               v-else>
               mdi-close
             </v-icon>
@@ -178,7 +178,7 @@
               mdi-check
             </v-icon>
             <v-icon
-              color="red"
+              color="red lighten-2"
               v-else>
               mdi-close
             </v-icon>
@@ -202,7 +202,7 @@
               mdi-check
             </v-icon>
             <v-icon
-              color="red"
+              color="red lighten-2"
               v-else>
               mdi-close
             </v-icon>
@@ -251,7 +251,7 @@
               mdi-check
             </v-icon>
             <v-icon
-              color="red"
+              color="red lighten-2"
               v-else>
               mdi-close
             </v-icon>

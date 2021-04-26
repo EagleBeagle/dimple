@@ -40,7 +40,6 @@ module.exports = {
           }
         }
       }, 65 * 60 * 1000)
-      console.log(cancellationToken)
       res.status(201).send({
         timestamp,
         signature,
@@ -143,9 +142,9 @@ module.exports = {
 
   async deleteImage (req, res) {
     try {
-      const imageId = req.params.imageId
+      const id = req.params.id
       const username = req.user.username
-      const image = await Image.findByPk(imageId)
+      const image = await Image.findByPk(id)
       if (!image) {
         return res.status(404).send('Invalid id')
       }

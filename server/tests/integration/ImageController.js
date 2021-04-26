@@ -86,7 +86,7 @@ describe('ImageController', () => {
     })
   })
 
-  describe('DELETE /image/:imageId', () => {
+  describe('DELETE /image/:id', () => {
     it('should respond with status code 403 if user is not logged in', async () => {
       await request(app)
         .delete('/image/something')

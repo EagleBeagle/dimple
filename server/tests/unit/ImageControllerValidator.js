@@ -262,7 +262,7 @@ describe('ImageControllerValidator', () => {
     it('should call next if input data is successfully validated', async () => {
       const req = mockRequest({
         params: {
-          imageId: uuidv4()
+          id: uuidv4()
         }
       })
       const next = sinon.spy()
@@ -274,7 +274,7 @@ describe('ImageControllerValidator', () => {
     it('should respond with status code 400 in case of invalid image id', async () => {
       const req = mockRequest({
         params: {
-          imageId: 'invalid image id'
+          id: 'invalid image id'
         }
       })
       const next = sinon.spy()

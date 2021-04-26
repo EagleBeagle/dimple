@@ -7,6 +7,12 @@ module.exports = {
   async create (req, res) {
     try {
       const { name, description, visibility } = req.body
+      const albums = await Album.findAll({ where: { fk_username: req.user.username } })
+      albums.forEach(album => {
+        if (album.name === name) {
+          return res.status(400).send('Name already used')
+        }
+      })
       const album = await Album.create({
         name,
         description,

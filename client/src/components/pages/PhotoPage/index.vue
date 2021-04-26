@@ -103,38 +103,68 @@
             'settings-container-xs': $vuetify.breakpoint.xsOnly}">
           <v-row justify="center" align-content="center" v-if="image">
             <v-col v-if="image.fk_username !== user.username" :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4">
-              <v-icon v-if="!image.favouritedByUser" large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="favourite()">
-                mdi-star-outline
-              </v-icon>
-              <v-icon v-else large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="unfavourite()">
-                mdi-star
-              </v-icon>
+              <v-tooltip top v-if="!image.favouritedByUser">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" v-bind="attrs" v-on="on" @click="favourite()">
+                    mdi-star-outline
+                  </v-icon>
+                </template>
+                <span>Add to favourites</span>
+              </v-tooltip>
+              <v-tooltip top v-else>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" v-bind="attrs" v-on="on" @click="unfavourite()">
+                    mdi-star
+                  </v-icon>
+                </template>
+                <span>Remove from favourites</span>
+              </v-tooltip>
               <album-dialog v-if="showAlbumDialog" :show="showAlbumDialog" :image="image" @close="showAlbumDialog = false"></album-dialog>
             </v-col>
             <v-col v-if="image.fk_username === user.username" :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4">
-              <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showAlbumDialog = true">
-                mdi-image-album
-              </v-icon>
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showAlbumDialog = true" v-bind="attrs" v-on="on">
+                    mdi-image-album
+                  </v-icon>
+                </template>
+                <span>Manage albums</span>
+              </v-tooltip>
               <album-dialog v-if="showAlbumDialog" :show="showAlbumDialog" :image="image" @close="showAlbumDialog = false"></album-dialog>
             </v-col>
             <v-col :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4" v-if="image && image.visibility">
-              <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showShareDialog = true">
-                mdi-share
-              </v-icon>
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="showShareDialog = true" v-bind="attrs" v-on="on">
+                    mdi-share
+                  </v-icon>
+                </template>
+                <span>Share photo</span>
+              </v-tooltip>
               <share-dialog v-if="showShareDialog" :show="showShareDialog" :image="image" @close="showShareDialog = false"></share-dialog>
             </v-col>
             <v-col :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4">
-              <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="downloadImage">
-                mdi-download
-              </v-icon>
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="downloadImage" v-bind="attrs" v-on="on">
+                    mdi-download
+                  </v-icon>
+                </template>
+                <span>Download photo</span>
+              </v-tooltip>
             </v-col>
             <v-col :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4" v-if="image.fk_username === user.username">
-              <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="deleteImage">
-                mdi-delete
-              </v-icon>
+              <v-tooltip top color="blue">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="deleteImage" v-bind="attrs" v-on="on">
+                    mdi-delete
+                  </v-icon>
+                </template>
+                <span>Delete photo</span>
+              </v-tooltip>
             </v-col>
           </v-row>
-          <v-divider></v-divider>
+          <v-divider v-if="$vuetify.breakpoint.xsOnly"></v-divider>
         </v-container>
       </v-row>
       <div v-if="expand" class="expanded-photo-div" tabindex="0">

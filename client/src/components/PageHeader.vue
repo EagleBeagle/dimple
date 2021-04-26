@@ -10,9 +10,7 @@
       <v-btn class="white--text" 
         depressed tile color="blue" 
         light 
-        @click="$router.push({ name: 'Photos', params: { username: user.username, album: 'all' } }).catch(err => {})">
-        You
-      </v-btn>
+        @click="$router.push({ name: 'Photos', params: { username: user.username, album: 'all' } }).catch(err => {})">You</v-btn>
       <v-btn class="white--text" 
         depressed tile color="blue" 
         light
@@ -64,7 +62,7 @@
                   @click="goToUser(searchedUser)">
                   <v-hover v-slot="{ hover }">
                     <v-container class="pa-0 py-2" :class="hover ? 'hovered' : null">
-                      <v-row justify="start">
+                      <v-row justify="center">
                         <v-col cols="3" class="pa-0">
                           <v-img :src="searchedUser.avatar" class="avatar ml-1" :class="searchedUser.avatar ? null: 'no-avatar'" aspect-ratio="1" width="50px">
                             <v-icon v-if="!searchedUser.avatar" size="37px" class="no-avatar-icon">
@@ -117,24 +115,31 @@
     <form
       name ="form"
       autocomplete="off">
-        <v-btn
-          :disabled="$store.state.uploadInProgress ? true : false" @click="!user.confirmationToken ? $refs.fileInput.click() : showAlertDialog = true"
-          color="white"
-          light
-          :x-large="$vuetify.breakpoint.mdAndUp"
-          class="white--text"
-          icon>
-          <v-icon :x-large="$vuetify.breakpoint.mdAndUp" color="white">
-            mdi-cloud-upload
-          </v-icon>
-        </v-btn>
-        <alert-dialog 
-          v-if="showAlertDialog" 
-          :show="showAlertDialog"
-          :title="'Whoops'"
-          :text="'You need to confirm your email address before you can start uploading photos.'"
-          @close="showAlertDialog = false">
-        </alert-dialog>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            :disabled="$store.state.uploadInProgress ? true : false" @click="!user.confirmationToken ? $refs.fileInput.click() : showAlertDialog = true"
+            color="white"
+            light
+            :x-large="$vuetify.breakpoint.mdAndUp"
+            class="white--text"
+            icon
+            v-bind="attrs"
+            v-on="on">
+            <v-icon :x-large="$vuetify.breakpoint.mdAndUp" color="white">
+              mdi-cloud-upload
+            </v-icon>
+          </v-btn>
+        </template>
+        <span>Upload photos</span>
+      </v-tooltip>
+      <alert-dialog 
+        v-if="showAlertDialog" 
+        :show="showAlertDialog"
+        :title="'Whoops'"
+        :text="'You need to confirm your email address before you can start uploading photos.'"
+        @close="showAlertDialog = false">
+      </alert-dialog>
       <input
         type="file"
         style="display: none"
@@ -143,20 +148,27 @@
         multiple
         @change="onFileChosen">
     </form>
-    <v-btn
-      v-if="user.admin" @click="$router.push({ name: 'AdminPage' }).catch(() => {})"
-      color="white"
-      light
-      :x-large="$vuetify.breakpoint.mdAndUp"
-      class="white--text mx-xs-0 mx-sm-1"
-      icon>
-      <v-icon :x-large="$vuetify.breakpoint.mdAndUp" color="white">
-        mdi-application-cog
-      </v-icon>
-    </v-btn>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          v-if="user.admin" @click="$router.push({ name: 'AdminPage' }).catch(() => {})"
+          color="white"
+          light
+          :x-large="$vuetify.breakpoint.mdAndUp"
+          class="white--text mx-xs-0 mx-sm-1"
+          icon
+          v-bind="attrs"
+          v-on="on">
+          <v-icon :x-large="$vuetify.breakpoint.mdAndUp" color="white">
+            mdi-application-cog
+          </v-icon>
+        </v-btn>
+      </template>
+      <span>Admin page</span>
+    </v-tooltip>
     <v-toolbar-items>
       <div class="pr-2">
-      <v-img :src="user.avatar" class="avatar ml-1" :class="user.avatar ? null: 'no-avatar'" style="cursor: pointer" aspect-ratio="1" width="52px"
+      <v-img :src="user.avatar" class="avatar ml-1" :class="user.avatar ? null: 'no-avatar'" style="cursor: pointer; text-align: center" aspect-ratio="1" width="52px"
         @click="$router.push({ name: 'Photos', params: { username: user.username, album: 'all' } }).catch(() => {})">
         <v-icon v-if="!user.avatar" size="40px" class="no-avatar-icon">
           mdi-account
@@ -167,18 +179,23 @@
         Log out
       </v-btn>
     </v-toolbar-items>
-    <v-btn
-      v-if="$vuetify.breakpoint.smAndDown"
-      color="white"
-      light
-      :x-large="$vuetify.breakpoint.mdAndUp"
-      class="white--text mx-xs-0 mx-sm-1"
-      icon
-      @click="signOut()">
-      <v-icon :x-large="$vuetify.breakpoint.mdAndUp" color="white">
-        mdi-logout
-      </v-icon>
-    </v-btn>
+    <v-tooltip bottom v-if="$vuetify.breakpoint.smAndDown">
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          color="white"
+          light
+          class="white--text mx-xs-0 mx-sm-1"
+          icon
+          v-bind="attrs"
+          v-on="on"
+          @click="signOut()">
+          <v-icon color="white">
+            mdi-logout
+          </v-icon>
+        </v-btn>
+      </template>
+      <span>Log out</span>
+    </v-tooltip>
   </v-app-bar> 
 </template>
 

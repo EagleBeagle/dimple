@@ -4,7 +4,7 @@ module.exports = {
   create (req, res, next) {
     const schema = Joi.object({
       name: Joi.string().min(1).max(25).required(),
-      description: Joi.string().max(200),
+      description: Joi.string().max(200).allow(''),
       visibility: Joi.boolean().required()
     })
     const { error } = schema.validate(req.body)

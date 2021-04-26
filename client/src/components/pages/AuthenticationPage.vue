@@ -34,8 +34,8 @@
                         color="blue"
                         />
                     </v-form>
-                    <h3 class="text-center mt-3 text-subtitle-1 font-weight-bold" style="cursor: pointer" @click="$router.push({ name: 'ForgotPassword' }).catch(() => {})">
-                      Forgot your password?
+                    <h3 class="text-center mt-3 text-subtitle-1 font-weight-bold">
+                      <span style="cursor: pointer" @click="$router.push({ name: 'ForgotPassword' }).catch(() => {})">Forgot your password?</span>
                     </h3>
                   </v-card-text>
                   <div class="text-center mt-3">
@@ -143,14 +143,14 @@ export default {
     valid: true,
     loading: false,
     usernameRules: [
-        v => !!v || "The username can't stay empty.",
+        v => !!v || "Username can't stay empty.",
         v => (v && v.length > 3) || 'The username has to be at least 4 characters long.',
         v => (v && v.length < 26) || "The username can't be longer than 25 characters.",
         v => /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/.test(v) || 'This username format is not allowed.'
       ],
     emailRules: [
       v => !!v || "Email can't stay empty.",
-      v => (v && v.length < 26) || "Email can't be longer than 60 characters.",
+      v => (v && v.length < 320) || "Email can't be longer than 320 characters.",
       v => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/igm.test(v) || 'E-mail must be valid.'
     ],
     passwordRules: [
@@ -178,7 +178,7 @@ export default {
           localStorage.setItem('user', JSON.stringify(response.data))
           this.$store.dispatch('setUser', response.data)
           this.loading = false
-          this.$router.push({ name: 'Photos', params: { username: response.data.username, album: 'all' } }).catch(() => {})
+          this.$router.push({ name: 'Explore' }).catch(() => {})
         } catch (err) {
           this.loading = false
           let errorMessage
@@ -206,8 +206,14 @@ export default {
           this.$router.push({ name: 'Explore' }).catch(() => {})
         } catch (err) {
           this.loading = false
-          console.log(err)
-          this.$store.dispatch('alert', 'An error has happened during sign up')
+          console.log(err.response)
+          if (err.response && err.response.data === 'Username already in use') {
+            this.$store.dispatch('alert', 'Username already in use.')
+          } else if (err.response && err.response.data === 'Email already in use') {
+            this.$store.dispatch('alert', 'Email already in use.')
+          } else {
+            this.$store.dispatch('alert', 'An error has happened during sign up')
+          }
         }
       }
     }

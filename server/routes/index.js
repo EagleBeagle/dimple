@@ -116,7 +116,7 @@ module.exports = app => {
     ImageController.updateImage
   )
 
-  app.delete('/image/:imageId',
+  app.delete('/image/:id',
     verifyAuth.isLoggedIn,
     verifyAuth.isConfirmed,
     ImageControllerValidator.deleteImage,
