@@ -158,9 +158,9 @@ export default {
         this.loading = true
         const avatarId = (await UserService.changeAvatar(this.user.username, formData)).data
         this.shownUser.avatar = true
-        this.shownUser.avatarUrl = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${this.user.username}/avatar/${avatarId}`
+        this.shownUser.avatarUrl = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_300/${this.user.username}/avatar/${avatarId}`
         this.$store.dispatch('alert', 'Avatar successfully set.')
-        this.user.avatar = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${this.user.username}/avatar/${avatarId}`
+        this.user.avatar = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_300/${this.user.username}/avatar/${avatarId}`
         this.$store.dispatch('setUser', this.user)
         this.loading = false
       } catch (err) {
@@ -172,7 +172,7 @@ export default {
       try {
         const username = this.$route.params.username
         const response = (await UserService.get(username)).data
-        response.avatarUrl = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${username}/avatar/${response.avatar}`
+        response.avatarUrl = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_300/${username}/avatar/${response.avatar}`
         this.shownUser = response
         console.log(response)
       } catch (err) {

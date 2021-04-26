@@ -112,8 +112,7 @@ export default {
       try {
         this.albums = (await AlbumService.get({ user: this.user.username })).data.map(album => {
           album.images = album.images.map(image => {
-            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/v1/${image.fk_username}/${image.id}`
-            console.log(image.url)
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_200/${image.fk_username}/${image.id}`
             return image
           })
           this.selectedAlbums.forEach(selectedAlbum => {

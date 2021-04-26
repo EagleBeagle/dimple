@@ -229,7 +229,7 @@ export default {
           this.loading = true
           this.searchResults = (await UserService.search(this.searchText)).data.map(user => {
             if (user.avatar) {
-              user.avatar = this.cloudinaryCore.url(`${user.username}/avatar/${user.avatar}`)
+              user.avatar = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_300/${user.username}/avatar/${user.avatar}`
             }
             return user
           })

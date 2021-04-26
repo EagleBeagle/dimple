@@ -366,7 +366,7 @@ export default {
       try {
         const user = (await UserService.get(this.image.fk_username)).data
         if (user.avatar) {
-          user.avatar = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${user.username}/avatar/${user.avatar}`
+          user.avatar = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_300/${user.username}/avatar/${user.avatar}`
         }
         this.photoOwner = user
         console.log(this.photoOwner)
@@ -420,26 +420,26 @@ export default {
             leftFilter.from = this.image.createdAt
             leftFilter.sort = 'date:asc'
             this.leftImages = (await ImageService.get(leftFilter)).data.reverse().map(image => {
-              image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
+              image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_200/${image.fk_username}/${image.id}`
               return image
             })
             rightFilter.to = this.image.createdAt
             rightFilter.sort = 'date:desc'
             this.rightImages = (await ImageService.get(rightFilter)).data.map(image => {
-              image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
+              image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_200/${image.fk_username}/${image.id}`
               return image
             })
           } else if (query.order === 'date:asc') {
             leftFilter.to = this.image.createdAt
             leftFilter.sort = 'date:desc'
             this.leftImages = (await ImageService.get(leftFilter)).data.reverse().map(image => {
-              image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
+              image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_200/${image.fk_username}/${image.id}`
               return image
             })
             rightFilter.from = this.image.createdAt
             rightFilter.sort = 'date:asc'
             this.rightImages = (await ImageService.get(rightFilter)).data.map(image => {
-              image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
+              image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_200/${image.fk_username}/${image.id}`
               return image
             })
           } else if (query.order === 'popularity:desc') {
