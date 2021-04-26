@@ -22,22 +22,28 @@
                       width="60px"
                       style="cursor: pointer"
                       @click="$router.push({ name: 'Photos', params: { username: comment.fk_username, album: 'all' } }).catch(() => {})">
-                      <v-icon v-if="!comment.user.avatar" size="60px" class="no-avatar-icon">
-                        mdi-account
-                      </v-icon>
+                      <v-container v-if="!comment.user.avatar" class="pa-0" fill-height>
+                        <v-row justify="center">
+                          <v-col cols="12" class="pa-0" align-self="center">
+                            <v-icon size="50px" style="text-align: center">
+                              mdi-account
+                            </v-icon>
+                          </v-col>
+                        </v-row>
+                      </v-container>
                     </v-img>
                   </v-col>
                   <v-col cols="8" sm="9" md="9" lg="8" xl="9" align-self="center" class="px-0 pr-sm-5 pr-xl-10">
                     <v-container class="pa-0">
                       <v-row justify="start">
-                        <v-col cols="7" sm="7" md="7" class="pa-0" align-self="center" style="text-align: start">
+                        <v-col cols="9" sm="9" md="9" class="pa-0" align-self="center" style="text-align: start">
                           <span 
                             class="text-body-1 font-weight-bold blue--text pa-0"
                             style="cursor: pointer"
                             @click="$router.push({ name: 'Photos', params: { username: comment.fk_username, album: 'all' } }).catch(() => {})">
                             {{ comment.fk_username }}
                           </span> 
-                          <span class="text-body-2 grey--text text--darken-2 pa-0 ml-2"><timeago :datetime="comment.createdAt"></timeago></span>
+                          <span class="pa-0 ml-2"><timeago class="grey--text text-body-2 text--darken-2" :datetime="comment.createdAt"></timeago></span>
                         </v-col>
                         <v-spacer></v-spacer>
                         <v-fade-transition>
@@ -73,9 +79,15 @@
             <v-row justify="start">
               <v-col cols="3" sm="3" md="4" lg="4" xl="3" class="pa-0 px-0 pl-sm-5 pl-xl-10">
                 <v-img :src="user.avatar" class="avatar" :class="user.avatar ? null: 'no-avatar'" aspect-ratio="1" width="60px">
-                  <v-icon v-if="!user.avatar" size="60px" class="no-avatar-icon">
-                    mdi-account
-                  </v-icon>
+                  <v-container v-if="!user.avatar" class="pa-0" fill-height>
+                        <v-row justify="center">
+                          <v-col cols="12" class="pa-0" align-self="center">
+                            <v-icon size="50px" style="text-align: center">
+                              mdi-account
+                            </v-icon>
+                          </v-col>
+                        </v-row>
+                      </v-container>
                 </v-img>
               </v-col>
               <v-col cols="8" sm="9" md="8" lg="8" xl="9" align-self="center" class="px-0 pr-sm-5 pr-xl-10 pb-1">

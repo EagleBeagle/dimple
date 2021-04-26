@@ -318,6 +318,7 @@ module.exports = {
           return res.status(404).send('User not found')
         }
         queryObject.joinTableAttributes = []
+        queryObject.where.visibility = true
         images = await user.getFavourite(queryObject)
       } else if (trash) {
         queryObject.where.trashed = true

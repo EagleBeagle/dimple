@@ -52,7 +52,7 @@
             <v-icon v-if="showFailure" color="red">mdi-emoticon-sad</v-icon>
           </v-fade-transition>
         </v-col>
-        <v-col xs="6" sm="8" md="8" lg="8" class="snack-column">
+        <v-col cols="9" sm="8" md="8" lg="8" class="snack-column">
           <div class="text-h6 pl-3 ml-3">
               <span v-if="uploadCount === 1">Uploading 1 photo</span>
               <span v-if="uploadCount > 1">Uploading {{ uploadCount }} photos</span>

@@ -65,9 +65,15 @@
                       <v-row justify="center">
                         <v-col cols="3" class="pa-0">
                           <v-img :src="searchedUser.avatar" class="avatar ml-1" :class="searchedUser.avatar ? null: 'no-avatar'" aspect-ratio="1" width="50px">
-                            <v-icon v-if="!searchedUser.avatar" size="37px" class="no-avatar-icon">
-                              mdi-account
-                            </v-icon>
+                            <v-container v-if="!searchedUser.avatar" class="pa-0" fill-height>
+                              <v-row justify="center">
+                                <v-col cols="12" class="pa-0" align-self="center">
+                                  <v-icon size="40px" style="text-align: center">
+                                    mdi-account
+                                  </v-icon>
+                                </v-col>
+                              </v-row>
+                            </v-container>
                           </v-img>
                         </v-col>
                         <v-col cols="9" class="pa-0 pl-3" align-self="center">
@@ -170,9 +176,15 @@
       <div class="pr-2">
       <v-img :src="user.avatar" class="avatar ml-1" :class="user.avatar ? null: 'no-avatar'" style="cursor: pointer; text-align: center" aspect-ratio="1" width="52px"
         @click="$router.push({ name: 'Photos', params: { username: user.username, album: 'all' } }).catch(() => {})">
-        <v-icon v-if="!user.avatar" size="40px" class="no-avatar-icon">
-          mdi-account
-        </v-icon>
+        <v-container class="pa-0" fill-height>
+          <v-row justify="center">
+            <v-col cols="12" class="pa-0" align-self="center">
+              <v-icon v-if="!user.avatar" size="40px" style="text-align: center">
+                mdi-account
+              </v-icon>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-img>
       </div>
       <v-btn v-if="$vuetify.breakpoint.mdAndUp" class="white--text" depressed tile color="blue" light @click="signOut()">
@@ -307,10 +319,7 @@ export default {
 }
 
 .no-avatar-icon {
-  position: absolute;
   background-color: white;
-  top: 50%;
-  transform:translate(-60%,-50%);
 }
 
 .search-card {

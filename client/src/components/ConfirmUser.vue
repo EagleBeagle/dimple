@@ -9,7 +9,7 @@ export default {
     try {
       const response = await UserService.confirm(confirmationToken)
       if (response.data.avatar) {
-        response.data.avatar = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${response.data.username}/avatar/${response.data.avatar}`
+        response.data.avatar = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_300${response.data.username}/avatar/${response.data.avatar}`
       }
       localStorage.setItem('user', JSON.stringify(response.data))
       this.$store.dispatch('setUser', response.data)

@@ -7,7 +7,7 @@ module.exports = {
     passport.authenticate('jwt', function (err, user) {
       if (err || !user) {
         res.status(403).send({
-          error: 'You do not have access to this action.'
+          error: 'Not logged in'
         })
       } else {
         req.user = user

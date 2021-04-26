@@ -13,7 +13,7 @@
                   aspect-ratio="1" 
                   width="80px" 
                   :src="shownUser.avatar ? shownUser.avatarUrl : null" @click="(shownUser.username === user.username && $refs.fileInput) ? $refs.fileInput.click() : null">
-                  <v-icon v-if="!shownUser.avatar" :size="$vuetify.breakpoint.smAndDown ? '30px' : '60px'" class="no-avatar-icon">
+                  <v-icon v-if="!shownUser.avatar" :size="$vuetify.breakpoint.smAndDown ? '30px' : '50px'" class="no-avatar-icon">
                     mdi-account
                   </v-icon>
                   <v-fade-transition>
