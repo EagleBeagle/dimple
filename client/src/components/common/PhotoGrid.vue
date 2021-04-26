@@ -12,12 +12,12 @@
                     :src="image.url">
                     <v-fade-transition>
                       <v-overlay
-                        v-if="hover && !interactionDisabled"
+                        v-if="(hover || $vuetify.breakpoint.xsOnly) && !interactionDisabled"
                         absolute
                         color="#000000"
-                        opacity="0.3">
+                        :opacity="$vuetify.breakpoint.xsOnly ? '0' : '0.3'">
                         <v-btn
-                          v-if="$route.name !== 'Explore' && ($route.name === 'Photos' && $route.params.album !== 'favourites')"
+                          v-if="$route.name !== 'Explore' && ($route.name === 'Photos' && $route.params.album !== 'favourites') && $store.state.user.username === image.fk_username"
                           v-on:click.stop
                           icon
                           large

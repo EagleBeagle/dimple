@@ -47,7 +47,7 @@
       </v-col>
     </v-row>
     <v-divider class="my-2"></v-divider>
-    <v-row v-if="images && images.length === 0">
+    <v-row v-if="images && images.length === 0 && !loading">
       <v-col cols="12" class="grey--text text-h4 mt-10">
         <span v-if="user.username === $route.params.username">No photos</span>
         <span v-else>No photos to show</span>
@@ -93,6 +93,7 @@ export default {
       photoToDelete: null,
       shouldDeleteAll: false,
       interactionDisabled: false,
+      loading: false
     }
   },
   async mounted() {
@@ -112,23 +113,31 @@ export default {
   watch: {
     '$route.params': async function () {
       window.scrollTo(0, 0)
+      this.loading = true
       await this.getAlbum()
       this.images = await this.getImages({ limit: 20 })
       this.rerenderPhotoGrid()
+      this.loading = false
     },
     async sort() {
+      this.loading = true
       this.images = await this.getImages({ limit: 20 })
       this.rerenderPhotoGrid()
       window.scrollTo(0, 0)
+      this.loading = false
     },
     async visibility() {
+      this.loading = true
       this.images = await this.getImages({ limit: 20 })
       this.rerenderPhotoGrid()
       window.scrollTo(0, 0)
+      this.loading = false
     },
     async updateShownPhotos() {
+      this.loading = true
       this.images = await this.getImages({ limit: 20 })
       this.rerenderPhotoGrid()
+      this.loading = false
     },
     async newPhotoId() {
       try {
@@ -338,52 +347,58 @@ export default {
       }
     },
     async infiniteHandler($state) {
-      let images
-      if (this.lastDate) {
-        if (this.sort.order === 'desc') {
-          images = await this.getImages({
-            to: this.lastDate,
-            limit: 20
-          })
+      try {
+        let images
+        if (this.lastDate) {
+          if (this.sort.order === 'desc') {
+            images = await this.getImages({
+              to: this.lastDate,
+              limit: 20
+            })
+          } else {
+            images = await this.getImages({
+              from: this.lastDate,
+              limit: 20
+            })
+          }
         } else {
-          images = await this.getImages({
-            from: this.lastDate,
-            limit: 20
-          })
-        }
-      } else {
-        images = await this.getImages({ limit: 20 })
-        const last = this.$route.query.last
-        if (last) {
-          const lastDate = new Date(last)
-          const createdDates = images.map(image => new Date(image.createdAt).toISOString())
-          if (!createdDates.includes(lastDate.toISOString())) {
-            if (this.sort.order === 'desc') {
-              const imagesToLast = await this.getImages({
-                from: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString()
-              })
-              if (imagesToLast) {
-                images = imagesToLast
+          this.loading = true
+          images = await this.getImages({ limit: 20 })
+          const last = this.$route.query.last
+          if (last) {
+            const lastDate = new Date(last)
+            const createdDates = images.map(image => new Date(image.createdAt).toISOString())
+            if (!createdDates.includes(lastDate.toISOString())) {
+              if (this.sort.order === 'desc') {
+                const imagesToLast = await this.getImages({
+                  from: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString()
+                })
+                if (imagesToLast) {
+                  images = imagesToLast
+                }
+              } else {
+                const imagesToLast = await this.getImages({
+                  to: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() + 1)).toISOString()
+                })
+                if (imagesToLast) {
+                  images = imagesToLast
+                }
               }
-            } else {
-              const imagesToLast = await this.getImages({
-                to: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() + 1)).toISOString()
-              })
-              if (imagesToLast) {
-                images = imagesToLast
-              }
+              setTimeout(() => {
+              window.scrollTo(0, document.body.scrollHeight)
+              }, 1)
             }
-            setTimeout(() => {
-            window.scrollTo(0, document.body.scrollHeight)
-            }, 1)
           }
         }
-      }
-      if (images && images.length) {
-        this.images.push(...images)
-        $state.loaded()
-      } else {
-        $state.complete()
+        if (images && images.length) {
+          this.images.push(...images)
+          $state.loaded()
+        } else {
+          $state.complete()
+        }
+        this.loading = false
+      } catch (err) {
+        this.$store.dispatch('alert', 'Failed to fetch photos')
       }
     },
     rerenderPhotoGrid() {

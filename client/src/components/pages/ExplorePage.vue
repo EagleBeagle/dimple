@@ -6,6 +6,16 @@
       </v-col>
     </v-row>
     <v-divider class="my-3 mt-8 mx-16"></v-divider>
+    <v-row v-if="loading">
+      <v-col cols="12" class="grey--text text-h4 mt-10">
+        <v-progress-circular
+          size="50"
+          width="5"
+          color="blue"
+          indeterminate
+        ></v-progress-circular>
+      </v-col>
+    </v-row>
     <photo-grid
       :images="images" 
       @reachedBottom="infiniteHandler"
@@ -26,7 +36,8 @@ export default {
     return {
       images: [],
       lastDate: null,
-      cloudinaryCore: null
+      cloudinaryCore: null,
+      loading: false
     }
   },
   computed: {
@@ -67,38 +78,45 @@ export default {
       }).catch(() => {})
     },
     async infiniteHandler($state) {
-      let images
-      if (this.lastDate) {
-        images = await this.getImages({
-          to: this.lastDate,
-          limit: 20
-        })
-      } else {
-        images = await this.getImages({ limit: 20 })
-        const last = this.$route.query.last
-        if (last) {
-          const lastDate = new Date(last)
-          const createdDates = images.map(image => new Date(image.createdAt).toISOString())
-          if (!createdDates.includes(lastDate.toISOString())) {
-            const imagesToLast = await this.getImages({
-              from: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString()
-            })
-            if (imagesToLast) {
-              images = imagesToLast
+      try {
+        let images
+        if (this.lastDate) {
+          images = await this.getImages({
+            to: this.lastDate,
+            limit: 20
+          })
+        } else {
+          this.loading = true
+          images = await this.getImages({ limit: 20 })
+          const last = this.$route.query.last
+          if (last) {
+            const lastDate = new Date(last)
+            const createdDates = images.map(image => new Date(image.createdAt).toISOString())
+            if (!createdDates.includes(lastDate.toISOString())) {
+              const imagesToLast = await this.getImages({
+                from: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString()
+              })
+              if (imagesToLast) {
+                images = imagesToLast
+              }
+              setTimeout(() => {
+              window.scrollTo(0, document.body.scrollHeight)
+              }, 1)
             }
-            setTimeout(() => {
-            window.scrollTo(0, document.body.scrollHeight)
-            }, 1)
           }
         }
+        if (images.length) {
+          this.images.push(...images)
+          $state.loaded()
+        } else {
+          $state.complete()
+        }
+        this.loading = false
+      } catch (err) {
+        this.loading = false
+        this.$store.dispatch('alert', 'Failed to fetch photos')
       }
-      if (images.length) {
-        this.images.push(...images)
-        $state.loaded()
-      } else {
-        $state.complete()
-      }
-    },
+    }
   }
 }
 </script>
