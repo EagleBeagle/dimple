@@ -202,7 +202,6 @@
 <script>
 import { mapState } from 'vuex'
 import UserService from '@/services/UserService'
-import { Cloudinary } from 'cloudinary-core'
 import AlertDialog from '@/components/common/AlertDialog'
 export default {
   data() {
@@ -235,7 +234,6 @@ export default {
           })
           this.loading = false
         } catch (err) {
-          console.log(err)
           this.loading = false
           this.$store.dispatch('alert', 'An error occured with searching')
         }
@@ -245,7 +243,6 @@ export default {
     }
   },
   mounted() {
-    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
     window.addEventListener('keyup', this.enterPressed)
   },
   methods: {
@@ -272,7 +269,6 @@ export default {
         this.searchText = ''
         this.$refs.searchField.blur()
       } else if (e.keyCode === 65 || e.keyCode === 68 || e.keyCode === 37 || e.keyCode === 39) {
-        console.log('jaaja')
         e.preventDefault()
       }
     },

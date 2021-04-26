@@ -61,7 +61,6 @@
 </template>
 
 <script>
-import { Cloudinary } from 'cloudinary-core';
 import { mapState } from 'vuex'
 import ImageService from '@/services/ImageService'
 import AlbumService from '@/services/AlbumService'
@@ -94,7 +93,6 @@ export default {
     }
   },
   async mounted () {
-    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME });
     this.albumImages = await this.getAlbumImages()
     this.images = await this.getImages({})
   },
@@ -114,7 +112,6 @@ export default {
         }
         return images
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'Failed to fetch photos')
         this.close()
       }
@@ -124,7 +121,6 @@ export default {
         const images = (await ImageService.get({ album: this.album.id })).data.map(image => image.id)
         return images
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'Failed to fetch photos of your album')
         this.close()
       }
@@ -142,13 +138,11 @@ export default {
         this.$emit('updatePhotos', selectedImages)
         this.close()
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'Album update unsuccessful')
         this.close()
       }
     },
     select(id) {
-      console.log(this.images[id])
       if (this.images[id].selected) {
         this.images[id].selected = false
         this.selectedCount--

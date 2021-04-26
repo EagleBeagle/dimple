@@ -156,8 +156,6 @@ export default {
   },
   watch: {
     async imageData(value) {
-      console.log('dialóg kéne maybe')
-      console.log(value)
       if (value) {
         this.clearFields()
         this.imagePreviews = []
@@ -198,7 +196,6 @@ export default {
       this.selectedAlbums = []
     },
     selectAll() {
-      console.log('hej')
       if (!this.allSelected) {
         this.imagePreviews = this.imagePreviews.map((imagePreview) => {
           imagePreview.selected = true
@@ -231,7 +228,6 @@ export default {
         this.$store.dispatch('initiateUpload', allFormData)
         this.show = false
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened during upload initialization')
         this.clearFields()
         this.show = false
@@ -240,7 +236,6 @@ export default {
     select(id) {
       this.differentAlbumsSelected = false
       this.privateCheckboxIndeterminate = false
-      //console.log('választás')
       if (this.imagePreviews[id].selected) {
         this.imagePreviews[id].selected = false
       } else {
@@ -251,7 +246,6 @@ export default {
       } else if (this.selectedCount === 1) {
         this.imagePreviews.forEach((imagePreview) => {
           if (imagePreview.selected) {
-            //console.log(imagePreview.id)
             this.selectedAlbums = [...imagePreview.selectedAlbums]
             this.privateCheckbox = imagePreview.private
           }
@@ -259,7 +253,6 @@ export default {
       } else if (this.selectedCount > 1 && this.sameAlbumsSelected()) {
         this.imagePreviews.forEach((imagePreview) => {
           if (imagePreview.selected && imagePreview.selectedAlbums.length > 0) {
-            //console.log(imagePreview.id)
             this.selectedAlbums = [...imagePreview.selectedAlbums]
           }
         })

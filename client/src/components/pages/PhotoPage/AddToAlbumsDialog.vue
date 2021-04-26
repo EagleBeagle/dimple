@@ -73,7 +73,6 @@
 </template>
 
 <script>
-import { Cloudinary } from 'cloudinary-core';
 import { mapState } from 'vuex'
 import AlbumService from '@/services/AlbumService'
 import ImageService from '@/services/ImageService'
@@ -103,9 +102,7 @@ export default {
     }
   },
   async mounted () {
-    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME });
     await this.getAlbums()
-    console.log(this.albums)
   },
   methods: {
     async getAlbums() {
@@ -122,9 +119,7 @@ export default {
           })
           return album
         })
-        console.log(this.albums)
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while fetching your albums')
         this.close()
       }
@@ -152,7 +147,6 @@ export default {
         this.$emit('updateAlbums', this.albums.filter(album => selectedAlbums.includes(album.id)))
         this.close()
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'Album update unsuccessful')
         this.close()
       }

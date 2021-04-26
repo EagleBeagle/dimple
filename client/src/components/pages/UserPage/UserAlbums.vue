@@ -60,7 +60,6 @@ import ShareDialog from '@/components/common/ShareDialog'
 import AddPhotosToAlbumDialog from '@/components/pages/UserPage/AddPhotosToAlbumDialog'
 import DeleteConfirmDialog from '@/components/pages/UserPage/DeleteConfirmDialog'
 import { mapState } from 'vuex'
-import { Cloudinary } from 'cloudinary-core';
 export default {
   components: {
     AlbumGrid,
@@ -82,7 +81,6 @@ export default {
     }
   },
   mounted() {
-    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME });
     this.getAlbums()
   },
   computed: {
@@ -127,7 +125,6 @@ export default {
         this.loading = false
       } catch (err) {
         this.loading = false
-        console.log(err)
         this.$store.dispatch('alert', 'An error has happened while fetching your albums')
       }
     },
@@ -136,7 +133,6 @@ export default {
         const url = (await AlbumService.download(id)).data
         window.open(url)
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error has occured while preparing your download')
       }
     },
@@ -152,7 +148,6 @@ export default {
         this.$store.dispatch('alert', 'Album deleted successfully.')
         this.albumToDelete = null
       } catch (err) {
-        console.log(err)
         this.albumToDelete = null
         this.showDeletionDialog = false
         this.$store.dispatch('alert', 'An error occured during deletion')

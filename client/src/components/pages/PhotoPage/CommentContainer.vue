@@ -114,7 +114,6 @@
 <script>
 import { mapState } from 'vuex'
 import CommentService from '@/services/CommentService'
-import { Cloudinary } from 'cloudinary-core'
 export default {
   props: [
     'image'
@@ -147,7 +146,6 @@ export default {
     }
   },
   async mounted() {
-    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
     await this.getComments()
     document.addEventListener('keyup', this.backspacePressed)
   },
@@ -168,7 +166,6 @@ export default {
           return comment
         })
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'Failed to load comments.')
       }
     },
@@ -187,7 +184,6 @@ export default {
         this.comments = [...comments, ...this.comments]
         return comments
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'Failed to load older comments.')
       }
     },
@@ -227,7 +223,6 @@ export default {
           this.$emit('count', this.count)
           this.$store.dispatch('alert', 'Comment created successfully.')
         } catch (err) {
-          console.log(err)
           if (err.response.status === 403) {
             this.$store.dispatch('alert', 'Confirm your email address to write comments.')
           } else {
@@ -244,7 +239,6 @@ export default {
         this.$emit('count', this.count)
         this.$store.dispatch('alert', 'Comment deleted successfully.')
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'Failed to delete comment.')
       }
     },

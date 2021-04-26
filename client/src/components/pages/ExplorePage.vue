@@ -17,7 +17,6 @@
 <script>
 import PhotoGrid from '@/components/common/PhotoGrid'
 import ImageService from '@/services/ImageService'
-import { Cloudinary } from 'cloudinary-core'
 import { mapState } from 'vuex'
 export default {
   components: {
@@ -29,9 +28,6 @@ export default {
       lastDate: null,
       cloudinaryCore: null
     }
-  },
-  async mounted() {
-    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
   },
   computed: {
     ...mapState([
@@ -52,7 +48,6 @@ export default {
         }
         return images
       } catch (err) {
-        console.log(err)
         this.$router.push({ name: 'GenericError' }).catch(() => {})
       }
     },
@@ -88,8 +83,6 @@ export default {
             const imagesToLast = await this.getImages({
               from: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString()
             })
-            console.log(last)
-            console.log(new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString())
             if (imagesToLast) {
               images = imagesToLast
             }

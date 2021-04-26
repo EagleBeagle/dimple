@@ -58,7 +58,6 @@ export default {
         this.$store.dispatch('alert', 'Password reset successful')
         this.$router.push({ name: 'Authentication' }).catch(() => {})
       } catch (err) {
-        console.log(err)
         this.loading = false
         this.$store.dispatch('alert', 'Password reset failed')
         this.$router.push({ name: 'Authentication' }).catch(() => {})

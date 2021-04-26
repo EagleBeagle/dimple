@@ -75,7 +75,6 @@ import PhotoGrid from '@/components/common/PhotoGrid'
 import DeleteConfirmDialog from '@/components/pages/UserPage/DeleteConfirmDialog'
 import ImageService from '@/services/ImageService'
 import AlbumService from '@/services/AlbumService'
-import { Cloudinary } from 'cloudinary-core'
 import { mapState } from 'vuex'
 export default {
   components: {
@@ -97,8 +96,6 @@ export default {
     }
   },
   async mounted() {
-    console.log('Uj')
-    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
     await this.getAlbum()
   },
   computed: {
@@ -147,7 +144,7 @@ export default {
           }
         }
       } catch (err) {
-        console.log(err)
+        return
       }
     },
     async triggerRestoreAll() {
@@ -158,7 +155,6 @@ export default {
           await ImageService.removeFromTrash(imagesToRestore[i].id)
           this.images = this.images.filter(image => image.id !== imagesToRestore[i].id )
         } catch (err) {
-          console.log(err)
           this.$store.dispatch('alert', 'An error happened while restoring a photo')
         }
       }
@@ -180,7 +176,7 @@ export default {
           this.album = null
         }
       } catch (err) {
-        console.log(err)
+        this.$store.dispatch('alert', 'Cannot retrieve album information.')
       }
     },
     async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
@@ -226,19 +222,16 @@ export default {
           return images
         } else {
           filter.album = this.$route.params.album
-          console.log('itt')
           const images = (await ImageService.get(filter)).data.map((image) => {
             image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
             return image
           })
-          console.log(images)
           if (images.length) {
             this.lastDate = images[images.length - 1].createdAt
           }
           return images
         }
       } catch (err) {
-        console.log(err)
         if (err.response && err.response.status === 404) {
           this.$router.push({ name: 'ContentNotFoundError' }).catch(() => {})
         } else {
@@ -270,7 +263,6 @@ export default {
           }
           this.$store.dispatch('alert', 'Photo restored')
         } catch (err) {
-          console.log(err)
           this.$store.dispatch('alert', 'An error happened while restoring the photo')
         }
       }
@@ -286,7 +278,6 @@ export default {
           this.photoToDelete = photoToDelete
         }
       } catch(err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error occured during deletion.')
       }
     },
@@ -303,7 +294,6 @@ export default {
         this.photoToDelete = null
         this.interactionDisabled = false
       } catch(err) {
-        console.log(err)
         this.photoToDelete = null
         this.interactionDisabled = false
         this.showDeletionDialog = false
@@ -326,7 +316,6 @@ export default {
         this.$store.dispatch('updateShownUser')
         this.shouldDeleteAll = false
       } catch(err) {
-        console.log(err)
         this.showDeletionDialog = false
         this.interactionDisabled = false
         this.shouldDeleteAll = false
@@ -344,7 +333,6 @@ export default {
           await AlbumService.update(this.album.id, { visibility })
           this.album.visibility = visibility
         } catch (err) {
-          console.log(err)
           this.$store.dispatch('alert', 'An error occured while changing viewing privacy')
         }
       }
@@ -374,8 +362,6 @@ export default {
               const imagesToLast = await this.getImages({
                 from: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString()
               })
-              console.log(last)
-              console.log(new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString())
               if (imagesToLast) {
                 images = imagesToLast
               }

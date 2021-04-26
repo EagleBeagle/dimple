@@ -101,24 +101,20 @@ export default {
     
     window.addEventListener('unload', async () => {
       if (!this.uploading) return
-      console.log('Hát geci')
       try {
         for (let i = 0; i < this.imageUploadData.length; i++) {
           if (!this.fileMetadata[i].finalized) {
-            console.log('lelelelel')
             await ImageService.cancelUpload(this.imageUploadData[i].formData.get('public_id'), this.cancellationTokens[i])
           }
         }
       } catch (err) {
-        console.log(err)
+        this.$store.dispatch('alert', 'Error while cancelling uploads.')
       }
     })
     window.addEventListener('beforeunload', async event => {
       if (!this.uploading) return
-      console.log(event)
       event.preventDefault()
       event.returnValue = ""
-      console.log(event)
       return 'sadadasdsadasdsa'
     })
   },
@@ -166,14 +162,10 @@ export default {
             try {
               if (response[i] && response[i].status === 200) {
                 this.fileMetadata[i].finalized = true
-                console.log('finalizálvalalaldsaldsadsa')
-                console.log('itt')
               } else {
-                console.log('cancelt hívunk')
                 await ImageService.cancelUpload(this.imageUploadData[i].formData.get('public_id'), this.cancellationTokens[i])
               }
             } catch(err) {
-              console.log(err)
               this.failure = true
               this.fileMetadata[i].finished = false
               this.fileMetadata[i].failed = true
@@ -195,7 +187,6 @@ export default {
               this.clear()
             }, 2000)
         } catch (err) {
-          console.log(err)
           setTimeout(() => {
               this.show = false
               this.clear()

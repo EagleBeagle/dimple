@@ -116,7 +116,6 @@
 <script>
 import UserService from '@/services/UserService'
 import { mapState } from 'vuex'
-import { Cloudinary } from 'cloudinary-core'
 export default {
   data () {
     return {
@@ -139,7 +138,6 @@ export default {
     }
   },
   async mounted() {
-    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
     await this.getUser()
   },
   methods: {
@@ -164,7 +162,6 @@ export default {
         this.$store.dispatch('setUser', this.user)
         this.loading = false
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while changing your avatar.')
       }
     },
@@ -174,9 +171,7 @@ export default {
         const response = (await UserService.get(username)).data
         response.avatarUrl = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_300/${username}/avatar/${response.avatar}`
         this.shownUser = response
-        console.log(response)
       } catch (err) {
-        console.log(err)
         if (err.response && err.response.status === 404) {
           this.$router.push({ name: 'ContentNotFoundError' }).catch(() => {})
         } else {

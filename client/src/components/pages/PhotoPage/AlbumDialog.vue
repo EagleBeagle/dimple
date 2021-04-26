@@ -56,7 +56,6 @@
 </template>
 
 <script>
-import { Cloudinary } from 'cloudinary-core';
 import AlbumService from '@/services/AlbumService'
 import AlbumGrid from '@/components/common/AlbumGrid'
 import AddToAlbumsDialog from '@/components/pages/PhotoPage/AddToAlbumsDialog'
@@ -72,7 +71,6 @@ export default {
         return this.show
       },
       set () {
-        this.clearFields()
         this.$emit('close')
       }
     }
@@ -84,13 +82,11 @@ export default {
     }
   },
   async mounted() {
-    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME });
     await this.getAlbums()
   },
   methods: {
     async getAlbums() {
       try {
-        console.log(this.image.id)
         this.albums = (await AlbumService.get({ imageId: this.image.id })).data.map(album => {
           album.images = album.images.map(image => {
             image.url = image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_400/${image.fk_username}/${image.id}`
@@ -99,7 +95,6 @@ export default {
           return album
         })
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while fetching your albums')
         this.close()
       }
@@ -113,13 +108,9 @@ export default {
         selectedAlbum.imageCount++
         return selectedAlbum
       })
-      console.log(this.albums)
     },
     close() {
       this.dialog = false
-    },
-    async clearFields() {
-      console.log('lel')
     }
   }
 }

@@ -105,7 +105,6 @@ router.beforeEach((to, from, next) => {
   }
 
   if (authRequired && !loggedIn) {
-    console.log('itt')
     return next('/auth');
   }
 

@@ -115,7 +115,6 @@ export default {
         this.clearFields()
         this.dialog = false
       } catch(err) {
-        console.log(err)
         this.$store.dispatch('alert', `An error has happened during album creation`)
       }
     },

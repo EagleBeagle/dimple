@@ -206,7 +206,6 @@ export default {
           this.$router.push({ name: 'Explore' }).catch(() => {})
         } catch (err) {
           this.loading = false
-          console.log(err.response)
           if (err.response && err.response.data === 'Username already in use') {
             this.$store.dispatch('alert', 'Username already in use.')
           } else if (err.response && err.response.data === 'Email already in use') {

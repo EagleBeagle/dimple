@@ -284,7 +284,6 @@
 import { mapState } from 'vuex'
 import ImageService from '@/services/ImageService'
 import UserService from '@/services/UserService'
-import { Cloudinary } from 'cloudinary-core';
 import ShareDialog from '@/components/common/ShareDialog'
 import AlbumDialog from '@/components/pages/PhotoPage/AlbumDialog'
 import CommentContainer from '@/components/pages/PhotoPage/CommentContainer'
@@ -333,7 +332,6 @@ export default {
     }
   },
   async mounted() {
-    this.cloudinaryCore = new Cloudinary({ cloud_name: process.env.VUE_APP_CLOUDINARY_NAME })
     document.addEventListener('keyup', this.arrowsPressed)
     window.scrollTo(0, 0)
     await this.getImage()
@@ -355,7 +353,6 @@ export default {
         image.url = image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
         this.image = image
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('setErrorHappening', true)
         if (err.response && err.response.status === 403) {
           this.$router.push({ name: 'ContentNotFoundError' }).catch(() => {})
@@ -369,9 +366,7 @@ export default {
           user.avatar = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_300/${user.username}/avatar/${user.avatar}`
         }
         this.photoOwner = user
-        console.log(this.photoOwner)
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('setErrorHappening', true)
         if (err.response && err.response.status === 403) {
           this.$router.push({ name: 'Photos', params: { username: this.user.username, album: 'all'}}).catch(() => {})
@@ -442,10 +437,6 @@ export default {
               image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_200/${image.fk_username}/${image.id}`
               return image
             })
-          } else if (query.order === 'popularity:desc') {
-            console.log('popularity:desc')
-          } else if (query.order === 'popularity:asc') {
-            console.log('popularity:asc')
           }
         } catch (err) {
           this.$store.dispatch('setErrorHappening', true)
@@ -518,7 +509,6 @@ export default {
     async downloadImage() {
       try {
         const image = (await ImageService.download(this.image.url)).data
-        console.log(image)
         const url = window.URL.createObjectURL(new Blob([image]))
         const link = document.createElement('a')
         link.href = url
@@ -526,7 +516,6 @@ export default {
         document.body.appendChild(link)
         link.click()
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error has occured while preparing your download')
       }
     },
@@ -542,7 +531,6 @@ export default {
           this.$store.dispatch('alert', 'Photo deleted successfully.')
         }
       } catch(err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error occured during deletion.')
       }
     },
@@ -569,7 +557,6 @@ export default {
           await ImageService.update(this.image.id, { visibility })
           this.image.visibility = visibility
         } catch (err) {
-          console.log(err)
           this.$store.dispatch('alert', 'An error occured while changing viewing privacy')
         }
       }
@@ -583,7 +570,6 @@ export default {
         this.image.favouriteCount++
         this.image.favouritedByUser = true
       } catch (err) {
-        console.log(err)
         if (err.response.status === 403) {
           this.$store.dispatch('alert', 'Confirm your email address to make photos your favourites.')
         } else {
@@ -597,7 +583,6 @@ export default {
         this.image.favouriteCount--
         this.image.favouritedByUser = false
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error occured while unfavouriting the photo')
       }
     }

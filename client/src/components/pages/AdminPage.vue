@@ -393,11 +393,9 @@ export default {
       try {
         this.loadingInfo = true
         this.adminInfo = (await UserService.getAdminInfo()).data
-        console.log(this.adminInfo)
         this.loadingInfo = false
       } catch (err) {
         this.loadingInfo = false
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while page info')
       }
     },
@@ -408,7 +406,6 @@ export default {
         this.loadingUsers = false
       } catch (err) {
         this.loadingUsers = false
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while fetching users')
       }
     },
@@ -419,7 +416,6 @@ export default {
         this.loadingImages = false
       } catch (err) {
         this.loadingImages = false
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while fetching images')
       }
     },
@@ -430,7 +426,6 @@ export default {
         this.loadingAlbums = false
       } catch (err) {
         this.loadingAlbums = false
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while fetching albums')
       }
     },
@@ -441,7 +436,6 @@ export default {
         this.loadingComments = false
       } catch (err) {
         this.loadingComments = false
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while fetching comments')
       }
     },
@@ -455,7 +449,6 @@ export default {
           return localUser
         })
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while changing admin status of user.')
       }
     },
@@ -465,7 +458,6 @@ export default {
         this.users = this.users.filter(localUser => localUser.username !== user.username)
         this.$store.dispatch('alert', 'User deleted successfully.')
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened during user deletion.')
       }
     },
@@ -479,7 +471,6 @@ export default {
           return localImage
         })
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while changing visibility of image.')
       }
     },
@@ -489,7 +480,6 @@ export default {
         this.images = this.images.filter(localImage => localImage.id !== image.id)
         this.$store.dispatch('alert', 'Photo deleted successfully.')
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened during image deletion.')
       }
     },
@@ -499,7 +489,6 @@ export default {
         this.comments = this.comments.filter(localComment => localComment.id !== comment.id)
         this.$store.dispatch('alert', 'Comment deleted successfully.')
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened during comment deletion.')
       }
     },
@@ -513,7 +502,6 @@ export default {
           return localAlbum
         })
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened while changing visibility of album.')
       }
     },
@@ -523,7 +511,6 @@ export default {
         this.albums = this.albums.filter(localAlbum => localAlbum.id !== album.id)
         this.$store.dispatch('alert', 'Album deleted successfully.')
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'An error happened during album deletion.')
       }
     }

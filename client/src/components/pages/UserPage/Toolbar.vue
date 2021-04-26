@@ -178,9 +178,6 @@ export default {
       'visibility'
     ])
   },
-  mounted() {
-    console.log(this.$route.name)
-  },
   methods: {
     changeSort(sort) {
       this.$store.dispatch('changeSort', sort)
@@ -191,10 +188,8 @@ export default {
     async addPhotosToAlbum() {
       try {
         this.albumToAddPhotos = (await AlbumService.get({ id: this.$route.params.album })).data
-        console.log(this.albumToAddPhotos)
         this.showAddPhotosDialog = true
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'Error while trying to add photos to album')
       }
     },

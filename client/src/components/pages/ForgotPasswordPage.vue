@@ -49,7 +49,6 @@ export default {
         this.$store.dispatch('alert', 'An email has been sent to you with further details.')
       } catch (err) {
         this.loading = false
-        console.log(err)
         if (err.response.status === 404) {
           this.$store.dispatch('alert', 'No user exists with the given email.')
         } else {

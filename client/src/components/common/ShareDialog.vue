@@ -170,7 +170,6 @@ export default {
         document.execCommand('copy')
         this.$store.dispatch('alert', 'Link copied to clipboard')
       } catch (err) {
-        console.log(err)
         this.$store.dispatch('alert', 'Copying unsuccessful')
       }
     }
