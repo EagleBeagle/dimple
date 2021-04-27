@@ -154,7 +154,7 @@
               </v-tooltip>
             </v-col>
             <v-col :cols="image.fk_username === user.username ? 3 : 4" :sm="image.fk_username === user.username ? 3 : 4" v-if="image.fk_username === user.username">
-              <v-tooltip top color="blue">
+              <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon large :color="$vuetify.breakpoint.xsOnly ? 'blue' : 'white'" @click="deleteImage" v-bind="attrs" v-on="on">
                     mdi-delete

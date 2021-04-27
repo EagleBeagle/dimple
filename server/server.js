@@ -5,7 +5,7 @@ const logger = require('morgan')
 require('dotenv').config()
 // production: const path = require('path')
 const history = require('connect-history-api-fallback')
-
+const faceapiConfig = require('./config/faceapi.config')
 const app = express()
 
 app.use(cors())
@@ -20,6 +20,8 @@ app.use(history())
 
 require('./config/passport.js')
 require('./config/db.config.js')
+
+faceapiConfig.loadModel()
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {

@@ -11,7 +11,7 @@
     <v-card-text class="album-card pa-0">
       <v-container v-if="images.length" style="upload-container" fluid>
         <v-row justify="start">
-          <v-col cols="4" sm="6" md="4" lg="3" class="pa-2" v-for="(image, index) in images" :key="index">
+          <v-col cols="4" sm="6" md="4" lg="3" class="pa-1 pa-sm-2" v-for="(image, index) in images" :key="index">
             <v-img 
               :src="image.url" 
               v-bind:class="[image.selected ? 'selected' : 'not-selected', 'photo']"

@@ -1,5 +1,5 @@
 <template>
-  <v-container class="px-xs-0 px-sm-4 px-md-16 photo-container" fluid>
+  <v-container class="px-4 px-sm-4 px-md-16 photo-container" fluid>
     <v-row v-if="images" justify="start" align="start" class="align-self-start px-xs-0 px-sm-4 px-md-16">
       <v-col xs="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
         <div class="text-h2 font-weight-regular mt-2 mb-0">Explore</div>

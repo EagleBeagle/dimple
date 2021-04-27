@@ -1,5 +1,5 @@
 <template>
-  <v-container class="px-8 photo-container" fluid>
+  <v-container class="px-4 px-sm-8 photo-container" fluid>
     <v-row v-if="images" justify="start" align="start" class="align-self-start">
       <v-col v-if="album" cols="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
         <div class="font-weight-regular mt-2 mb-0" :class="$vuetify.breakpoint.mdAndUp ? 'text-h3' : 'text-h4'">{{ album.name }}</div>
@@ -142,7 +142,7 @@ export default {
     async newPhotoId() {
       try {
         const newPhoto = (await ImageService.get({ id: this.newPhotoId })).data
-        newPhoto.url = `https://res.cloudinary.com/dimplecloud/image/upload/${newPhoto.fk_username}/${newPhoto.id}`
+        newPhoto.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_600/${newPhoto.fk_username}/${newPhoto.id}`
         const albumIds = (await AlbumService.get({ imageId: newPhoto.id })).data.map(album => album.id)
         albumIds.push('all')
         if (albumIds.includes(this.$route.params.album)) {
@@ -199,7 +199,7 @@ export default {
         if (this.$route.params.album === 'all') {
           filter.user = this.$route.params.username
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_600/${image.fk_username}/${image.id}`
             return image
           })
           if (images.length) {
@@ -212,7 +212,7 @@ export default {
           filter.user = this.$route.params.username
           filter.favourites = true
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_600/${image.fk_username}/${image.id}`
             return image
           })
           if (images.length) {
@@ -222,7 +222,7 @@ export default {
         } else if (this.$route.params.album === 'trash') {
           filter.trash = true
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_600/${image.fk_username}/${image.id}`
             return image
           })
           if (images.length) {
@@ -232,7 +232,7 @@ export default {
         } else {
           filter.album = this.$route.params.album
           const images = (await ImageService.get(filter)).data.map((image) => {
-            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_600/${image.fk_username}/${image.id}`
             return image
           })
           if (images.length) {

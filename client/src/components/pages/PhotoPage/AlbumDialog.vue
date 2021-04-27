@@ -5,9 +5,9 @@
   :width="$vuetify.breakpoint.mdAndUp ? '50%' : '100%'"
   scrollable>
   <v-card class="album-container">
-    <v-card-title class="headline">
+    <v-card-title :class="$vuetify.breakpoint.smAndUp ? 'headline' : 'text-body-1 font-weight-bold'">
       <span v-if="albums.length > 0">This photo is in {{ `${albums.length} ${albums.length === 1 ? 'album' : 'albums'}` }}</span>
-      <span v-else class="text-h6">This photo is not in any albums yet</span>
+      <span v-else :class="$vuetify.breakpoint.smAndUp ? 'headline' : 'text-body-2 font-weight-bold'" >This photo is not in any albums yet</span>
       <v-spacer></v-spacer>
       <v-icon @click="close()">
         mdi-close
@@ -25,7 +25,7 @@
               large
               color="blue"
               class="white--text"
-              @click="addToAlbumsDialog = true">
+              @click="addPhotoToAlbumsDialog = true">
               Add to albums
             </v-btn>
           </v-col>
@@ -40,17 +40,17 @@
         large
         color="blue"
         class="white--text"
-        @click="addToAlbumsDialog = true">
+        @click="addPhotoToAlbumsDialog = true">
         Edit albums
       </v-btn>
     </v-card-actions>
-    <add-to-albums-dialog
-        v-if="addToAlbumsDialog" 
-        :show="addToAlbumsDialog" 
+    <add-photo-to-albums-dialog
+        v-if="addPhotoToAlbumsDialog" 
+        :show="addPhotoToAlbumsDialog" 
         :image="image" 
         :selectedAlbums="albums"
         @updateAlbums="updateAlbums"
-        @close="addToAlbumsDialog = false" />
+        @close="addPhotoToAlbumsDialog = false" />
   </v-card>
   </v-dialog>
 </template>
@@ -58,9 +58,9 @@
 <script>
 import AlbumService from '@/services/AlbumService'
 import AlbumGrid from '@/components/common/AlbumGrid'
-import AddToAlbumsDialog from '@/components/pages/PhotoPage/AddToAlbumsDialog'
+import AddPhotoToAlbumsDialog from '@/components/pages/PhotoPage/AddPhotoToAlbumsDialog'
 export default {
-  components: { AlbumGrid, AddToAlbumsDialog },
+  components: { AlbumGrid, AddPhotoToAlbumsDialog },
   props: [
     'show',
     'image'
@@ -78,7 +78,7 @@ export default {
   data () {
     return {
       albums: null,
-      addToAlbumsDialog: false
+      addPhotoToAlbumsDialog: false
     }
   },
   async mounted() {

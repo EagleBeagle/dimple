@@ -6,7 +6,7 @@
     <v-card-title class="headline">
       Create New Album
     </v-card-title>
-    <v-card-text>
+    <v-card-text class="pb-0">
       <v-form
         ref="form"
         outlined

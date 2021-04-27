@@ -27,6 +27,7 @@ db.user = require('../models/user.model.js')(sequelize, Sequelize)
 db.album = require('../models/album.model.js')(sequelize, Sequelize)
 db.image = require('../models/image.model.js')(sequelize, Sequelize)
 db.comment = require('../models/comment.model.js')(sequelize, Sequelize)
+db.face = require('../models/face.model.js')(sequelize, Sequelize)
 
 db.user.hasMany(db.album)
 db.album.belongsTo(db.user, {
@@ -63,6 +64,12 @@ db.comment.belongsTo(db.image)
 
 db.image.belongsToMany(db.user, { as: 'favourite', through: 'favourites' })
 db.user.belongsToMany(db.image, { as: 'favourite', through: 'favourites' })
+
+db.image.hasMany(db.face)
+db.face.belongsTo(db.image)
+
+db.album.hasMany(db.face)
+db.face.belongsTo(db.album)
 
 db.sequelize.sync({
   alter: true

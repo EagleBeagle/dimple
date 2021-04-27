@@ -51,17 +51,17 @@
           </v-col>
           <v-col cols="4" sm="2" class="py-1">
             <shareNetwork
-              network="messenger"
+              network="twitter"
               :url="url"
-              :title="image ? `${user.username} would like to share a photo with you!` : `${user.username} would like to share an album with you!`">
+              :title="image ? `Dimple: ${user.username} would like to share a photo with you!` : `Dimple: ${user.username} would like to share an album with you!`">
               <v-btn
                 large
                 fab
                 depressed
-                color="#00B2FF"
+                color="#1DA1F2"
                 class="network-icon">
                 <v-icon color="white">
-                  mdi-facebook-messenger
+                  mdi-twitter
                 </v-icon>
               </v-btn>
             </shareNetwork>
@@ -85,17 +85,17 @@
           </v-col>
           <v-col cols="4" sm="2" class="py-1">
             <shareNetwork
-              network="twitter"
+              network="skype"
               :url="url"
-              :title="image ? `Dimple: ${user.username} would like to share a photo with you!` : `Dimple: ${user.username} would like to share an album with you!`">
+              :title="image ? `${user.username} would like to share a photo with you!` : `${user.username} would like to share an album with you!`">
               <v-btn
                 large
                 fab
                 depressed
-                color="#1DA1F2"
+                color="#00AFF0"
                 class="network-icon">
                 <v-icon color="white">
-                  mdi-twitter
+                  mdi-skype
                 </v-icon>
               </v-btn>
             </shareNetwork>

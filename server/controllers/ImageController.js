@@ -5,6 +5,7 @@ const Image = db.image
 const Album = db.album
 const User = db.user
 const cloudinary = require('../config/cloudinary.config.js')
+const FaceDetectionService = require('../services/FaceDetectionService')
 
 module.exports = {
   async initiateUpload (req, res) {
@@ -38,8 +39,10 @@ module.exports = {
           } catch (err) {
             console.log(err)
           }
+        } else { // all the ML stuff
+          await FaceDetectionService.detectFaces(image)
         }
-      }, 65 * 60 * 1000)
+      }, 5000 /* 65 * 60 * 1000 */)
       res.status(201).send({
         timestamp,
         signature,

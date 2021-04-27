@@ -2,11 +2,11 @@
 <v-dialog
   scrollable
   v-model="show"
-  :width="$vuetify.breakpoint.smAndDown ? '100%' : '50%'">
+  :width="$vuetify.breakpoint.smAndDown ? '100%' : $vuetify.breakpoint.mdOnly ? '70%' : '50%'">
   <v-card>
     <v-card-title>
-      <v-container class="ma-0 pa-0">
-        <v-row justify="space-between" class="mb-1">
+      <v-container class="pa-0 ma-0">
+        <v-row justify="space-between" class="mb-sm-1">
           <v-col cols="3" class="ma-0 pa-0">
             <span class="text-h5 font-weight-medium" style="white-space: nowrap">Upload New Photos</span>
           </v-col>
@@ -23,9 +23,9 @@
       </v-container>
     </v-card-title>
     <v-divider></v-divider>
-    <v-container style="padding-bottom: 0px; padding-top: 0px">
+    <v-container class="py-0">
       <v-row justify="space-around">
-        <v-col cols="3" style="padding: 0px" v-if="$vuetify.breakpoint.smAndUp">
+        <v-col cols="3" class="pa-0" v-if="$vuetify.breakpoint.smAndUp">
           <v-card-text>
           <v-container class="ml-4">
             <v-row v-if="!selectedCount" justify="center">
@@ -81,11 +81,11 @@
         </v-card-text>
         </v-col>
         <v-divider v-if="$vuetify.breakpoint.smAndUp" vertical></v-divider>
-        <v-col cols="12" sm="8" style="padding: 0px">
-        <v-card-text class="photo-grid" style="height: 400px;">
-          <v-container style="upload-container" fluid>
+        <v-col cols="12" sm="8" class="pa-0">
+        <v-card-text class="photo-grid" :style="$vuetify.breakpoint.smAndUp ? 'height: 400px;' : 'height: 300px'">
+          <v-container style="upload-container" fluid :class="$vuetify.breakpoint.xsOnly ? 'pa-1' : ''">
             <v-row justify="start">
-              <v-col cols="6" sm="6" md="4" lg="3" class="pa-2" v-for="(imagePreview, index) in imagePreviews" :key="index">
+              <v-col cols="4" sm="6" md="4" lg="3" :class="$vuetify.breakpoint.smAndUp ? 'pa-2' : 'pa-1'" v-for="(imagePreview, index) in imagePreviews" :key="index">
                 <v-img 
                   :src="imagePreview.src" 
                   v-bind:class="[imagePreview.selected ? 'selected' : 'not-selected', 'photo']"
@@ -100,7 +100,6 @@
       </v-row>
     </v-container>
     <v-divider></v-divider>
-
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn

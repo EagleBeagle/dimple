@@ -1,18 +1,18 @@
 <template>
   <v-container class="pa-0 ma-0 photo-container" fluid>
       <transition-group name="fade" class="row wrap justify-start">
-        <v-col cols="12" sm="6" md="4" lg="3" class="image-div pa-3 item" v-for="image in images" :key="image.id" style="animation-duration: 0.3s">
+        <v-col cols="6" sm="4" md="4" lg="3" class="image-div pa-1 pa-sm-3 item" v-for="image in images" :key="image.id" style="animation-duration: 0.3s">
           <kinesis-container>
             <kinesis-element :strength="10" type="depth">
               <v-hover v-slot="{hover}">
-                <v-card class="image-card" elevation="20" @click="!interactionDisabled ? $emit('imageClicked', image) : null">
+                <v-card class="image-card" :elevation="$vuetify.breakpoint.smAndUp ? '20' : '3'" @click="!interactionDisabled ? $emit('imageClicked', image) : null">
                   <v-img 
                     class="image"
                     aspect-ratio="1"
                     :src="image.url">
                     <v-fade-transition>
                       <v-overlay
-                        v-if="(hover || $vuetify.breakpoint.xsOnly) && !interactionDisabled"
+                        v-if="hover && $vuetify.breakpoint.smAndUp && !interactionDisabled"
                         absolute
                         color="#000000"
                         :opacity="$vuetify.breakpoint.xsOnly ? '0' : '0.3'">

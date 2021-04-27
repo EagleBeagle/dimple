@@ -54,8 +54,8 @@
         </v-col>
         <v-col cols="9" sm="8" md="8" lg="8" class="snack-column">
           <div class="text-h6 pl-3 ml-3">
-              <span v-if="uploadCount === 1">Uploading 1 photo</span>
-              <span v-if="uploadCount > 1">Uploading {{ uploadCount }} photos</span>
+              <span v-if="uploadCount === 1 && (!showSuccess && !showFailure)">Uploading 1 photo</span>
+              <span v-if="uploadCount > 1 && (!showSuccess && !showFailure)">Uploading {{ uploadCount }} photos</span>
               <span v-if="showFailure">Some uploads failed</span>
               <span v-if="showSuccess">Upload successful</span>
           </div>
@@ -265,5 +265,9 @@ export default {
 .fade-enter,
 .fade-leave-to {
     opacity: 0
+}
+
+div.v-snack:not(.v-snack--absolute) {
+  height: 100%;
 }
 </style>
