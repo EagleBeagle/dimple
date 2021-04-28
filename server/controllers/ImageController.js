@@ -4,6 +4,7 @@ const Op = db.Sequelize.Op
 const Image = db.image
 const Album = db.album
 const User = db.user
+const Face = db.face
 const cloudinary = require('../config/cloudinary.config.js')
 const FaceDetectionService = require('../services/FaceDetectionService')
 
@@ -42,7 +43,7 @@ module.exports = {
         } else { // all the ML stuff
           await FaceDetectionService.detectFaces(image)
         }
-      }, 5000 /* 65 * 60 * 1000 */)
+      }, 10000 /* 65 * 60 * 1000 */)
       res.status(201).send({
         timestamp,
         signature,
@@ -156,7 +157,18 @@ module.exports = {
         if (response.result !== 'ok' && response.result !== 'not found') {
           return res.status(400).send('cloudinary error')
         }
+        const faces = await Face.findAll({ where: { imageId: id } })
+        const faceAlbums = await Album.findAll({
+          where: { id: faces.map(face => face.albumId) }
+        })
+        await Face.destroy({ where: { imageId: id } })
         await image.destroy()
+        for (let i = 0; i < faceAlbums.length; i++) {
+          const faceCount = await Face.count({ where: { albumId: faceAlbums[i].id } })
+          if (faceCount === 0) {
+            await faceAlbums[i].destroy()
+          }
+        }
         return res.status(200).send()
       } else {
         return res.status(403).send('Unauthorized')

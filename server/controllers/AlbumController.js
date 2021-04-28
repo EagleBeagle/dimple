@@ -32,9 +32,12 @@ module.exports = {
       const user = req.query.user
       const imageId = req.query.image
       const visibility = req.query.visibility
+      const people = req.query.people
       const admin = req.query.admin
       const queryObject = {
-        where: {},
+        where: {
+          type: 'face'
+        },
         order: [
           ['name', 'ASC']
         ],

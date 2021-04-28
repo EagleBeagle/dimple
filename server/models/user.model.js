@@ -10,6 +10,10 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       unique: 'email'
     },
+    password: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
     confirmationToken: {
       type: Sequelize.STRING,
       unique: 'confirmationToken'
@@ -25,9 +29,8 @@ module.exports = (sequelize, Sequelize) => {
     avatar: {
       type: Sequelize.STRING
     },
-    password: {
-      type: Sequelize.STRING,
-      allowNull: false
+    notification: {
+      type: Sequelize.STRING
     },
     admin: {
       type: Sequelize.BOOLEAN,

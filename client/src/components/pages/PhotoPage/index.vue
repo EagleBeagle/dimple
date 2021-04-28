@@ -69,7 +69,7 @@
             'photo-rail-md': $vuetify.breakpoint.mdOnly,
             'photo-rail-sm': $vuetify.breakpoint.smOnly,
             'photo-rail-xs': $vuetify.breakpoint.xsOnly}">
-          <v-row justify="center">
+          <v-row justify="center" v-if="!loadingNeighbours">
             <v-col v-if="leftImages.length === 0" cols="2" sm="1" class="pa-0">
               <v-img v-if="image" height="40px" width="40px" aspect-ratio="1" class="thumbnail"></v-img>
             </v-col>
@@ -90,6 +90,15 @@
             </v-col>
             <v-col v-if="rightImages.length === 0" cols="2" sm="1" class="pa-0">
               <v-img v-if="image" height="40px" width="40px" aspect-ratio="1" class="thumbnail"></v-img>
+            </v-col>
+          </v-row>
+          <v-row justify="center" v-else>
+            <v-col class="pa-0 pt-2">
+              <v-progress-circular
+                size="25"
+                indeterminate
+                color="blue"
+              ></v-progress-circular>
             </v-col>
           </v-row>
         </v-container>
@@ -307,7 +316,8 @@ export default {
       goBackParams: null,
       commentCount: 0,
       lastSwitchedPhotoTime: null,
-      photoOwner: null
+      photoOwner: null,
+      loadingNeighbours: false
     }
   },
   computed: {
@@ -412,6 +422,7 @@ export default {
             rightFilter.explore = true
           }
           if (query.order === 'date:desc') {
+            this.loadingNeighbours = true
             leftFilter.from = this.image.createdAt
             leftFilter.sort = 'date:asc'
             this.leftImages = (await ImageService.get(leftFilter)).data.reverse().map(image => {
@@ -424,7 +435,9 @@ export default {
               image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_100/${image.fk_username}/${image.id}`
               return image
             })
+            this.loadingNeighbours = false
           } else if (query.order === 'date:asc') {
+            this.loadingNeighbours = true
             leftFilter.to = this.image.createdAt
             leftFilter.sort = 'date:desc'
             this.leftImages = (await ImageService.get(leftFilter)).data.reverse().map(image => {
@@ -437,12 +450,12 @@ export default {
               image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_100/${image.fk_username}/${image.id}`
               return image
             })
+            this.loadingNeighbours = false
           }
         } catch (err) {
+          this.loadingNeighbours = false
           this.$store.dispatch('setErrorHappening', true)
         }
-      } else { // todo todooo
-
       }
     },
     async imageFromThumbnail(index, side) {

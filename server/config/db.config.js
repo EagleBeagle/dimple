@@ -66,7 +66,7 @@ db.image.belongsToMany(db.user, { as: 'favourite', through: 'favourites' })
 db.user.belongsToMany(db.image, { as: 'favourite', through: 'favourites' })
 
 db.image.hasMany(db.face)
-db.face.belongsTo(db.image)
+db.face.belongsTo(db.image, { onDelete: 'CASCADE' })
 
 db.album.hasMany(db.face)
 db.face.belongsTo(db.album)

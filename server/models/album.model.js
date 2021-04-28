@@ -1,8 +1,7 @@
 module.exports = (sequelize, Sequelize) => {
   const Album = sequelize.define('album', {
     name: {
-      type: Sequelize.STRING(25),
-      allowNull: false
+      type: Sequelize.STRING(25)
     },
     visibility: {
       type: Sequelize.BOOLEAN,
@@ -10,6 +9,9 @@ module.exports = (sequelize, Sequelize) => {
     },
     description: {
       type: Sequelize.STRING(200)
+    },
+    type: {
+      type: Sequelize.STRING
     }
   })
 
