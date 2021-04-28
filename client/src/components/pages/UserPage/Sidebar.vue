@@ -58,7 +58,7 @@
       <v-list-item-group
         color="primary"
         class="pa-2">
-        <v-list-item ref="albumsButton" @click="goTo('UserAlbums')">
+        <v-list-item @click="goTo('UserAlbums')">
           <v-list-item-icon>
             <v-icon>mdi-image-album</v-icon>
           </v-list-item-icon>
@@ -67,7 +67,6 @@
           </v-list-item-content>
         </v-list-item>
         <v-list-item
-          ref="photosButton" 
           @click="goTo('Photos', { username: $route.params.username, album: 'all' })">
           <v-list-item-icon>
             <v-icon>mdi-image-multiple</v-icon>
@@ -76,7 +75,18 @@
             <v-list-item-title>Photos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item ref="favesButton" @click="goTo('Photos', { username: $route.params.username, album: 'favourites' })">
+        <v-list-item
+          v-if="$route.params.username === user.username && shownUser && shownUser.hasPeople"
+          @click="goTo('UserPeople', { username: $route.params.username })">
+          <v-list-item-icon>
+            <v-icon v-if="notification !=='people'">mdi-account-multiple</v-icon>
+            <v-icon v-else color="blue">mdi-account-multiple-plus</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title :class="notification =='people' ? 'blue--text' : null">People</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item @click="goTo('Photos', { username: $route.params.username, album: 'favourites' })">
           <v-list-item-icon>
             <v-icon>mdi-star</v-icon>
           </v-list-item-icon>
@@ -84,7 +94,7 @@
             <v-list-item-title>Favourites</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item ref="trashButton" v-if="user.username === $route.params.username" @click="goTo('Photos', { username: $route.params.username, album: 'trash' })">
+        <v-list-item v-if="user.username === $route.params.username" @click="goTo('Photos', { username: $route.params.username, album: 'trash' })">
           <v-list-item-icon>
             <v-icon>mdi-trash-can</v-icon>
           </v-list-item-icon>
@@ -120,7 +130,8 @@ export default {
   data () {
     return {
       shownUser: null,
-      loading: false
+      loading: false,
+      notification: ''
     }
   },
   computed: {
@@ -141,7 +152,17 @@ export default {
     await this.getUser()
   },
   methods: {
-    goTo(route, params) {
+    async goTo(route, params) {
+      if (route === 'UserPeople' && this.notification === 'people') {
+        try {
+          this.notification = ''
+          await UserService.update(this.user.username, {
+            notification: ''
+          })
+        } catch {
+          this.notification = ''
+        }
+      }
       if (this.$route.name !== route || (this.$route.name === 'Photos' && this.$route.params.album !== params.album)) {
         this.$router.push({ name: route, params }).catch(() => {})
       } else {
@@ -171,6 +192,12 @@ export default {
         const response = (await UserService.get(username)).data
         response.avatarUrl = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_300/${username}/avatar/${response.avatar}`
         this.shownUser = response
+        if (username === this.user.username && response.notification) {
+          if (response.notification === 'people') {
+            this.$store.dispatch('update', 'New people have appeared in your photos!')
+          }
+          this.notification = response.notification
+        }
       } catch (err) {
         if (err.response && err.response.status === 404) {
           this.$router.push({ name: 'ContentNotFoundError' }).catch(() => {})

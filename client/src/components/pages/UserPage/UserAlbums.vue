@@ -2,8 +2,9 @@
 <v-container class="px-8 album-container" fluid>
     <v-row justify="start">
       <v-col class style="text-align: left">
-        <div v-if="$route.params.username === user.username" class="text-h3 font-weight-regular my-2">Your Albums</div>
-        <div v-else class="text-h3 font-weight-regular my-2">{{ $route.params.username }}'s albums</div>
+        <div v-if="$route.params.username === user.username && $route.name === 'UserAlbums'" class="text-h3 font-weight-regular my-2">Your Albums</div>
+        <div v-else-if="$route.name === 'UserAlbums'" class="text-h3 font-weight-regular my-2">{{ $route.params.username }}'s albums</div>
+        <div v-else-if="$route.name === 'UserPeople'" class="text-h3 font-weight-regular my-2">People</div>
       </v-col>
     </v-row>
     <v-divider class="my-2"></v-divider>
@@ -98,6 +99,9 @@ export default {
       await this.getAlbums()
       this.rerenderAlbumGrid()
       window.scrollTo(0, 0)
+    },
+    '$route.name': async function () {
+      await this.getAlbums()
     }
   },
   methods: {
@@ -107,7 +111,8 @@ export default {
     async getAlbums() {
       try {
         let filter = {
-          user: this.$route.params.username
+          user: this.$route.params.username,
+          people: this.$route.name === 'UserPeople'
         }
         if (this.visibility === 'public') {
           filter.visibility = true
@@ -117,7 +122,7 @@ export default {
         this.loading = true
         this.albums = (await AlbumService.get(filter)).data.map(album => {
           album.images = album.images.map(image => {
-            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
+            image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_400/${image.fk_username}/${image.id}`
             return image
           })
           return album
@@ -173,7 +178,7 @@ export default {
     },
     updatePhotos(selectedPhotos) {
       selectedPhotos.forEach(selectedPhoto => {
-        this.albumToAddPhotos.images.push({ url: `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${this.albumToAddPhotos.fk_username}/${selectedPhoto}` })
+        this.albumToAddPhotos.images.push({ url: `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_400/${this.albumToAddPhotos.fk_username}/${selectedPhoto}` })
         this.albumToAddPhotos.imageCount++
       })
     }

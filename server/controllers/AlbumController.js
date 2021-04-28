@@ -1,7 +1,9 @@
 const cloudinary = require('../config/cloudinary.config.js')
 const db = require('../config/db.config.js')
+const Op = db.Sequelize.Op
 const Album = db.album
 const Image = db.image
+const Face = db.face
 
 module.exports = {
   async create (req, res) {
@@ -35,9 +37,7 @@ module.exports = {
       const people = req.query.people
       const admin = req.query.admin
       const queryObject = {
-        where: {
-          type: 'face'
-        },
+        where: {},
         order: [
           ['name', 'ASC']
         ],
@@ -65,8 +65,13 @@ module.exports = {
           return res.status(403).send()
         }
       }
-      if ((id && user) || (id && imageId) || (user && imageId) || (!id && !user && !imageId)) {
+      if ((id && user) || (id && imageId) || (user && imageId) || (!id && !user && !imageId) || (people && id) || (people && imageId)) {
         return res.status(400).send('Invalid query')
+      }
+      if (people) { // típusváltás
+        queryObject.where.type = 'people'
+      } else {
+        queryObject.where.type = 'user'
       }
       queryObject.attributes.include.push([
         db.Sequelize.literal(`(
@@ -78,6 +83,7 @@ module.exports = {
       ])
       if (id) {
         queryObject.where.id = req.query.id
+        delete queryObject.where.type
         const album = await Album.findOne(queryObject)
         if (!album) {
           return res.status(404).send('Album not found')
@@ -151,6 +157,9 @@ module.exports = {
           })
         }
       }
+      if (people) {
+        albums = albums.filter(album => album.dataValues.imageCount > 1)
+      }
       res.status(200).send(albums)
     } catch (err) {
       console.log(err)
@@ -161,9 +170,10 @@ module.exports = {
   async update (req, res) {
     try {
       const albumId = req.params.id
+      const name = req.body.name
       const images = req.body.images
       const visibility = req.body.visibility
-      if (!images && typeof visibility === 'undefined') {
+      if (!images && !name && typeof visibility === 'undefined') {
         return res.status(400).send()
       }
       const album = await Album.findByPk(albumId)
@@ -172,6 +182,13 @@ module.exports = {
       }
       if (album.fk_username !== req.user.username && !req.user.admin) {
         return res.status(403).send('Unauthorized')
+      }
+      if (name) {
+        if (album.type !== 'people') {
+          return res.status(400).send()
+        }
+        album.name = name
+        await album.save()
       }
       if (images) {
         await album.addImages(images)
@@ -196,6 +213,7 @@ module.exports = {
         return res.status(404).send('Album not found')
       }
       if (album.fk_username === username || req.user.admin) {
+        await Face.destroy({ where: { albumId: album.id } })
         await album.destroy()
         return res.status(200).send()
       } else {

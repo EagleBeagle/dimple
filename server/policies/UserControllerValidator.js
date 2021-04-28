@@ -101,7 +101,8 @@ module.exports = {
       ).required()
     })
     const bodySchema = Joi.object({
-      admin: Joi.boolean()
+      admin: Joi.boolean(),
+      notification: Joi.string().valid('people', '') // notificaiton típusok
     })
     const paramsError = paramsSchema.validate(req.params)
     const bodyError = bodySchema.validate(req.body)

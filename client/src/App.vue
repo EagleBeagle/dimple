@@ -7,13 +7,39 @@
         <router-view  />
       </v-main>
       <v-snackbar
+        v-if="showUpdateSnackbar && ['Photos', 'UserAlbums', 'UserPeople'].includes($route.name)"
+        v-model="showUpdateSnackbar"
+        top
+        class="mt-6"
+        timeout="5000"
+        style="text-align: center"
+        multi-line>
+        <v-container class="pa-1 pl-3">
+          <v-row justify="space-between">
+            <v-col cols="1" class="pa-0" align-self="center">
+              <v-icon color="white">
+                mdi-bell
+              </v-icon>
+            </v-col>
+            <v-col cols="10" class="pa-0 pl-2" style="font-size: 14px; text-align: start" align-self="center">
+              {{ updateSnackbarText }}
+            </v-col>
+            <v-col cols="1" class="pa-0" align-self="center">
+              <v-icon color="white" @click="hideNotification">
+                mdi-close
+              </v-icon>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-snackbar>
+      <v-snackbar
         v-if="showAlertSnackbar"
         v-model="showAlertSnackbar"
         bottom middle
         timeout="2000"
         style="text-align: center"
         >
-        {{ snackbarText }}
+        {{ alertSnackbarText }}
       </v-snackbar>
       <upload-dialog />
       <upload-snackbar v-if="user.jwtToken" />
@@ -25,12 +51,14 @@ import PageHeader from '@/components/PageHeader.vue'
 import UploadSnackbar from '@/components/UploadSnackbar'
 import UploadDialog from '@/components/UploadDialog'
 import { mapState } from 'vuex'
-
+import UserService from '@/services/UserService'
 export default {
   data() {
     return {
       showAlertSnackbar: false,
-      snackbarText: '',
+      alertSnackbarText: '',
+      showUpdateSnackbar: false,
+      updateSnackbarText: '',
       mainMargin: 'margin-top: 0px'
     }
   },
@@ -49,19 +77,36 @@ export default {
   computed: {
     ...mapState([
       'alert',
+      'update',
       'user'
     ])
   },
   watch: {
     alert () {
-      this.snackbarText = this.$store.state.snackbarText
+      this.alertSnackbarText = this.$store.state.alertSnackbarText
       this.showAlertSnackbar = true
+    },
+    update () {
+      this.updateSnackbarText = this.$store.state.updateSnackbarText
+      this.showUpdateSnackbar = true
     },
     user (value) {
       if (value.jwtToken) {
         this.mainMargin = 'margin-top: 60px'
       } else {
         this.mainMargin = 'margin-top: 0px'
+      }
+    }
+  },
+  methods: {
+    async hideNotification() {
+      try {
+        this.showUpdateSnackbar = false
+        await UserService.update(this.user.username, {
+          notification: ''
+        })
+      } catch {
+        this.showUpdateSnackbar = false
       }
     }
   }

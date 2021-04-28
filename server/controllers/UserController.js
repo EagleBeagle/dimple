@@ -192,7 +192,17 @@ module.exports = {
     try {
       const username = req.params.username
       const admin = req.body.admin
-      await User.update({ admin }, { where: { username } })
+      const notification = req.body.notification
+      if (admin) {
+        if (req.user.admin) {
+          await User.update({ admin }, { where: { username } })
+        } else {
+          return res.status(403).send('Unauthorized')
+        }
+      }
+      if (typeof notification !== 'undefined') {
+        await User.update({ notification }, { where: { username } })
+      }
       res.status(200).send()
     } catch (err) {
       console.log(err)
@@ -264,6 +274,7 @@ module.exports = {
         return res.status(404).send('User not found')
       }
       let imageCount
+      let hasPeople = false
       if (req.user.username === user.username) {
         imageCount = await Image.count({
           where: {
@@ -271,6 +282,30 @@ module.exports = {
             cancellationToken: null
           }
         })
+        const albums = await Album.findAll({
+          where: {
+            type: 'people',
+            fk_username: user.username
+          },
+          attributes: {
+            include: [
+              [
+                db.Sequelize.literal(`(
+                  SELECT COUNT(*) FROM albumimage
+                  WHERE albumimage.albumId = album.id AND 
+                  (SELECT trashed FROM images WHERE id = albumimage.imageId ) = 0 AND 
+                  (SELECT cancellationToken FROM images WHERE id = albumimage.imageId ) IS NULL
+                )`), 'imageCount'
+              ]
+            ]
+          }
+        })
+        for (let i = 0; i < albums.length; i++) {
+          if (albums[i].dataValues.imageCount >= 2) {
+            hasPeople = true
+            break
+          }
+        }
       } else {
         imageCount = await Image.count({
           where: {
@@ -280,11 +315,17 @@ module.exports = {
           }
         })
       }
-      return res.status(200).send({
+      const response = {
         username: user.username,
         avatar: user.avatar,
         imageCount
-      })
+      }
+      if (user.id === req.user.id) {
+        response.notification = user.notification
+        response.hasPeople = hasPeople
+      }
+      console.log(hasPeople)
+      return res.status(200).send(response)
     } catch (err) {
       console.log(err)
       res.status(500).send()

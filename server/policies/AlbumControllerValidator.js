@@ -28,6 +28,7 @@ module.exports = {
       ),
       image: Joi.string().uuid(),
       visibility: Joi.boolean(),
+      people: Joi.boolean(),
       admin: Joi.boolean()
     })
     const { error } = schema.validate(req.query)
@@ -46,6 +47,7 @@ module.exports = {
       id: Joi.number().required()
     })
     const bodySchema = Joi.object({
+      name: Joi.string().min(1).max(25),
       images: Joi.array().items(Joi.string().uuid()),
       visibility: Joi.boolean()
     })

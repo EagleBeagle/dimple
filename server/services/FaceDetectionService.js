@@ -1,8 +1,10 @@
 const faceapi = require('@vladmandic/face-api')
 const { loadImage } = require('canvas')
 const db = require('../config/db.config.js')
+const Op = db.Sequelize.Op
 const Face = db.face
 const Album = db.album
+const User = db.user
 
 module.exports = {
   async detectFaces (image) {
@@ -45,11 +47,23 @@ module.exports = {
             if (!albumsAlreadyAddedTo.includes(newFaces[i].albumId)) {
               const faceAlbum = await Album.findByPk(newFaces[i].albumId)
               await faceAlbum.addImage(image)
-              const imageCount = await faceAlbum.countImages()
+              const imageCount = await faceAlbum.countImages({
+                where: {
+                  trashed: false,
+                  cancellationToken: {
+                    [Op.eq]: null
+                  }
+                }
+              })
+              if (imageCount === 2) {
+                const user = await User.findOne({ where: { username: image.fk_username } })
+                user.notification = 'people'
+                await user.save()
+              }
               albumsAlreadyAddedTo.push(newFaces[i].albumId)
             }
           } else {
-            const newFaceAlbum = await Album.create({ type: 'face', visibility: false, fk_username: image.fk_username })
+            const newFaceAlbum = await Album.create({ type: 'people', visibility: false, fk_username: image.fk_username })
             await newFaceAlbum.addImage(image)
             newFaces[i].albumId = newFaceAlbum.id
             await newFaces[i].save()
@@ -57,7 +71,7 @@ module.exports = {
         }
       } else {
         for (let i = 0; i < newFaces.length; i++) {
-          const newFaceAlbum = await Album.create({ type: 'face', visibility: false, fk_username: image.fk_username })
+          const newFaceAlbum = await Album.create({ type: 'people', visibility: false, fk_username: image.fk_username })
           await newFaceAlbum.addImage(image)
           newFaces[i].albumId = newFaceAlbum.id
           await newFaces[i].save()

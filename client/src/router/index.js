@@ -41,10 +41,16 @@ const routes = [
     path: '/user/:username',
     name: 'UserPage',
     component: UserPage,
+    redirect: { name: 'Explore' },
     children: [
       {
         path: 'albums',
         name: 'UserAlbums',
+        component: UserAlbums
+      },
+      {
+        path: 'people',
+        name: 'UserPeople',
         component: UserAlbums
       },
       {
@@ -114,6 +120,10 @@ router.beforeEach((to, from, next) => {
 
   if (to.path === '/' && loggedIn) {
     return next(`/explore`)
+  }
+
+  if (to.name === 'UserPeople' && to.params.username !== store.state.user.username) {
+    return next(`/user/${to.params.username}/photos/all`)
   }
   
   store.dispatch('setErrorHappening', false)

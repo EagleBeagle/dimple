@@ -2,10 +2,34 @@
   <v-container class="px-4 px-sm-8 photo-container" fluid>
     <v-row v-if="images" justify="start" align="start" class="align-self-start">
       <v-col v-if="album" cols="12" sm="12" md="12" lg="12" class="pb-0" style="text-align: left">
-        <div class="font-weight-regular mt-2 mb-0" :class="$vuetify.breakpoint.mdAndUp ? 'text-h3' : 'text-h4'">{{ album.name }}</div>
+        <div v-if="album.name" class="font-weight-regular mt-2 mb-0" :class="$vuetify.breakpoint.mdAndUp ? 'text-h3' : 'text-h4'">{{ album.name }}</div>
+        <div v-else class="pa-0 ma-0">
+          <div class="font-weight-regular mt-2 mb-0" :class="$vuetify.breakpoint.mdAndUp ? 'text-h3' : 'text-h4'">Who's this person?</div>
+        </div>
       </v-col>
       <v-col v-if="album" cols="12" sm="6" class="py-0 my-0" style="text-align: left; word-wrap: break-word">
-        <div class="my-0 font-weight-light" :class="$vuetify.breakpoint.mdAndUp ? 'text-h5' : 'text-body-1'">{{ album.description }}</div>
+        <div v-if="album.name && album.type !== 'people'" class="my-0 font-weight-light" :class="$vuetify.breakpoint.mdAndUp ? 'text-h5' : 'text-body-1'">{{ album.description }}</div>
+        <div v-else-if="album.type === 'people' && $route.params.username === user.username">
+          <v-container class="pa-0 pl-5 pa-sm-0">
+            <v-row justify="start">
+              <v-col cols="1" class="pa-0" style="text-align: center" align-self="center">
+                <v-icon color="blue" @click="showPersonNameDialog = true">
+                  mdi-pencil
+                </v-icon>
+              </v-col>
+              <v-col cols="11" class="pa-0" align-self="center">
+                <span
+                  class="my-0 font-weight-light"
+                  :class="$vuetify.breakpoint.mdAndUp ? 'text-h5' : 'text-body-1'"
+                  style="cursor: pointer"
+                  @click="showPersonNameDialog = true">
+                  <span v-if="!album.name">Click here to give a name</span>
+                  <span v-else>Change name</span>
+                </span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </div>
       </v-col>
       <v-spacer v-if="album"></v-spacer>
       <v-col 
@@ -67,6 +91,11 @@
       @close="deletionDialogClosed" 
       @confirm="deletionConfirmed" 
       @deleteAll="deleteAll" />
+    <person-name-dialog 
+      v-if="showPersonNameDialog"
+      :show="showPersonNameDialog" 
+      @close="showPersonNameDialog = false" 
+      @confirm="namePerson" />
   </v-container>
 </template>
 
@@ -75,11 +104,13 @@ import PhotoGrid from '@/components/common/PhotoGrid'
 import DeleteConfirmDialog from '@/components/pages/UserPage/DeleteConfirmDialog'
 import ImageService from '@/services/ImageService'
 import AlbumService from '@/services/AlbumService'
+import PersonNameDialog from '@/components/pages/UserPage/PersonNameDialog'
 import { mapState } from 'vuex'
 export default {
   components: {
     PhotoGrid,
-    DeleteConfirmDialog
+    DeleteConfirmDialog,
+    PersonNameDialog
   },
   data () {
     return {
@@ -93,7 +124,8 @@ export default {
       photoToDelete: null,
       shouldDeleteAll: false,
       interactionDisabled: false,
-      loading: false
+      loading: false,
+      showPersonNameDialog: false
     }
   },
   async mounted() {
@@ -344,6 +376,15 @@ export default {
         } catch (err) {
           this.$store.dispatch('alert', 'An error occured while changing viewing privacy')
         }
+      }
+    },
+    async namePerson(name) {
+      try {
+        await AlbumService.update(this.album.id, { name })
+        this.album.name = name
+        this.$store.dispatch('alert', 'Person named successfully.')
+      } catch {
+        this.$store.dispatch('alert', 'Failed to name person.')
       }
     },
     async infiniteHandler($state) {

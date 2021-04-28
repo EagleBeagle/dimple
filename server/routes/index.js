@@ -26,7 +26,6 @@ module.exports = app => {
 
   app.put('/user/:username',
     verifyAuth.isLoggedIn,
-    verifyAuth.isAdmin,
     UserControllerValidator.update,
     UserController.update)
 

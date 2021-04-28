@@ -7,7 +7,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     alert: false,
-    snackbarText: '',
+    alertSnackbarText: '',
+    update: false,
+    updateSnackbarText: '',
     user: {},
     imageData: null,
     imageUploadData: null,
@@ -28,8 +30,11 @@ export default new Vuex.Store({
   },
   actions: {
     alert({ commit }, text) {
-        commit('alert', text)
+      commit('alert', text)
     },
+    update({ commit }, text) {
+      commit('update', text)
+  },
     setUser({ commit }, user) {
       commit('setUser', user)
     },
@@ -79,8 +84,12 @@ export default new Vuex.Store({
   mutations: {
     alert(state, text) {
         state.alert = !state.alert
-        state.snackbarText = text
+        state.alertSnackbarText = text
     },
+    update(state, text) {
+      state.update = !state.update
+      state.updateSnackbarText = text
+  },
     setUser(state, user) {
       state.user = user
     },

@@ -43,7 +43,7 @@ module.exports = {
         } else { // all the ML stuff
           await FaceDetectionService.detectFaces(image)
         }
-      }, 10000 /* 65 * 60 * 1000 */)
+      }, 60 * 1000 /* 65 * 60 * 1000 nem elfelejteni */)
       res.status(201).send({
         timestamp,
         signature,
