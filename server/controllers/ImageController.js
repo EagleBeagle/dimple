@@ -40,10 +40,8 @@ module.exports = {
           } catch (err) {
             console.log(err)
           }
-        } else { // all the ML stuff
-          await FaceDetectionService.detectFaces(image)
         }
-      }, 60 * 1000 /* 65 * 60 * 1000 nem elfelejteni */)
+      }, 65 * 60 * 1000)
       res.status(201).send({
         timestamp,
         signature,
@@ -68,6 +66,7 @@ module.exports = {
       }
       image.cancellationToken = null
       await image.save()
+      await FaceDetectionService.detectFaces(image)
       res.status(200).send()
     } catch (err) {
       console.log(err)

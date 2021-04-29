@@ -22,12 +22,11 @@ module.exports = {
         if (faceDescriptions[i].detection.score >= 0.6) {
           const face = await Face.create({
             imageId: image.id,
-            descriptor: faceDescriptions[i].descriptor
+            descriptor: JSON.stringify(faceDescriptions[i].descriptor)
           })
           newFaces.push(face)
         }
       }
-      console.log('Faces detected: ' + newFaces.length)
       if (facesOfUser.length > 0) {
         const albumsAlreadyAddedTo = []
         for (let i = 0; i < newFaces.length; i++) {
@@ -83,10 +82,11 @@ module.exports = {
   }
 }
 
-function toFloat32Array (sqlJSONDescriptor) {
+function toFloat32Array (serializedJSONDescriptor) {
+  const jsonDescriptor = JSON.parse(serializedJSONDescriptor)
   const regularArray = []
   for (let i = 0; i < 128; i++) {
-    regularArray.push(sqlJSONDescriptor[i.toString()])
+    regularArray.push(jsonDescriptor[i.toString()])
   }
   const float32Array = new Float32Array(128)
   float32Array.set(regularArray)

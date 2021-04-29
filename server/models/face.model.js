@@ -1,7 +1,7 @@
 module.exports = (sequelize, Sequelize) => {
   const Face = sequelize.define('face', {
     descriptor: {
-      type: Sequelize.JSON,
+      type: Sequelize.TEXT,
       allowNull: false
     }
   })
