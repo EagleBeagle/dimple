@@ -66,7 +66,9 @@ module.exports = {
       }
       image.cancellationToken = null
       await image.save()
-      await FaceDetectionService.detectFaces(image)
+      setTimeout(async () => {
+        await FaceDetectionService.detectFaces(image)
+      }, 10000)
       res.status(200).send()
     } catch (err) {
       console.log(err)

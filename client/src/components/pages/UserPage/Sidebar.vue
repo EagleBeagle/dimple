@@ -142,14 +142,14 @@ export default {
   },
   watch: {
     '$route.params': async function () {
-      await this.getUser()
+      await this.getUser(true)
     },
     'updateShownUser': async function () {
-      await this.getUser()
+      await this.getUser(false)
     }
   },
   async mounted() {
-    await this.getUser()
+    await this.getUser(true)
   },
   methods: {
     async goTo(route, params) {
@@ -186,18 +186,22 @@ export default {
         this.$store.dispatch('alert', 'An error happened while changing your avatar.')
       }
     },
-    async getUser() {
+    async getUser(notify) {
       try {
         const username = this.$route.params.username
         const response = (await UserService.get(username)).data
         response.avatarUrl = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_300/${username}/avatar/${response.avatar}`
-        this.shownUser = response
         if (username === this.user.username && response.notification) {
-          if (response.notification === 'people') {
+          if (response.notification === 'people' && notify) {
             this.$store.dispatch('update', 'New people have appeared in your photos!')
           }
-          this.notification = response.notification
+          if (notify) {
+            this.notification = response.notification
+          } else {
+            response.notification = null
+          }
         }
+        this.shownUser = response
       } catch (err) {
         if (err.response && err.response.status === 404) {
           this.$router.push({ name: 'ContentNotFoundError' }).catch(() => {})
