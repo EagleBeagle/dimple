@@ -44,8 +44,7 @@
       </v-row>
       <v-row align="center" justify="space-around">
         <v-col cols="1" lg="1" class="snack-column ml-3">
-          <v-progress-circular v-if="showLoadingCircle" :value="overallProgress" rotate="-90" color="blue">
-            <!-- {{ overallProgress }} -->
+          <v-progress-circular v-if="showLoadingCircle" indeterminate color="blue">
           </v-progress-circular>
           <v-fade-transition>
             <v-icon v-if="showSuccess" color="green">mdi-emoticon-happy</v-icon>
@@ -90,7 +89,6 @@ export default {
       showFailure: false,
       uploading: false,
       fileMetadata: [],
-      overallProgress: 0,
       previousProgresses: [],
       cancellationTokens: [],
       failure: false,
@@ -205,7 +203,6 @@ export default {
       this.uploadCount = 0
       this.overallUploadCount = 0
       this.fileMetadata = []
-      this.overallProgress = 0
       this.failure = false
       this.expand = false
     },
@@ -220,14 +217,6 @@ export default {
           this.uploadCount--
         }
       }, 1000)
-      
-      let sumProgress = 0
-      for (let i = 0; i < this.overallUploadCount; i++) {
-        if (!this.fileMetadata[i].failed) {
-          sumProgress += this.fileMetadata[i].progress
-        }
-      }
-      this.overallProgress = sumProgress / this.overallUploadCount
     },
     errorLocator(index) {
       this.fileMetadata[index].failed = true
