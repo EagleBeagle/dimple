@@ -37,7 +37,7 @@
             mdi-chevron-left
           </v-icon>
         </v-col>
-        <v-col cols="8" sm="10" class="pa-0">
+        <v-col cols="8" sm="10" class="pa-0" v-if="!loading">
           <v-img
             v-if="image"
             :key="image.id"
@@ -49,6 +49,20 @@
               $vuetify.breakpoint.smOnly ? '54vh' : '45vh'" 
             class="photo">
           </v-img>
+        </v-col>
+        <v-col cols="8" sm="10" class="pa-0" v-else>
+          <v-container class="pa-0" fill-height :style="
+            $vuetify.breakpoint.lgAndUp ? 'height: 65vh' : 
+            $vuetify.breakpoint.mdOnly ? 'height: 65vh' : 
+            $vuetify.breakpoint.smOnly ? 'height: 54vh' : 'height: 45vh'" >
+              <v-row justify="center">
+                <v-col cols="12" class="pa-0">
+                  <v-icon size="150" color="grey darken-4">
+                    mdi-image-outline
+                  </v-icon>
+                </v-col>
+              </v-row>
+          </v-container>
         </v-col>
         <v-col cols="2" sm="1" class="pa-0" align-self="center" style="text-align: end">
           <v-icon 
@@ -97,7 +111,7 @@
               <v-progress-circular
                 size="25"
                 indeterminate
-                color="blue"
+                color="white"
               ></v-progress-circular>
             </v-col>
           </v-row>
@@ -317,6 +331,7 @@ export default {
       commentCount: 0,
       lastSwitchedPhotoTime: null,
       photoOwner: null,
+      loading: false,
       loadingNeighbours: false
     }
   },
@@ -351,6 +366,7 @@ export default {
   methods: {
     async getImage() { 
       try {
+        this.loading = true
         const image = (await ImageService.get({ id: this.$route.params.id })).data
         if (image.trashed) {
           this.$router.push({
@@ -362,7 +378,9 @@ export default {
         }
         image.url = image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/${image.fk_username}/${image.id}`
         this.image = image
+        this.loading = false
       } catch (err) {
+        this.loading = false
         this.$store.dispatch('setErrorHappening', true)
         if (err.response && err.response.status === 403) {
           this.$router.push({ name: 'ContentNotFoundError' }).catch(() => {})
@@ -481,6 +499,7 @@ export default {
           }
         }
         try {
+          this.loading = true
           this.image = this.leftImages[this.leftImages.length - 1]
           this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query }).catch(() => {})
           this.lastSwitchedPhotoTime = Date.now()
@@ -500,7 +519,8 @@ export default {
           }
         }
         try {
-          this.image = this.rightImages[0]
+          this.loading = true
+          this.image = this.rightImages[this.rightImages.length - 1]
           this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query }).catch(() => {})
           this.lastSwitchedPhotoTime = Date.now()
           await this.getNeighbouringImages()
