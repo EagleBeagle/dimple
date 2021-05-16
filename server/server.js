@@ -5,7 +5,7 @@ const logger = require('morgan')
 require('dotenv').config()
 // production: const path = require('path')
 const history = require('connect-history-api-fallback')
-const faceapiConfig = require('./config/faceapi.config')
+const machineLearningConfig = require('./config/machineLearning.config')
 
 const app = express()
 
@@ -22,10 +22,10 @@ app.use(history())
 require('./config/passport.js')
 require('./config/db.config.js')
 
-faceapiConfig.loadModels()
+machineLearningConfig.loadFaceModels()
 
 const PORT = process.env.PORT || 8080
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}.`)
 })
 

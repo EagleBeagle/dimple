@@ -19,6 +19,7 @@ module.exports = {
         name,
         description,
         visibility,
+        type: 'user',
         fk_username: req.user.username
       })
       res.status(201).send(album)
@@ -68,10 +69,11 @@ module.exports = {
       if ((id && user) || (id && imageId) || (user && imageId) || (!id && !user && !imageId) || (people && id) || (people && imageId)) {
         return res.status(400).send('Invalid query')
       }
-      if (people) { // típusváltás
+      if (people) {
         queryObject.where.type = 'people'
       } else {
-        queryObject.where.type = 'user'
+        queryObject.where.type = {}
+        queryObject.where.type[Op.ne] = 'people'
       }
       queryObject.attributes.include.push([
         db.Sequelize.literal(`(
@@ -158,7 +160,17 @@ module.exports = {
         }
       }
       if (people) {
-        albums = albums.filter(album => album.dataValues.imageCount > 1)
+        albums = albums.filter(album => album.dataValues.imageCount >= 2)
+      } else {
+        albums = albums.filter(album => {
+          if (album.dataValues.type === 'recommended' && ['Animals', 'Plants', 'Vehicles'].includes(album.dataValues.name)) {
+            return album.dataValues.imageCount >= 20
+          } else if (album.dataValues.type === 'recommended') {
+            return album.dataValues.imageCount >= 10
+          } else {
+            return true
+          }
+        })
       }
       res.status(200).send(albums)
     } catch (err) {
@@ -195,6 +207,11 @@ module.exports = {
       }
       if (typeof visibility !== 'undefined') {
         album.visibility = visibility
+        await album.save()
+      }
+      if (album.type !== 'people') {
+        album.type = 'user'
+        album.description = 'Photos of ' + album.name.toLowerCase()
         await album.save()
       }
       return res.status(200).send(album)

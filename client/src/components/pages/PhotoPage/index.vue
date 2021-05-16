@@ -57,7 +57,7 @@
             $vuetify.breakpoint.smOnly ? 'height: 54vh' : 'height: 45vh'" >
               <v-row justify="center">
                 <v-col cols="12" class="pa-0">
-                  <v-icon size="150" color="grey darken-4">
+                  <v-icon size="150" color="grey darken-3">
                     mdi-image-outline
                   </v-icon>
                 </v-col>
@@ -351,8 +351,12 @@ export default {
       }
     },
     '$route.params.id': async function() {
+      this.loading = true
+      this.loadingNeighbours = true
       await this.getImage()
+      this.loading = false
       await this.getNeighbouringImages()
+      this.loadingNeighbours = false
       await this.getOwner()
     }
   },
@@ -499,12 +503,11 @@ export default {
           }
         }
         try {
-          this.loading = true
-          this.image = this.leftImages[this.leftImages.length - 1]
-          this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query }).catch(() => {})
+         
+          this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.leftImages[this.leftImages.length - 1].id }, query: this.$route.query }).catch(() => {})
           this.lastSwitchedPhotoTime = Date.now()
-          await this.getNeighbouringImages()
         } catch (err) {
+          this.loading = false
           this.$store.dispatch('setErrorHappening', true)
           this.$store.dispatch('alert', 'An error happened while trying to go left')
         }
@@ -519,12 +522,11 @@ export default {
           }
         }
         try {
-          this.loading = true
-          this.image = this.rightImages[this.rightImages.length - 1]
-          this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.image.id }, query: this.$route.query }).catch(() => {})
+          
+          this.$router.push({ name: 'Photo', params: { username: this.image.fk_username, id: this.rightImages[0].id }, query: this.$route.query }).catch(() => {})
           this.lastSwitchedPhotoTime = Date.now()
-          await this.getNeighbouringImages()
         } catch (err) {
+          this.loading = false
           this.$store.dispatch('setErrorHappening', true)
           this.$store.dispatch('alert', 'An error happened while trying to go left')
         }

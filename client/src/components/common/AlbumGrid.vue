@@ -3,7 +3,7 @@
     <transition-group name="fade" class="row wrap justify-start">
       <v-col cols="12" sm="6" md="4" lg="3" class="pa-4 album" v-for="album in albums" :key="album.id" style="animation-duration: 0.3s">
         <v-hover v-slot="{hover}">
-          <v-card  tile @click="$emit('open', album)" :hover="inDialog" height="100%">
+          <v-card  tile @click="$emit('open', album)" :hover="inDialog" height="100%" :class="album.type === 'recommended' ? 'recommended-album' : 'user-album'">
             <div class="overlay-div">
                 <v-container class="overlay-container pa-0">
                   <v-row justify="start">
@@ -131,7 +131,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .vignette {
   position: absolute;
   top: 0;
@@ -171,6 +171,10 @@ export default {
 .album {
   transition: all 0.6s;
   display: inline-block;
+}
+
+.v-sheet.recommended-album {
+  box-shadow: 0 0 10px 4px rgb(33, 150, 243, 0.8);
 }
 
 </style>

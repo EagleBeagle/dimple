@@ -191,16 +191,6 @@ export default {
   padding: 0px;
 }
 
-.vignette {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  box-shadow: 0 -70px 70px -40px rgb(43, 43, 43) inset;
-}
-
 .overlay-div {
   position: absolute;
   width: 100%;

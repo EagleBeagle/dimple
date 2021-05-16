@@ -29,6 +29,7 @@ module.exports = {
       image: Joi.string().uuid(),
       visibility: Joi.boolean(),
       people: Joi.boolean(),
+      recommended: Joi.boolean(),
       admin: Joi.boolean()
     })
     const { error } = schema.validate(req.query)

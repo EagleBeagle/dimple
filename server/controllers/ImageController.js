@@ -6,7 +6,8 @@ const Album = db.album
 const User = db.user
 const Face = db.face
 const cloudinary = require('../config/cloudinary.config.js')
-const FaceDetectionService = require('../services/FaceDetectionService')
+const ImageClassificationService = require('../services/ImageClassificationService.js')
+const FaceDetectionService = require('../services/FaceDetectionService.js')
 
 module.exports = {
   async initiateUpload (req, res) {
@@ -67,8 +68,9 @@ module.exports = {
       image.cancellationToken = null
       await image.save()
       setTimeout(async () => {
+        await ImageClassificationService.classifyImage(image)
         await FaceDetectionService.detectFaces(image)
-      }, 10000)
+      }, 5000) // 10000
       res.status(200).send()
     } catch (err) {
       console.log(err)
@@ -125,11 +127,14 @@ module.exports = {
             }
           }
         })
-        existingAlbums.forEach(album => {
-          if (album.fk_username !== username) {
+        for (let i = 0; i < existingAlbums.length; i++) {
+          if (existingAlbums[i].fk_username !== username) {
             return res.status(403).send('Unauthorized')
           }
-        })
+          existingAlbums[i].type = 'user'
+          existingAlbums[i].description = 'Photos of ' + existingAlbums[i].name.toLowerCase()
+          await existingAlbums[i].save()
+        }
         await image.setAlbums(existingAlbums)
       }
 

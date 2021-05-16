@@ -60,10 +60,10 @@
         class="pa-2">
         <v-list-item @click="goTo('UserAlbums')">
           <v-list-item-icon>
-            <v-icon>mdi-image-album</v-icon>
+            <v-icon :color="notification === 'recommendation' ? 'blue' : null">mdi-image-album</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>Albums</v-list-item-title>
+            <v-list-item-title :class="notification =='recommendation' ? 'blue--text' : null">Albums</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item
@@ -105,7 +105,7 @@
       </v-list-item-group>
       <v-divider class="mx-2"></v-divider>
     </v-list>
-    <v-container class="pa-0 navigation-bottom" v-if="shownUser">
+    <v-container class="pa-0" :class="$vuetify.breakpoint.smAndUp ? 'navigation-bottom-sm' : 'navigation-bottom-xs'" v-if="shownUser">
       <v-row justify="center">
       </v-row>
       <v-row justify="center">
@@ -162,6 +162,15 @@ export default {
         } catch {
           this.notification = ''
         }
+      } else if (route === 'UserAlbums' && this.notification === 'recommendation' && this.$route.params.username && this.$route.params.username === this.user.username) {
+        try {
+          this.notification = ''
+          await UserService.update(this.user.username, {
+            notification: ''
+          })
+        } catch {
+          this.notification = ''
+        }
       }
       if (this.$route.name !== route || (this.$route.name === 'Photos' && this.$route.params.album !== params.album)) {
         this.$router.push({ name: route, params }).catch(() => {})
@@ -194,6 +203,8 @@ export default {
         if (username === this.user.username && response.notification) {
           if (response.notification === 'people' && notify) {
             this.$store.dispatch('update', 'New people have appeared in your photos!')
+          } else if (response.notification === 'recommendation' && notify) {
+            this.$store.dispatch('update', 'You have new recommended albums!')
           }
           if (notify) {
             this.notification = response.notification
@@ -219,9 +230,14 @@ export default {
   border-radius: 50%;
   border: 2px #2196F3 solid
 }
-.navigation-bottom {
+.navigation-bottom-sm {
   position: absolute;
   bottom: 10%
+}
+
+.navigation-bottom-xs {
+  position: absolute;
+  bottom: 5%
 }
 
 .change-avatar-icon {

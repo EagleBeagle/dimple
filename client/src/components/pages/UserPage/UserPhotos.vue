@@ -8,7 +8,7 @@
         </div>
       </v-col>
       <v-col v-if="album" cols="12" sm="6" class="py-0 my-0" style="text-align: left; word-wrap: break-word">
-        <div v-if="album.name && album.type !== 'people'" class="my-0 font-weight-light" :class="$vuetify.breakpoint.mdAndUp ? 'text-h5' : 'text-body-1'">{{ album.description }}</div>
+        <div v-if="album.name && album.type === 'user'" class="my-0 font-weight-light" :class="$vuetify.breakpoint.mdAndUp ? 'text-h5' : 'text-body-1'">{{ album.description }}</div>
         <div v-else-if="album.type === 'people' && $route.params.username === user.username">
           <v-container class="pa-0 pl-5 pa-sm-0">
             <v-row justify="start">
