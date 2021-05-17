@@ -70,10 +70,16 @@ export default {
       queryString += `&user=${data.user}`
     }
     if (data.from) {
-      queryString += `&from=${data.from}` 
+      queryString += `&fromDate=${data.from}` 
     }
     if (data.to) {
-      queryString += `&to=${data.to}` 
+      queryString += `&toDate=${data.to}` 
+    }
+    if (data.fromScore) {
+      queryString += `&fromScore=${data.fromScore}`
+    }
+    if (data.toScore) {
+      queryString += `&toScore=${data.toScore}` 
     }
     if (data.limit) {
       queryString += `&limit=${data.limit}` 

@@ -108,8 +108,10 @@ module.exports = {
 
   get (req, res, next) {
     const schema = Joi.object({
-      from: Joi.date().less('now'),
-      to: Joi.date().less('now'),
+      fromDate: Joi.date().less('now'),
+      toDate: Joi.date().less('now'),
+      fromScore: Joi.number(),
+      toScore: Joi.number(),
       album: Joi.number(),
       limit: Joi.number().max(500),
       sort: Joi.string().valid('date:desc', 'date:asc', 'relevancy'),

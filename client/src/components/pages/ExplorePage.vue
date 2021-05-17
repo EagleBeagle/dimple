@@ -36,6 +36,7 @@ export default {
     return {
       images: [],
       lastDate: null,
+      lastScore: null,
       cloudinaryCore: null,
       loading: false
     }
@@ -48,7 +49,7 @@ export default {
   methods: {
     async getImages(filter) { // itt kell majd lekezelni a hiányzó képeket
       try {
-        filter.sort = `date:desc`
+        filter.sort = `relevancy`
         filter.explore = true
         const images = (await ImageService.get(filter)).data.map((image) => {
           image.url = `https://res.cloudinary.com/${process.env.VUE_APP_CLOUDINARY_NAME}/image/upload/w_600/${image.fk_username}/${image.id}`
@@ -56,7 +57,11 @@ export default {
         })
         if (images.length) {
           this.lastDate = images[images.length - 1].createdAt
+          this.lastScore = images[images.length - 1].relevancy
         }
+        images.forEach(image => {
+          console.log(image.relevancy)
+        })
         return images
       } catch (err) {
         this.$router.push({ name: 'GenericError' }).catch(() => {})
@@ -80,21 +85,29 @@ export default {
     async infiniteHandler($state) {
       try {
         let images
-        if (this.lastDate) {
+        console.log('LAST SCORE: ' + this.lastScore)
+        console.log('LAST DATE: ' + this.lastDate)
+        if (this.lastScore !== null && this.lastDate) {
           images = await this.getImages({
             to: this.lastDate,
+            toScore: this.lastScore,
             limit: 20
           })
+          console.log('van last score')
         } else {
+          console.log('nincs last score')
           this.loading = true
           images = await this.getImages({ limit: 20 })
           const last = this.$route.query.last
-          if (last) {
+          const lastScore = this.$route.query.lastScore
+          if (last && lastScore) {
             const lastDate = new Date(last)
             const createdDates = images.map(image => new Date(image.createdAt).toISOString())
-            if (!createdDates.includes(lastDate.toISOString())) {
+            const scores = images.map(image => new Date(image.relevancy))
+            if (!scores.includes(lastScore) || !createdDates.includes(lastDate.toISOString())) {
               const imagesToLast = await this.getImages({
-                from: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString()
+                from: new Date(lastDate.setMilliseconds(lastDate.getMilliseconds() - 1)).toISOString(),
+                fromScore: lastScore
               })
               if (imagesToLast) {
                 images = imagesToLast

@@ -6,6 +6,7 @@ require('dotenv').config()
 // production: const path = require('path')
 const history = require('connect-history-api-fallback')
 const machineLearningConfig = require('./config/machineLearning.config')
+const RelevancyService = require('./services/RelevancyService.js')
 
 const app = express()
 
@@ -16,7 +17,6 @@ app.use(bodyParser.text())
 if (process.env.NODE_ENV !== 'test') {
   app.use(logger('dev'))
 }
-app.use(history())
 // production: app.use(express.static(path.join(__dirname, '../dist')))
 
 require('./config/passport.js')
@@ -26,6 +26,7 @@ machineLearningConfig.loadFaceModels()
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, async () => {
+  await RelevancyService.startUpdating()
   console.log(`Server is running on port ${PORT}.`)
 })
 

@@ -8,6 +8,7 @@ const Face = db.face
 const cloudinary = require('../config/cloudinary.config.js')
 const ImageClassificationService = require('../services/ImageClassificationService.js')
 const FaceDetectionService = require('../services/FaceDetectionService.js')
+const RelevancyService = require('../services/RelevancyService.js')
 
 module.exports = {
   async initiateUpload (req, res) {
@@ -66,6 +67,7 @@ module.exports = {
         return res.status(403).send('Unauthorized')
       }
       image.cancellationToken = null
+      image.relevancy = RelevancyService.calculateRelevancy(image)
       await image.save()
       setTimeout(async () => {
         await ImageClassificationService.classifyImage(image)
@@ -190,8 +192,10 @@ module.exports = {
       let images
       const id = req.query.id
       const username = req.query.user
-      const fromDate = req.query.from
-      const toDate = req.query.to
+      const fromDate = req.query.fromDate
+      const toDate = req.query.toDate
+      const fromScore = req.query.fromScore
+      const toScore = req.query.toScore
       const albumName = req.query.album
       const limit = req.query.limit
       const sort = req.query.sort
@@ -200,7 +204,10 @@ module.exports = {
       const trash = req.query.trash
       const explore = req.query.explore
       const admin = req.query.admin
-
+      console.log(fromScore)
+      console.log(fromDate)
+      console.log(toScore)
+      console.log(toDate)
       if (admin) {
         if (req.user.admin) {
           const images = await Image.findAll({
@@ -257,7 +264,7 @@ module.exports = {
          (trash && id) ||
          (trash && username) ||
          (trash && explore) ||
-         (username && explore) || // perszonalizációnál ezt kivenni I guess
+         (username && explore) ||
          (id && explore) ||
          (albumName && explore) ||
          (favourites && explore)) {
@@ -297,6 +304,10 @@ module.exports = {
           queryObject.order.push(['createdAt', 'DESC'])
         } else if (sort === 'date:asc') {
           queryObject.order.push(['createdAt', 'ASC'])
+        } else if (sort === 'relevancy') {
+          queryObject.order = [
+            db.Sequelize.literal('relevancy DESC, createdAt DESC')
+          ]
         } else {
           return res.status(400).send('Invalid sort criteria')
         }
@@ -310,11 +321,21 @@ module.exports = {
       if (toDate) {
         queryObject.where.createdAt[Op.lt] = toDate
       }
+      if (typeof fromScore !== 'undefined' || typeof toScore !== 'undefined') {
+        queryObject.where.relevancy = {}
+      }
+      if (typeof fromScore !== 'undefined') {
+        queryObject.where.relevancy[Op.gte] = fromScore
+      }
+      if (typeof toScore !== 'undefined') {
+        queryObject.where.relevancy[Op.lte] = toScore
+      }
       if (limit) {
         queryObject.limit = Number(limit)
       } else {
         queryObject.limit = 500
       }
+      console.log(queryObject)
       if (albumName) {
         const album = await Album.findByPk(albumName)
         if (album) {
@@ -345,6 +366,7 @@ module.exports = {
         queryObject.where.trashed = true
         images = await Image.findAll(queryObject)
       } else {
+        console.log(queryObject)
         images = await Image.findAll(queryObject)
       }
       /* const validImages = []
