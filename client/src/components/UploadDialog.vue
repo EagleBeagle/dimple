@@ -105,9 +105,16 @@
       <v-btn
         depressed
         class="blue--text"
-        @click="upload()"
-      >
-        UPLOAD
+        width="82px"
+        @click="!loading ? upload() : null">
+        <span v-if="!loading">UPLOAD</span>
+        <v-progress-circular
+          v-else
+          size="25"
+          width="3"
+          color="blue"
+          indeterminate
+        ></v-progress-circular>
       </v-btn>
       <v-btn
         depressed
@@ -135,7 +142,8 @@ export default {
       differentAlbumsSelected: false,
       privateCheckbox: false,
       privateCheckboxIndeterminate: true,
-      allSelected: false
+      allSelected: false,
+      loading: false
     }
   },
   computed: {
@@ -206,6 +214,7 @@ export default {
     async upload() {
       try {
         let allFormData = []
+        this.loading = true
         for (let i = 0; i < this.imageData.length; i++) {
           const response = (await ImageService.initiateUpload({
             visibility: this.imagePreviews[i].private  ? false : true,
@@ -225,8 +234,10 @@ export default {
           })
         }
         this.$store.dispatch('initiateUpload', allFormData)
+        this.loading = false
         this.show = false
       } catch (err) {
+        this.loading = false
         this.$store.dispatch('alert', 'An error happened during upload initialization')
         this.clearFields()
         this.show = false
