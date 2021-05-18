@@ -41,7 +41,7 @@ const routes = [
     path: '/user/:username',
     name: 'UserPage',
     component: UserPage,
-    redirect: { name: 'Explore' },
+    redirect: '/user/:username/photos/all',
     children: [
       {
         path: 'albums',

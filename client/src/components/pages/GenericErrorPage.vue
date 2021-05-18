@@ -15,7 +15,7 @@
           </v-row>
           <v-row justify="center">
             <v-col cols="12" class="pa-0 font-weight-light" :class="$vuetify.breakpoint.smAndUp ? 'text-h6' : 'text-subtitle-1'">
-              Verify that you're trying to reach a valid page, or try again later
+              Verify that you're trying to reach a valid page, or try again later.
             </v-col>
           </v-row>
           <v-row justify="center">
