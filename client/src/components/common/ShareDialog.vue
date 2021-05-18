@@ -15,98 +15,115 @@
     <v-card-text class="pb-0 px-1" style="overflow: hidden">
       <v-container class="pa-0">
         <v-row justify="space-around" class="mx-1">
-          <v-col cols="4" sm="2" class="py-1">
+          <v-col cols="2" sm="2" class="py-1">
             <shareNetwork
               network="email"
               :url="url"
               :title="image ? `Dimple: ${user.username} would like to share a photo with you!` : `Dimple: ${user.username} would like to share an album with you!`">
               <v-btn 
-                large
+                :large="$vuetify.breakpoint.smAndUp"
+                :small="$vuetify.breakpoint.xsOnly"
                 fab
                 depressed
                 color="grey darken-1"
                 class="network-icon">
-                <v-icon color="white">
+                <v-icon 
+                  :small="$vuetify.breakpoint.xsOnly"
+                  color="white">
                   mdi-email
                 </v-icon>
               </v-btn>
             </shareNetwork>
           </v-col>
-          <v-col cols="4" sm="2" class="py-1">
+          <v-col cols="2" sm="2" class="py-1">
             <shareNetwork
               network="facebook"
               :url="url"
               :title="image ? `${user.username} would like to share a photo with you!` : `${user.username} would like to share an album with you!`">
               <v-btn
-                large
+                :large="$vuetify.breakpoint.smAndUp"
+                :small="$vuetify.breakpoint.xsOnly"
                 fab
                 depressed
                 color="#4267B2"
                 class="network-icon">
-                <v-icon large color="white">
+                <v-icon
+                  :large="$vuetify.breakpoint.smAndUp"
+                  color="white">
                   mdi-facebook
                 </v-icon>
               </v-btn>
             </shareNetwork>
           </v-col>
-          <v-col cols="4" sm="2" class="py-1">
+          <v-col cols="2" sm="2" class="py-1">
             <shareNetwork
               network="twitter"
               :url="url"
               :title="image ? `Dimple: ${user.username} would like to share a photo with you!` : `Dimple: ${user.username} would like to share an album with you!`">
               <v-btn
-                large
+                :large="$vuetify.breakpoint.smAndUp"
+                :small="$vuetify.breakpoint.xsOnly"
                 fab
                 depressed
                 color="#1DA1F2"
                 class="network-icon">
-                <v-icon color="white">
+                <v-icon 
+                  color="white"
+                  :small="$vuetify.breakpoint.xsOnly">
                   mdi-twitter
                 </v-icon>
               </v-btn>
             </shareNetwork>
           </v-col>
-          <v-col cols="4" sm="2" class="py-1">
+          <v-col cols="2" sm="2" class="py-1">
             <shareNetwork
               network="reddit"
               :url="url"
               :title="image ? `Dimple: ${user.username} would like to share a photo with you!` : `Dimple: ${user.username} would like to share an album with you!`">
               <v-btn
-                large
+                :large="$vuetify.breakpoint.smAndUp"
+                :small="$vuetify.breakpoint.xsOnly"
                 fab
                 depressed
                 color="#FF5700"
                 class="network-icon">
-                <v-icon large color="white">
+                <v-icon 
+                  :large="$vuetify.breakpoint.smAndUp"
+                  :small="$vuetify.breakpoint.xsOnly"
+                  color="white">
                   mdi-reddit
                 </v-icon>
               </v-btn>
             </shareNetwork>
           </v-col>
-          <v-col cols="4" sm="2" class="py-1">
+          <v-col cols="2" sm="2" class="py-1">
             <shareNetwork
               network="skype"
               :url="url"
               :title="image ? `${user.username} would like to share a photo with you!` : `${user.username} would like to share an album with you!`">
               <v-btn
-                large
+                :large="$vuetify.breakpoint.smAndUp"
+                :small="$vuetify.breakpoint.xsOnly"
                 fab
                 depressed
                 color="#00AFF0"
                 class="network-icon">
-                <v-icon color="white">
+                <v-icon
+                  :small="$vuetify.breakpoint.xsOnly"
+                  color="white">
                   mdi-skype
                 </v-icon>
               </v-btn>
             </shareNetwork>
           </v-col>
         </v-row>
-        <v-row justify="center" class="mt-3">
-          <v-col cols="10">
+        <v-row justify="center" class="pt-2">
+          <v-col cols="10" class="pb-6">
             <v-text-field
               :value="url"
               readonly
               single-line
+              hide-details
               outlined
               append-icon="mdi-content-copy"
               @click:append="copyUrl()"
