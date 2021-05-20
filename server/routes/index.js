@@ -39,14 +39,6 @@ module.exports = app => {
     UserControllerValidator.confirm,
     UserController.confirm)
 
-  app.put('/user/forgotpassword',
-    UserControllerValidator.forgotPassword,
-    UserController.forgotPassword)
-
-  app.put('/user/resetpassword/:resetPasswordToken',
-    UserControllerValidator.resetPassword,
-    UserController.resetPassword)
-
   app.get('/user',
     verifyAuth.isLoggedIn,
     UserControllerValidator.search,
@@ -57,6 +49,14 @@ module.exports = app => {
     multerUploads,
     UserControllerValidator.changeAvatar,
     UserController.changeAvatar)
+
+  app.put('/forgotpassword',
+    UserControllerValidator.forgotPassword,
+    UserController.forgotPassword)
+
+  app.put('/resetpassword/:resetPasswordToken',
+    UserControllerValidator.resetPassword,
+    UserController.resetPassword)
 
   app.get('/admin',
     verifyAuth.isLoggedIn,

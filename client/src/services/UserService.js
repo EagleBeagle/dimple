@@ -14,11 +14,11 @@ export default {
   },
 
   forgotPassword(email) {
-    return Api().put(`/user/forgotpassword`, email)
+    return Api().put(`/forgotpassword`, email)
   },
 
   resetPassword(resetPasswordToken, password) {
-    return Api().put(`/user/resetpassword/${resetPasswordToken}`, { password })
+    return Api().put(`/resetpassword/${resetPasswordToken}`, { password })
   },
 
   changeAvatar(username, formData) {

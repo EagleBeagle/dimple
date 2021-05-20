@@ -20,10 +20,6 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.BOOLEAN,
       allowNull: false,
       defaultValue: false
-    },
-    relevancy: {
-      type: Sequelize.FLOAT,
-      defaultValue: 0
     }
   })
 
