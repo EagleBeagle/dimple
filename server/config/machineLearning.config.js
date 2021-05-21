@@ -17,6 +17,7 @@ module.exports = {
   },
   async loadClassifierModel () {
     const imageClassifier = await tf.loadLayersModel('file://public/models/image_classification/model.json')
+    // PRODUCTION
     // imageClassifier = await tf.loadLayersModel('file://app/server/public/models/image_classification/model.json')
     return imageClassifier
   }

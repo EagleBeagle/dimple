@@ -324,7 +324,6 @@ module.exports = {
         response.notification = user.notification
         response.hasPeople = hasPeople
       }
-      console.log(hasPeople)
       return res.status(200).send(response)
     } catch (err) {
       console.log(err)
