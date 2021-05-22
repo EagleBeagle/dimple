@@ -193,7 +193,7 @@ module.exports = {
       const username = req.params.username
       const admin = req.body.admin
       const notification = req.body.notification
-      if (admin) {
+      if (typeof admin !== 'undefined') {
         if (req.user.admin) {
           await User.update({ admin }, { where: { username } })
         } else {

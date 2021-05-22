@@ -259,8 +259,8 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-divider v-if="$vuetify.breakpoint.xsOnly && image.fk_username === user.username"></v-divider>
-    <v-divider v-if="$vuetify.breakpoint.smAndUp && image.fk_username === user.username" style="margin-left: 25%; margin-right: 25%;"></v-divider>
+    <v-divider v-if="$vuetify.breakpoint.xsOnly && image && image.fk_username === user.username"></v-divider>
+    <v-divider v-if="$vuetify.breakpoint.smAndUp && image && image.fk_username === user.username" style="margin-left: 25%; margin-right: 25%;"></v-divider>
     <v-container class="privacy-container" v-if="image && image.fk_username === user.username">
       <v-row justify="center">
         <v-col cols="12" sm="4" xl="2" align-self="start" class="pa-0 text-body-1">

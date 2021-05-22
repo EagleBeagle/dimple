@@ -137,13 +137,13 @@
             </v-icon>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-icon small v-if="!item.admin" @click="setAdmin(item, true)" class="mr-2">
+            <v-icon small v-if="!item.admin && item.username !== user.username" @click="setAdmin(item, true)" class="mr-2">
               mdi-account-plus
             </v-icon>
-            <v-icon small v-if="item.admin" @click="setAdmin(item, false)" class="mr-2">
+            <v-icon small v-if="item.admin && item.username !== user.username" @click="setAdmin(item, false)" class="mr-2">
               mdi-account-minus
             </v-icon>
-            <v-icon small @click="deleteUser(item)">
+            <v-icon small v-if="item.username !== user.username" @click="deleteUser(item)">
               mdi-delete
             </v-icon>
           </template>
