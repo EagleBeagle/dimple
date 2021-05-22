@@ -16,7 +16,8 @@ app.use(bodyParser.text())
 if (process.env.NODE_ENV !== 'test') {
   app.use(logger('dev'))
 }
-app.use(history())
+
+// production: app.use(history())
 // production: app.use(express.static(path.join(__dirname, '../dist')))
 
 require('./config/passport.js')

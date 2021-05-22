@@ -9,6 +9,7 @@ const sinon = require('sinon')
 const db = require('../../config/db.config.js')
 const Image = db.image
 const Album = db.album
+const Face = db.face
 
 const AlbumController = require('../../controllers/AlbumController.js')
 const cloudinary = require('../../config/cloudinary.config.js')
@@ -218,7 +219,7 @@ describe('AlbumController', () => {
     })
 
     it('should respond with status code 200 if correctly updating containing photos', async () => {
-      sinon.stub(Album, 'findByPk').returns({ fk_username: 'user1', addImages: () => {}, save: () => {} })
+      sinon.stub(Album, 'findByPk').returns({ fk_username: 'user1', addImages: () => {}, save: () => {}, name: 'name' })
       const req = mockRequest({
         body: {
           images: ['image1']
@@ -236,7 +237,7 @@ describe('AlbumController', () => {
     })
 
     it('should respond with status code 200 if correctly updating visibility', async () => {
-      sinon.stub(Album, 'findByPk').returns({ fk_username: 'user1', addImages: () => {}, save: () => {} })
+      sinon.stub(Album, 'findByPk').returns({ fk_username: 'user1', addImages: () => {}, save: () => {}, name: 'name' })
       const req = mockRequest({
         body: {
           visibility: true
@@ -275,6 +276,7 @@ describe('AlbumController', () => {
   describe('delete', () => {
     it('should respond with status code 200 in case of correct params', async () => {
       sinon.stub(Album, 'findByPk').returns({ fk_username: 'user1', destroy: () => {} })
+      sinon.stub(Face, 'destroy').returns({})
       const req = mockRequest({
         body: {
         },

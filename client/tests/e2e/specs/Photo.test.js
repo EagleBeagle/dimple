@@ -10,7 +10,6 @@ describe('Photo operations', () => {
     cy.fixture('test_image.jpg').then(() => {
       cy.get('input[type="file"]').attachFile('test_image.jpg')
       cy.get('.v-card').find('span').contains('UPLOAD').click().wait(5000)
-      cy.get('.snack-container').contains('Upload successful')
       cy.get('.image-div')
     })
   })

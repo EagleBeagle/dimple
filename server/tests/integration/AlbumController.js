@@ -106,7 +106,7 @@ describe('AlbumController', () => {
     })
     it('should respond with status code 200 if querying correctly for a specific album', async () => {
       const album = await Album.create({
-        name: 'album1',
+        name: 'album2',
         visibility: true,
         fk_username: 'testUser'
       })
@@ -114,7 +114,7 @@ describe('AlbumController', () => {
         .get(`/album?id=${album.id}`)
         .set('Authorization', 'Bearer ' + token)
         .send({
-          name: 'album1',
+          name: 'album2',
           description: 'this is a test album',
           visibility: true
         })
@@ -135,7 +135,7 @@ describe('AlbumController', () => {
   describe('DELETE /album', () => {
     it('should respond with status code 200 if correctly deleting an album', async () => {
       const album = await Album.create({
-        name: 'album1',
+        name: 'album3',
         visibility: true,
         fk_username: 'testUser'
       })
@@ -143,7 +143,7 @@ describe('AlbumController', () => {
         .delete(`/album/${album.id}`)
         .set('Authorization', 'Bearer ' + token)
         .send({
-          name: 'album1',
+          name: 'album3',
           description: 'this is a test album',
           visibility: true
         })
@@ -151,14 +151,14 @@ describe('AlbumController', () => {
     })
     it('should respond with status code 403 if trying to delete an album unauthorized', async () => {
       const album = await Album.create({
-        name: 'album1',
+        name: 'album4',
         visibility: true,
         fk_username: 'testUser'
       })
       await request(app)
         .delete(`/album/${album.id}`)
         .send({
-          name: 'album1',
+          name: 'album4',
           description: 'this is a test album',
           visibility: true
         })
